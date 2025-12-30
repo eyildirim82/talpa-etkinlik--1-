@@ -1,0 +1,417 @@
+/* Google Fonts - Inter (Must be first) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+/* Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* MUBI-Style Color Variables (Pure B&W) */
+:root {
+  --mubi-black: #000000;
+  --mubi-white: #FFFFFF;
+  --mubi-gray: #F5F5F5;
+  --mubi-text-secondary: #666666;
+
+  /* TALPA Corporate Colors (From Logo) */
+  --talpa-red: #C41E3A;
+  /* Kırmızı - Ana renk (logo'dan) */
+  --talpa-red-light: #D64356;
+  /* Açık kırmızı */
+  --talpa-red-dark: #A01729;
+  /* Koyu kırmızı */
+  --talpa-white: #FFFFFF;
+  /* Beyaz */
+  --talpa-gray-bg: #F8F9FA;
+  /* Footer arka plan */
+}
+
+/* Global Styles */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--mubi-white);
+  color: var(--mubi-black);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography - Cinematic Scale */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Inter', sans-serif;
+  color: var(--mubi-black);
+  margin: 0;
+  padding: 0;
+}
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 80vh;
+  min-height: 600px;
+  overflow: hidden;
+  padding-top: 110px;
+  /* Account for larger fixed header */
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4rem 2rem 3rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, transparent 100%);
+}
+
+.hero-title {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--mubi-white);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+/* Credits Style (Editorial) */
+.credits {
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mubi-white);
+  opacity: 0.9;
+}
+
+.credits-separator {
+  margin: 0 0.5rem;
+  opacity: 0.6;
+}
+
+/* Sticky Footer CTA */
+.sticky-cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--mubi-white);
+  border-top: 1px solid var(--mubi-black);
+  padding: 1rem;
+}
+
+.cta-button {
+  display: block;
+  width: 100%;
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 1.25rem 2rem;
+  background: var(--talpa-red);
+  color: var(--talpa-white);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cta-button:hover {
+  background: var(--talpa-red-light);
+}
+
+.cta-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Past Events Section */
+.past-events {
+  padding: 6rem 2rem 8rem;
+  background: var(--mubi-gray);
+}
+
+.past-events-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 3rem;
+  text-align: center;
+  color: var(--mubi-text-secondary);
+}
+
+.past-events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .past-events-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Minimal Event Card */
+.minimal-card {
+  background: var(--mubi-white);
+  overflow: hidden;
+  transition: opacity 0.2s ease;
+}
+
+.minimal-card:hover {
+  opacity: 0.7;
+}
+
+.minimal-card-image {
+  width: 100%;
+  aspect-ratio: 3/2;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(30%);
+}
+
+.minimal-card-content {
+  padding: 1.5rem 0;
+}
+
+.minimal-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--mubi-black);
+}
+
+.minimal-card-meta {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mubi-text-secondary);
+}
+
+/* Remove all shadows globally */
+*,
+*::before,
+*::after {
+  box-shadow: none !important;
+}
+
+/* Fixed Header (TALPA Branding) */
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #F8F9FA;
+  /* Light gray background */
+  border-bottom: 1px solid #E0E0E0;
+  padding: 1rem 2rem;
+}
+
+.fixed-header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-logo {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-logo-main {
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--talpa-red);
+  line-height: 1;
+}
+
+.header-logo-subtitle {
+  font-size: 0.625rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mubi-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-badge {
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mubi-text-secondary);
+}
+
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--talpa-red);
+}
+
+/* Trust Signals */
+.trust-overline {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--talpa-red);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.trust-note {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--mubi-text-secondary);
+  text-align: center;
+  margin-top: 0.75rem;
+  padding: 0 1rem;
+}
+
+.trust-note::before {
+  content: '🔒 ';
+}
+
+/* Institutional Footer */
+.institutional-footer {
+  background: var(--talpa-gray-bg);
+  padding: 4rem 2rem 2rem;
+  text-align: center;
+  border-top: 1px solid #E0E0E0;
+  margin-top: 4rem;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--talpa-red);
+  margin-bottom: 0.5rem;
+}
+
+.footer-subtitle {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--mubi-text-secondary);
+  margin-bottom: 2rem;
+}
+
+.footer-contact {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: var(--mubi-text-secondary);
+}
+
+.footer-contact p {
+  margin: 0.5rem 0;
+}
+
+.footer-social {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.footer-social a {
+  color: var(--mubi-black);
+  text-decoration: none;
+  font-size: 1.25rem;
+  transition: color 0.2s ease;
+}
+
+.footer-social a:hover {
+  color: var(--talpa-red);
+}
+
+.footer-copyright {
+  font-size: 0.75rem;
+  color: var(--mubi-text-secondary);
+  padding-top: 2rem;
+  border-top: 1px solid #E0E0E0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Clean header */
+.clean-header {
+  padding: 2rem;
+  background: var(--mubi-white);
+  border-bottom: 1px solid var(--mubi-black);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--mubi-black);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: clamp(2rem, 10vw, 4rem);
+  }
+
+  .hero-overlay {
+    padding: 2rem 1.5rem;
+  }
+
+  .past-events {
+    padding: 4rem 1.5rem 6rem;
+  }
+
+  .past-events-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .fixed-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .header-logo-main {
+    font-size: 1.25rem;
+  }
+
+  .header-logo-subtitle {
+    font-size: 0.5rem;
+  }
+
+  .institutional-footer {
+    padding: 3rem 1.5rem 1.5rem;
+  }
+}
