@@ -56,7 +56,10 @@ export const ActionZone: React.FC = () => {
 
   const getButtonContent = () => {
     // 1. Loading State
-    if (isLoadingRequest || requestMutation.isPending) {
+    // Only consider request loading if user exists (query is enabled)
+    const isRequestLoading = user && isLoadingRequest;
+
+    if (isRequestLoading || requestMutation.isPending) {
       return {
         text: 'İŞLEM SÜRÜYOR...',
         subtext: 'Lütfen bekleyiniz',
