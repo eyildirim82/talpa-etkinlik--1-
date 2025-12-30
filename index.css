@@ -24,6 +24,14 @@
   /* Beyaz */
   --talpa-gray-bg: #F8F9FA;
   /* Footer arka plan */
+  --talpa-purple: #7C3AED;
+  /* Mor - Vurgu rengi */
+  --talpa-pink: #EC4899;
+  /* Pembe - Vurgu rengi */
+  --talpa-text-primary: #0F172A;
+  /* Ana metin rengi */
+  --talpa-text-secondary: #64748B;
+  /* İkincil metin rengi */
 }
 
 /* Global Styles */

@@ -182,8 +182,8 @@ export const ActionZone: React.FC = () => {
             w-full h-24
             flex items-center justify-between px-8
             text-lg md:text-2xl font-bold tracking-widest uppercase font-mono
-            transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] active:translate-y-[2px] active:shadow-none
-            disabled:shadow-none disabled:active:translate-y-0 disabled:cursor-not-allowed
+            transition-all duration-300 active:translate-y-[2px]
+            disabled:active:translate-y-0 disabled:cursor-not-allowed
             ${btnContent.colorClass}
           `}
         >

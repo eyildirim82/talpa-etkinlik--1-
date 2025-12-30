@@ -14,6 +14,7 @@ export default {
           primary: '#0F172A', // Slate 900 - Main Text/Dark
           secondary: '#64748B', // Slate 500 - Muted Text
           accent: '#2563EB', // Blue 600 - Action
+          hover: '#1D4ED8', // Blue 700 - Hover state
           surface: '#FFFFFF', // White
           bg: '#F8FAFC', // Slate 50 - Background
           success: '#059669', // Emerald 600

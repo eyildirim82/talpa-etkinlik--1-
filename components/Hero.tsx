@@ -44,7 +44,7 @@ export const Hero: React.FC<HeroProps> = ({ isLoading = false }) => {
       />
 
       {/* Soft Gradient Overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-talpa-primary/90 via-talpa-primary/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
       {/* Modern Status Badge */}
       <div className="absolute top-6 right-6">

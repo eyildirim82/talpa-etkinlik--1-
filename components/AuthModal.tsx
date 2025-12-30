@@ -145,7 +145,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                     Şifre
                   </label>
                   {activeTab === 'login' && (
-                    <a className="text-xs font-medium text-talpa-primary hover:text-talpa-hover transition-colors cursor-pointer">
+                    <a className="text-xs font-medium text-talpa-primary hover:text-talpa-accent transition-colors cursor-pointer">
                       Şifremi Unuttum?
                     </a>
                   )}

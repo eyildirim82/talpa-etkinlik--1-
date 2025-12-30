@@ -32,7 +32,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isFeatured = false 
         <div
             className="event-card"
             style={isFeatured ? {
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
                 border: '2px solid var(--talpa-pink)'
             } : {}}
         >

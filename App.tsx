@@ -35,10 +35,10 @@ const Header: React.FC = () => {
             </div>
             <button
               onClick={() => logout()}
-              className="p-2 text-talpa-secondary hover:text-talpa-danger transition-colors bg-gray-50 hover:bg-red-50 rounded-sm border border-talpa-border"
-              title="Çıkış Yap"
+              className="px-4 py-2 text-sm font-medium text-talpa-secondary hover:text-talpa-danger transition-colors bg-gray-50 hover:bg-red-50 rounded-sm border border-talpa-border flex items-center gap-2"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4" />
+              <span>Çıkış Yap</span>
             </button>
           </div>
         ) : (
@@ -81,16 +81,13 @@ const MainContent: React.FC = () => {
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './utils/react-query';
-import { BrowserRouter } from 'react-router-dom';
 
 const App: React.FC<AppProps> = ({ initialEvent, initialUser }) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AppProvider initialEvent={initialEvent} initialUser={initialUser}>
-          <MainContent />
-        </AppProvider>
-      </BrowserRouter>
+      <AppProvider initialEvent={initialEvent} initialUser={initialUser}>
+        <MainContent />
+      </AppProvider>
     </QueryClientProvider>
   );
 };
