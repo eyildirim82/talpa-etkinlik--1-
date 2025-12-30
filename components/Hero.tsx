@@ -1,8 +1,34 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 
-export const Hero: React.FC = () => {
+interface HeroProps {
+  isLoading?: boolean;
+}
+
+export const Hero: React.FC<HeroProps> = ({ isLoading = false }) => {
   const { event } = useApp();
+
+  if (isLoading) {
+    return (
+      <div className="relative w-full h-[40vh] md:h-[50vh] bg-gray-200 overflow-hidden rounded-t-xl animate-pulse">
+        {/* Skeleton for Status Badge */}
+        <div className="absolute top-6 right-6 z-10">
+          <div className="w-24 h-8 bg-gray-300 rounded-full"></div>
+        </div>
+
+        {/* Skeleton for Title */}
+        <div className="absolute bottom-0 left-0 w-full p-6 md:p-10">
+          <div className="max-w-4xl mx-auto">
+            <div className="w-32 h-6 bg-gray-300 rounded mb-4"></div>
+            <div className="w-3/4 h-12 bg-gray-300 rounded mb-2"></div>
+            <div className="w-1/2 h-12 bg-gray-300 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) return null;
 
   // Status mapping based on boolean is_active
   const statusText = event.is_active ? 'SATIŞTA' : 'SATIŞA KAPALI';
@@ -11,12 +37,12 @@ export const Hero: React.FC = () => {
   return (
     <div className="relative w-full h-[40vh] md:h-[50vh] bg-gray-100 overflow-hidden rounded-t-xl">
       {/* Background Image */}
-      <img 
-        src={event.image_url} 
-        alt={event.title} 
+      <img
+        src={event.image_url || ''}
+        alt={event.title}
         className="w-full h-full object-cover"
       />
-      
+
       {/* Soft Gradient Overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-talpa-primary/90 via-talpa-primary/20 to-transparent" />
 

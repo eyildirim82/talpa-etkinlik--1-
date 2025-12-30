@@ -1,32 +1,16 @@
+import { Database } from './src/types/supabase';
+
 export enum EventStatus {
   BOARDING = 'BOARDING',
   CLOSED = 'CLOSED',
   STANDBY = 'STANDBY'
 }
 
-// Matches 'active_event_view' structure
-export interface EventData {
-  id: string;
-  title: string;
-  description?: string;
-  image_url: string;
-  event_date: string; // ISO string from DB
-  location: string;
-  price: number;
-  currency: string;
-  total_quota: number;
-  remaining_stock: number; // Calculated field from View
-  is_active: boolean;
-}
+// Matches 'active_event_view' structure. Note: remaining_stock is added to the view manually in SQL but should be in the generated types if the view was generated correctly.
+export type EventData = Database['public']['Views']['active_event_view']['Row'];
 
 // Matches 'profiles' table
-export interface User {
-  id: string;
-  full_name: string;
-  talpa_sicil_no?: string;
-  phone?: string;
-  role: 'admin' | 'member';
-}
+export type User = Database['public']['Tables']['profiles']['Row'];
 
 // Matches 'tickets' table
 export interface Ticket {
@@ -54,19 +38,4 @@ export interface Request {
   status: RequestStatus;
   created_at: string;
   updated_at: string;
-}
-
-export interface EventData {
-  id: string;
-  title: string;
-  description?: string;
-  image_url: string;
-  event_date: string; // ISO string from DB
-  location: string;
-  price: number;
-  currency: string;
-  total_quota: number;
-  remaining_stock: number; // Calculated field from View
-  is_active: boolean;
-  current_user_request?: Request | null; // Optional field for UI state
 }

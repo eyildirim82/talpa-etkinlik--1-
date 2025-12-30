@@ -1,10 +1,12 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { EventData, User } from '../types';
 import { logout as logoutAction } from '../actions/auth';
+import { useActiveEvent } from '../src/hooks/useActiveEvent';
+import { useProfile } from '../src/hooks/useProfile';
 
 interface AppContextType {
-  user: User | null;
-  event: EventData | null;
+  user: User | null | undefined;
+  event: EventData | null | undefined;
   isLoading: boolean;
   logout: () => Promise<void>;
 }
@@ -18,19 +20,28 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children, initialEvent, initialUser }) => {
-  const [user, setUser] = useState<User | null>(initialUser);
-  const [event] = useState<EventData | null>(initialEvent);
+  // Use React Query hooks
+  const { data: eventData, isLoading: isEventLoading } = useActiveEvent();
+  const { user: userData, isLoading: isUserLoading } = useProfile();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const logout = async () => {
     setIsLoading(true);
     await logoutAction();
-    setUser(null);
     setIsLoading(false);
+    // Note: useProfile hook monitors auth state, so it should auto-update.
+    // However, we might want to reload the page or invalidate queries.
+    window.location.reload();
   };
 
+  const finalEvent = eventData ?? initialEvent; // Fallback to initial if needed, but Query is source of truth
+  const finalUser = userData ?? initialUser;
+
+  const globalLoading = isEventLoading || isUserLoading || isLoading;
+
   return (
-    <AppContext.Provider value={{ user, event, isLoading, logout }}>
+    <AppContext.Provider value={{ user: finalUser, event: finalEvent, isLoading: globalLoading, logout }}>
       {children}
     </AppContext.Provider>
   );

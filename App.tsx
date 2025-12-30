@@ -52,10 +52,10 @@ const Header: React.FC = () => {
 };
 
 const MainContent: React.FC = () => {
-  const { event } = useApp();
+  const { event, isLoading } = useApp();
 
-  // Safety check, though parent should handle null event
-  if (!event) return null;
+  // If not loading and no event, we can't show anything useful (maybe 404 later)
+  if (!isLoading && !event) return null;
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-12">
@@ -63,7 +63,8 @@ const MainContent: React.FC = () => {
 
       {/* Main Container - Card Style */}
       <main className="flex-grow w-full max-w-4xl mx-auto bg-white shadow-sm md:rounded-b-xl md:mt-0 md:mb-12 overflow-hidden border-x border-b border-talpa-border">
-        <Hero />
+        <Hero isLoading={isLoading} />
+
         <InfoCockpit />
         <ActionZone />
       </main>
