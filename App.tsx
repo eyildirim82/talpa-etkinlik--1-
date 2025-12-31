@@ -1,20 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { Hero } from './components/Hero';
 import { InfoCockpit } from './components/InfoCockpit';
 import { ActionZone } from './components/ActionZone';
 import { EventData, User } from './types';
-import { LogOut } from 'lucide-react';
+import { LogOut, Settings } from 'lucide-react';
+import AdminPage from './src/pages/AdminPage';
 
 interface AppProps {
   initialEvent: EventData | null;
   initialUser: User | null;
 }
 
-const Header: React.FC = () => {
+type Page = 'home' | 'admin';
+
+interface HeaderProps {
+  onAdminClick: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onAdminClick }) => {
   const { user, logout } = useApp();
+  const isAdmin = user?.role === 'admin';
 
   return (
     <header className="bg-white/90 backdrop-blur-md border-b border-talpa-border h-20 sticky top-0 z-40">
@@ -28,7 +36,18 @@ const Header: React.FC = () => {
 
         {/* User Menu */}
         {user ? (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* Admin Button */}
+            {isAdmin && (
+              <button
+                onClick={onAdminClick}
+                className="px-4 py-2 text-sm font-medium text-white bg-[#C41E3A] hover:bg-[#A01729] transition-colors rounded-sm flex items-center gap-2"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Admin Panel</span>
+              </button>
+            )}
+
             <div className="text-right hidden md:block">
               <span className="block text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">KAPTAN PİLOT</span>
               <span className="block text-sm font-semibold text-talpa-primary">{user.full_name}</span>
@@ -51,7 +70,11 @@ const Header: React.FC = () => {
   );
 };
 
-const MainContent: React.FC = () => {
+interface MainContentProps {
+  onAdminClick: () => void;
+}
+
+const MainContent: React.FC<MainContentProps> = ({ onAdminClick }) => {
   const { event, isLoading } = useApp();
 
   // If not loading and no event, we can't show anything useful (maybe 404 later)
@@ -59,7 +82,7 @@ const MainContent: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-12">
-      <Header />
+      <Header onAdminClick={onAdminClick} />
 
       {/* Main Container - Card Style */}
       <main className="flex-grow w-full max-w-4xl mx-auto bg-white shadow-sm md:rounded-b-xl md:mt-0 md:mb-12 overflow-hidden border-x border-b border-talpa-border">
@@ -83,10 +106,46 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './utils/react-query';
 
 const App: React.FC<AppProps> = ({ initialEvent, initialUser }) => {
+  const [currentPage, setCurrentPage] = useState<Page>('home');
+
+  // Handle hash-based routing
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#admin') {
+        setCurrentPage('admin');
+      } else {
+        setCurrentPage('home');
+      }
+    };
+
+    // Check initial hash
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const navigateTo = (page: Page) => {
+    if (page === 'admin') {
+      window.location.hash = 'admin';
+    } else {
+      window.location.hash = '';
+    }
+    setCurrentPage(page);
+  };
+
+  // Render Admin Page
+  if (currentPage === 'admin') {
+    return <AdminPage onBack={() => navigateTo('home')} />;
+  }
+
+  // Render Main App
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider initialEvent={initialEvent} initialUser={initialUser}>
-        <MainContent />
+        <MainContent onAdminClick={() => navigateTo('admin')} />
       </AppProvider>
     </QueryClientProvider>
   );
