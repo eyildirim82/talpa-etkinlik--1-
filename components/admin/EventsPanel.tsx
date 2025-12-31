@@ -25,21 +25,27 @@ import {
 interface EventFormData {
     title: string;
     description: string;
-    location: string;
+    location_url: string;
     event_date: string;
     price: number;
-    total_quota: number;
-    image_url: string;
+    quota_asil: number;
+    quota_yedek: number;
+    cut_off_date: string;
+    status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
+    banner_image: string;
 }
 
 const initialFormData: EventFormData = {
     title: '',
     description: '',
-    location: '',
+    location_url: '',
     event_date: '',
     price: 0,
-    total_quota: 100,
-    image_url: '',
+    quota_asil: 50,
+    quota_yedek: 30,
+    cut_off_date: '',
+    status: 'DRAFT',
+    banner_image: '',
 };
 
 const inputStyle: React.CSSProperties = {
@@ -77,11 +83,14 @@ export const EventsPanel: React.FC = () => {
         setFormData({
             title: event.title,
             description: event.description || '',
-            location: event.location,
+            location_url: event.location_url || event.location || '',
             event_date: event.event_date.slice(0, 16),
             price: event.price,
-            total_quota: event.total_quota,
-            image_url: event.image_url || '',
+            quota_asil: event.quota_asil || 50,
+            quota_yedek: event.quota_yedek || 30,
+            cut_off_date: event.cut_off_date ? new Date(event.cut_off_date).toISOString().slice(0, 16) : '',
+            status: event.status || 'DRAFT',
+            banner_image: event.banner_image || event.image_url || '',
         });
         setShowModal(true);
     };
@@ -90,8 +99,9 @@ export const EventsPanel: React.FC = () => {
         e.preventDefault();
         const eventData = {
             ...formData,
-            currency: 'TL',
-            is_active: false,
+            // Convert datetime-local to ISO string
+            event_date: new Date(formData.event_date).toISOString(),
+            cut_off_date: formData.cut_off_date ? new Date(formData.cut_off_date).toISOString() : new Date(formData.event_date).toISOString(),
         };
 
         try {
@@ -106,7 +116,7 @@ export const EventsPanel: React.FC = () => {
         }
     };
 
-    const handleDelete = async (eventId: string) => {
+    const handleDelete = async (eventId: number) => {
         try {
             await deleteEvent.mutateAsync(eventId);
             setDeleteConfirm(null);
@@ -115,7 +125,7 @@ export const EventsPanel: React.FC = () => {
         }
     };
 
-    const handleSetActive = async (eventId: string) => {
+    const handleSetActive = async (eventId: number) => {
         try {
             await setActiveEvent.mutateAsync(eventId);
         } catch (error) {
@@ -189,7 +199,7 @@ export const EventsPanel: React.FC = () => {
                             key={event.id}
                             style={{
                                 background: 'linear-gradient(135deg, rgba(13, 33, 55, 0.8) 0%, rgba(10, 25, 41, 0.9) 100%)',
-                                border: event.is_active
+                                border: event.status === 'ACTIVE'
                                     ? '1px solid rgba(212, 175, 55, 0.5)'
                                     : '1px solid rgba(212, 175, 55, 0.1)',
                                 borderRadius: '16px',
@@ -197,7 +207,7 @@ export const EventsPanel: React.FC = () => {
                                 position: 'relative'
                             }}
                         >
-                            {event.is_active && (
+                            {event.status === 'ACTIVE' && (
                                 <div style={{
                                     position: 'absolute',
                                     top: 0,
@@ -228,18 +238,30 @@ export const EventsPanel: React.FC = () => {
                                     <div style={{ flex: 1, minWidth: '200px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                                             <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#E5E5E5', margin: 0 }}>{event.title}</h3>
-                                            {event.is_active && (
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.65rem',
-                                                    fontWeight: '700',
-                                                    background: 'rgba(212, 175, 55, 0.2)',
-                                                    color: '#D4AF37',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.1em'
-                                                }}>Aktif</span>
-                                            )}
+                            {event.status === 'ACTIVE' && (
+                                <span style={{
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '20px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: '700',
+                                    background: 'rgba(212, 175, 55, 0.2)',
+                                    color: '#D4AF37',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em'
+                                }}>Aktif</span>
+                            )}
+                            {event.status === 'DRAFT' && (
+                                <span style={{
+                                    padding: '0.25rem 0.75rem',
+                                    borderRadius: '20px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: '700',
+                                    background: 'rgba(156, 163, 175, 0.2)',
+                                    color: '#9CA3AF',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.1em'
+                                }}>Taslak</span>
+                            )}
                                         </div>
 
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginTop: '0.75rem' }}>
@@ -253,7 +275,7 @@ export const EventsPanel: React.FC = () => {
                                             </span>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)' }}>
                                                 <Users style={{ width: '14px', height: '14px' }} />
-                                                {event.sold_tickets || 0} / {event.total_quota}
+                                                Asil: {event.asil_count || 0} / {event.quota_asil || 0} | Yedek: {event.yedek_count || 0} / {event.quota_yedek || 0}
                                             </span>
                                         </div>
 
@@ -264,7 +286,7 @@ export const EventsPanel: React.FC = () => {
 
                                     {/* Actions */}
                                     <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                                        {!event.is_active ? (
+                                        {event.status !== 'ACTIVE' ? (
                                             <button
                                                 onClick={() => handleSetActive(event.id)}
                                                 disabled={setActiveEvent.isPending}
@@ -321,7 +343,7 @@ export const EventsPanel: React.FC = () => {
                             <div style={{ height: '4px', background: 'rgba(255,255,255,0.03)' }}>
                                 <div style={{
                                     height: '100%',
-                                    width: `${Math.min(((event.sold_tickets || 0) / event.total_quota) * 100, 100)}%`,
+                                    width: `${Math.min((((event.asil_count || 0) + (event.yedek_count || 0)) / ((event.quota_asil || 0) + (event.quota_yedek || 0))) * 100, 100)}%`,
                                     background: 'linear-gradient(90deg, #D4AF37 0%, #10B981 100%)',
                                     borderRadius: '0 2px 2px 0'
                                 }} />
@@ -388,8 +410,8 @@ export const EventsPanel: React.FC = () => {
                                     <input type="datetime-local" required value={formData.event_date} onChange={(e) => setFormData({ ...formData, event_date: e.target.value })} style={inputStyle} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Konum</label>
-                                    <input type="text" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} style={inputStyle} placeholder="İstanbul" />
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Konum (URL)</label>
+                                    <input type="url" required value={formData.location_url} onChange={(e) => setFormData({ ...formData, location_url: e.target.value })} style={inputStyle} placeholder="https://maps.google.com/..." />
                                 </div>
                             </div>
 
@@ -399,14 +421,34 @@ export const EventsPanel: React.FC = () => {
                                     <input type="number" required min="0" step="0.01" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} style={inputStyle} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Kontenjan</label>
-                                    <input type="number" required min="1" value={formData.total_quota} onChange={(e) => setFormData({ ...formData, total_quota: parseInt(e.target.value) || 0 })} style={inputStyle} />
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Durum</label>
+                                    <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as any })} style={inputStyle}>
+                                        <option value="DRAFT">Taslak</option>
+                                        <option value="ACTIVE">Aktif</option>
+                                        <option value="ARCHIVED">Arşiv</option>
+                                    </select>
                                 </div>
                             </div>
 
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Asil Kota</label>
+                                    <input type="number" required min="1" value={formData.quota_asil} onChange={(e) => setFormData({ ...formData, quota_asil: parseInt(e.target.value) || 0 })} style={inputStyle} />
+                                </div>
+                                <div>
+                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Yedek Kota</label>
+                                    <input type="number" required min="0" value={formData.quota_yedek} onChange={(e) => setFormData({ ...formData, quota_yedek: parseInt(e.target.value) || 0 })} style={inputStyle} />
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Son İptal Tarihi</label>
+                                <input type="datetime-local" required value={formData.cut_off_date} onChange={(e) => setFormData({ ...formData, cut_off_date: e.target.value })} style={inputStyle} />
+                            </div>
+
                             <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Görsel URL</label>
-                                <input type="url" value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} style={inputStyle} placeholder="https://..." />
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Afiş Görseli URL</label>
+                                <input type="url" value={formData.banner_image} onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })} style={inputStyle} placeholder="https://..." />
                             </div>
 
                             <div style={{ display: 'flex', gap: '0.75rem' }}>

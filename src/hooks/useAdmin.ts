@@ -4,25 +4,37 @@ import { supabase } from '../lib/supabase';
 // Types
 export interface AdminStats {
     totalEvents: number;
-    activeEvent: { id: string; title: string } | null;
-    totalTicketsSold: number;
+    activeEvent: { id: number; title: string } | null;
+    totalBookings: number;
+    asilCount: number;
+    yedekCount: number;
+    paidCount: number;
     totalRevenue: number;
     occupancyRate: number;
 }
 
 export interface AdminEvent {
-    id: string;
+    id: number;
     title: string;
     description: string | null;
-    image_url: string | null;
+    banner_image: string | null;
     event_date: string;
-    location: string;
+    location_url: string | null;
     price: number;
-    currency: string;
-    total_quota: number;
-    is_active: boolean;
+    quota_asil: number;
+    quota_yedek: number;
+    cut_off_date: string;
+    status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
     created_at: string;
     updated_at: string;
+    asil_count?: number;
+    yedek_count?: number;
+    paid_count?: number;
+    // Backward compatibility
+    image_url?: string | null;
+    location?: string | null;
+    total_quota?: number;
+    is_active?: boolean;
     sold_tickets?: number;
 }
 
@@ -67,16 +79,39 @@ export function useAdminEvents() {
 
             if (error) throw error;
 
-            // Get ticket counts for each event
+            // Get booking counts for each event
             const eventsWithCounts = await Promise.all(
                 (data || []).map(async (event) => {
-                    const { count } = await supabase
-                        .from('tickets')
+                    const { count: asilCount } = await supabase
+                        .from('bookings')
                         .select('*', { count: 'exact', head: true })
                         .eq('event_id', event.id)
-                        .in('status', ['pending', 'paid']);
+                        .eq('queue_status', 'ASIL');
 
-                    return { ...event, sold_tickets: count || 0 };
+                    const { count: yedekCount } = await supabase
+                        .from('bookings')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('event_id', event.id)
+                        .eq('queue_status', 'YEDEK');
+
+                    const { count: paidCount } = await supabase
+                        .from('bookings')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('event_id', event.id)
+                        .eq('payment_status', 'PAID');
+
+                    return { 
+                        ...event, 
+                        asil_count: asilCount || 0,
+                        yedek_count: yedekCount || 0,
+                        paid_count: paidCount || 0,
+                        // Backward compatibility
+                        image_url: event.banner_image,
+                        location: event.location_url,
+                        total_quota: event.quota_asil + event.quota_yedek,
+                        is_active: event.status === 'ACTIVE',
+                        sold_tickets: (asilCount || 0) + (yedekCount || 0)
+                    };
                 })
             );
 
@@ -149,32 +184,44 @@ export function useAdminStats() {
 
             if (eventsError) throw eventsError;
 
-            const activeEvent = events?.find(e => e.is_active) || null;
+            const activeEvent = events?.find(e => e.status === 'ACTIVE') || null;
 
-            // Get all tickets
-            const { data: tickets, error: ticketsError } = await supabase
-                .from('tickets')
+            // Get all bookings
+            const { data: bookings, error: bookingsError } = await supabase
+                .from('bookings')
                 .select('*, events!inner(price)')
-                .in('status', ['pending', 'paid']);
+                .in('queue_status', ['ASIL', 'YEDEK']);
 
-            if (ticketsError) throw ticketsError;
+            if (bookingsError) throw bookingsError;
 
-            const totalTicketsSold = tickets?.length || 0;
-            const totalRevenue = tickets?.reduce((sum, t: any) => sum + (t.events?.price || 0), 0) || 0;
+            const totalBookings = bookings?.length || 0;
+            const asilCount = bookings?.filter((b: any) => b.queue_status === 'ASIL').length || 0;
+            const yedekCount = bookings?.filter((b: any) => b.queue_status === 'YEDEK').length || 0;
+            const paidCount = bookings?.filter((b: any) => b.payment_status === 'PAID').length || 0;
+            const totalRevenue = bookings?.reduce((sum, b: any) => {
+                if (b.payment_status === 'PAID') {
+                    return sum + (b.events?.price || 0);
+                }
+                return sum;
+            }, 0) || 0;
 
             // Calculate occupancy for active event
             let occupancyRate = 0;
             if (activeEvent) {
-                const activeEventTickets = tickets?.filter((t: any) => t.event_id === activeEvent.id).length || 0;
-                occupancyRate = activeEvent.total_quota > 0
-                    ? Math.round((activeEventTickets / activeEvent.total_quota) * 100)
+                const activeEventBookings = bookings?.filter((b: any) => b.event_id === activeEvent.id).length || 0;
+                const totalQuota = activeEvent.quota_asil + activeEvent.quota_yedek;
+                occupancyRate = totalQuota > 0
+                    ? Math.round((activeEventBookings / totalQuota) * 100)
                     : 0;
             }
 
             return {
                 totalEvents: events?.length || 0,
                 activeEvent: activeEvent ? { id: activeEvent.id, title: activeEvent.title } : null,
-                totalTicketsSold,
+                totalBookings,
+                asilCount,
+                yedekCount,
+                paidCount,
                 totalRevenue,
                 occupancyRate,
             };
@@ -187,33 +234,20 @@ export function useAdminStats() {
 // ============================================
 
 /**
- * Set active event (direct SQL - deactivate all, then activate one)
+ * Set active event (uses RPC function)
  */
 export function useSetActiveEvent() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (eventId: string) => {
-            // First, deactivate all events
-            const { error: deactivateError } = await supabase
-                .from('events')
-                .update({ is_active: false })
-                .neq('id', '00000000-0000-0000-0000-000000000000'); // Workaround: use neq to satisfy WHERE clause requirement
+        mutationFn: async (eventId: number) => {
+            const { data, error } = await supabase.rpc('set_active_event', {
+                p_event_id: eventId
+            });
 
-            if (deactivateError) {
-                throw new Error('Etkinlikler deaktif edilirken hata: ' + deactivateError.message);
-            }
-
-            // Then, activate the selected event
-            const { data, error: activateError } = await supabase
-                .from('events')
-                .update({ is_active: true })
-                .eq('id', eventId)
-                .select()
-                .single();
-
-            if (activateError) {
-                throw new Error('Etkinlik aktif edilirken hata: ' + activateError.message);
+            if (error) throw error;
+            if (!data.success) {
+                throw new Error(data.error || 'Etkinlik aktif edilemedi.');
             }
 
             return data;
@@ -255,10 +289,21 @@ export function useCreateEvent() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (event: Omit<AdminEvent, 'id' | 'created_at' | 'updated_at' | 'sold_tickets'>) => {
+        mutationFn: async (event: Omit<AdminEvent, 'id' | 'created_at' | 'updated_at' | 'asil_count' | 'yedek_count' | 'paid_count' | 'sold_tickets' | 'image_url' | 'location' | 'total_quota' | 'is_active'>) => {
             const { data, error } = await supabase
                 .from('events')
-                .insert(event)
+                .insert({
+                    title: event.title,
+                    description: event.description,
+                    banner_image: event.banner_image,
+                    event_date: event.event_date,
+                    location_url: event.location_url,
+                    price: event.price,
+                    quota_asil: event.quota_asil,
+                    quota_yedek: event.quota_yedek,
+                    cut_off_date: event.cut_off_date,
+                    status: event.status || 'DRAFT'
+                })
                 .select()
                 .single();
 
@@ -279,10 +324,29 @@ export function useUpdateEvent() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async ({ id, ...updates }: Partial<AdminEvent> & { id: string }) => {
+        mutationFn: async ({ id, ...updates }: Partial<AdminEvent> & { id: number }) => {
+            // Map backward compatibility fields
+            const updateData: any = {};
+            if (updates.title !== undefined) updateData.title = updates.title;
+            if (updates.description !== undefined) updateData.description = updates.description;
+            if (updates.banner_image !== undefined) updateData.banner_image = updates.banner_image;
+            if (updates.image_url !== undefined) updateData.banner_image = updates.image_url; // Backward compat
+            if (updates.event_date !== undefined) updateData.event_date = updates.event_date;
+            if (updates.location_url !== undefined) updateData.location_url = updates.location_url;
+            if (updates.location !== undefined) updateData.location_url = updates.location; // Backward compat
+            if (updates.price !== undefined) updateData.price = updates.price;
+            if (updates.quota_asil !== undefined) updateData.quota_asil = updates.quota_asil;
+            if (updates.quota_yedek !== undefined) updateData.quota_yedek = updates.quota_yedek;
+            if (updates.cut_off_date !== undefined) updateData.cut_off_date = updates.cut_off_date;
+            if (updates.status !== undefined) updateData.status = updates.status;
+            if (updates.is_active !== undefined) {
+                // Backward compatibility: convert is_active to status
+                updateData.status = updates.is_active ? 'ACTIVE' : 'ARCHIVED';
+            }
+
             const { data, error } = await supabase
                 .from('events')
-                .update(updates)
+                .update(updateData)
                 .eq('id', id)
                 .select()
                 .single();
@@ -304,7 +368,7 @@ export function useDeleteEvent() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: async (eventId: string) => {
+        mutationFn: async (eventId: number) => {
             const { error } = await supabase
                 .from('events')
                 .delete()

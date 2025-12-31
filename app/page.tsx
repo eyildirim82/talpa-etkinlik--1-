@@ -6,31 +6,62 @@ import { EventData, User } from '../types';
 
 // Fetch Active Event
 async function getActiveEvent(supabase: any): Promise<EventData | null> {
-  // 1. Get the single active event
+  // 1. Get the single active event (using status = 'ACTIVE')
   const { data: eventData, error } = await supabase
     .from('events')
     .select('*')
-    .eq('is_active', true)
-    .single();
+    .eq('status', 'ACTIVE')
+    .maybeSingle();
 
   if (error || !eventData) {
+    // Fallback: try active_event_view for backward compatibility
+    const { data: viewData } = await supabase
+      .from('active_event_view')
+      .select('*')
+      .maybeSingle();
+    
+    if (viewData) {
+      return viewData;
+    }
+    
     return null;
   }
 
-  // 2. Calculate remaining stock
-  const { count, error: countError } = await supabase
-    .from('tickets')
+  // 2. Calculate remaining stock from bookings
+  const { count: asilCount } = await supabase
+    .from('bookings')
     .select('*', { count: 'exact', head: true })
     .eq('event_id', eventData.id)
-    .neq('status', 'cancelled');
+    .eq('queue_status', 'ASIL');
 
-  const soldCount = count || 0;
-  const remainingStock = (eventData.total_quota || 0) - soldCount;
+  const { count: yedekCount } = await supabase
+    .from('bookings')
+    .select('*', { count: 'exact', head: true })
+    .eq('event_id', eventData.id)
+    .eq('queue_status', 'YEDEK');
 
+  const totalBookings = (asilCount || 0) + (yedekCount || 0);
+  const totalQuota = (eventData.quota_asil || 0) + (eventData.quota_yedek || 0);
+  const remainingStock = totalQuota - totalBookings;
+
+  // Return in backward compatible format
   return {
     ...eventData,
-    remaining_stock: remainingStock < 0 ? 0 : remainingStock,
-  };
+    id: eventData.id.toString(), // Convert BIGINT to string
+    image_url: eventData.banner_image,
+    location: eventData.location_url || '',
+    currency: 'TL',
+    total_quota: totalQuota,
+    is_active: true,
+    remaining_stock: Math.max(remainingStock, 0),
+    // Include new fields for ActionZone
+    quota_asil: eventData.quota_asil,
+    quota_yedek: eventData.quota_yedek,
+    cut_off_date: eventData.cut_off_date,
+    status: eventData.status,
+    asil_count: asilCount || 0,
+    yedek_count: yedekCount || 0
+  } as any;
 }
 
 // Fetch Current User with Profile
@@ -51,6 +82,10 @@ async function getUser(supabase: any): Promise<User | null> {
     id: user.id,
     full_name: profile.full_name,
     talpa_sicil_no: profile.talpa_sicil_no,
+    sicil_no: profile.sicil_no,
+    tckn: profile.tckn,
+    email: profile.email,
+    is_admin: profile.is_admin,
     role: profile.role,
     phone: profile.phone
   };

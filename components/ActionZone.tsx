@@ -1,48 +1,43 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { AuthModal } from './AuthModal';
-import { ArrowRight, AlertCircle, User, Lock, AlertOctagon, CheckCircle2, Clock, XCircle, List } from 'lucide-react';
-import { createEventRequest, getUserRequest } from '../actions/requests';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { RequestStatus } from '../types';
+import { BookingModal } from './BookingModal';
+import { BookingStatus } from './BookingStatus';
+import { ArrowRight, AlertCircle, Lock, AlertOctagon, CheckCircle2, Clock, XCircle } from 'lucide-react';
+import { useBooking, useBookingQueuePosition } from '../src/hooks/useBooking';
+import { QueueStatus } from '../types';
 
 export const ActionZone: React.FC = () => {
   const { event, user } = useApp();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const queryClient = useQueryClient();
 
-  // 1. Check for existing request
-  const { data: userRequest, isLoading: isLoadingRequest } = useQuery({
-    queryKey: ['request', event?.id, user?.id],
-    queryFn: () => event && user ? getUserRequest(event.id) : null,
-    enabled: !!event && !!user,
-  });
+  // Convert event id to number if it's a string (backward compatibility)
+  const eventId = event?.id ? (typeof event.id === 'string' ? parseInt(event.id) : event.id) : null;
 
-  // 2. Mutation for creating request
-  const requestMutation = useMutation({
-    mutationFn: async () => {
-      if (!event) throw new Error("No event");
-      return await createEventRequest(event.id);
-    },
-    onSuccess: (result) => {
-      if (result.success) {
-        // Invalidate query to refetch status
-        queryClient.invalidateQueries({ queryKey: ['request', event?.id, user?.id] });
-      } else {
-        setErrorMsg(result.message);
-      }
-    },
-    onError: () => {
-      setErrorMsg("Bir hata oluştu.");
-    }
-  });
+  // Get user's booking for this event
+  const { data: booking, isLoading: isLoadingBooking } = useBooking(eventId || null);
+
+  // Get queue position if in yedek list
+  const { data: queuePosition } = useBookingQueuePosition(
+    eventId || null,
+    user?.id || null
+  );
 
   if (!event) return null;
 
-  // Stock Logic using DB View properties
-  const isLowStock = event.remaining_stock < 20 && event.remaining_stock > 0;
-  const isSoldOut = event.remaining_stock <= 0;
+  // Calculate availability
+  const totalQuota = (event as any).quota_asil + (event as any).quota_yedek || event.total_quota || 0;
+  const remainingStock = event.remaining_stock || 0;
+  const isLowStock = remainingStock < 20 && remainingStock > 0;
+  const isSoldOut = remainingStock <= 0;
+
+  // Calculate asil/yedek counts (if available)
+  const asilCount = (event as any).asil_count;
+  const yedekCount = (event as any).yedek_count;
+  const quotaAsil = (event as any).quota_asil || totalQuota;
+  const quotaYedek = (event as any).quota_yedek || 0;
 
   const handleAction = () => {
     if (!user) {
@@ -50,18 +45,24 @@ export const ActionZone: React.FC = () => {
       return;
     }
 
+    if (isSoldOut) {
+      return; // Button disabled
+    }
+
     setErrorMsg(null);
-    requestMutation.mutate();
+    setShowBookingModal(true);
+  };
+
+  const handleBookingSuccess = (queue: QueueStatus) => {
+    // Booking successful, modal will close automatically
+    // Query will refetch automatically via hook invalidation
   };
 
   const getButtonContent = () => {
     // 1. Loading State
-    // Only consider request loading if user exists (query is enabled)
-    const isRequestLoading = user && isLoadingRequest;
-
-    if (isRequestLoading || requestMutation.isPending) {
+    if (user && isLoadingBooking) {
       return {
-        text: 'İŞLEM SÜRÜYOR...',
+        text: 'YÜKLENİYOR...',
         subtext: 'Lütfen bekleyiniz',
         icon: <div className="w-6 h-6 border-2 border-white/30 border-t-white animate-spin rounded-full" />,
         disabled: true,
@@ -69,37 +70,29 @@ export const ActionZone: React.FC = () => {
       }
     }
 
-    // 2. Existing Request State
-    if (userRequest) {
-      switch (userRequest.status) {
-        case RequestStatus.PENDING:
+    // 2. Existing Booking State
+    if (booking) {
+      switch (booking.queue_status) {
+        case QueueStatus.ASIL:
           return {
-            text: 'TALEBİNİZ ALINDI',
-            subtext: 'Yönetici onayı bekleniyor',
-            icon: <Clock className="w-8 h-8" />,
-            disabled: true,
-            colorClass: 'bg-orange-500 text-white'
-          };
-        case RequestStatus.APPROVED:
-          return {
-            text: 'TALEBİNİZ ONAYLANDI',
-            subtext: 'Ödeme ve biletleme için hazırsınız',
+            text: '✅ KAYDINIZ ALINDI (ASİL)',
+            subtext: 'Ödeme onayından sonra biletiniz e-postanıza gelecektir',
             icon: <CheckCircle2 className="w-8 h-8" />,
-            disabled: true, // For now disabled, next step would be "Buy Ticket"
+            disabled: true,
             colorClass: 'bg-green-600 text-white'
           };
-        case RequestStatus.WAITLIST:
+        case QueueStatus.YEDEK:
           return {
-            text: 'YEDEK LİSTEDESİNİZ',
+            text: `⚠️ YEDEK LİSTEDESİNİZ${queuePosition ? ` (SIRA: ${queuePosition})` : ''}`,
             subtext: 'Yer açıldığında size haber verilecek',
-            icon: <List className="w-8 h-8" />,
+            icon: <Clock className="w-8 h-8" />,
             disabled: true,
             colorClass: 'bg-yellow-600 text-white'
           };
-        case RequestStatus.REJECTED:
+        case QueueStatus.IPTAL:
           return {
-            text: 'TALEP REDDEDİLDİ',
-            subtext: 'Bu etkinlik için talebiniz onaylanmadı',
+            text: '❌ BAŞVURUNUZ İPTAL EDİLDİ',
+            subtext: 'Bu etkinlik için başvurunuz iptal edilmiştir',
             icon: <XCircle className="w-8 h-8" />,
             disabled: true,
             colorClass: 'bg-red-600 text-white'
@@ -107,11 +100,11 @@ export const ActionZone: React.FC = () => {
       }
     }
 
-    // 3. Default State (No Request)
+    // 3. Default State (No Booking)
     if (isSoldOut) {
       return {
-        text: 'KONTENJAN DOLDU',
-        subtext: 'Yeni talepler kapandı',
+        text: '❌ KONTENJAN DOLU',
+        subtext: 'Yeni başvurular kabul edilmiyor',
         icon: <AlertCircle className="w-8 h-8" />,
         disabled: true,
         colorClass: 'bg-gray-100 text-gray-400 border-2 border-dashed border-gray-300'
@@ -120,8 +113,8 @@ export const ActionZone: React.FC = () => {
 
     if (!user) {
       return {
-        text: 'GİRİŞ YAP / KAYIT OL',
-        subtext: 'Talep oluşturmak için önce giriş yapın',
+        text: 'BİLET ALMAK İÇİN GİRİŞ YAP',
+        subtext: 'Etkinliğe katılmak için önce giriş yapın',
         icon: <Lock className="w-6 h-6" />,
         disabled: false,
         colorClass: 'bg-talpa-primary hover:bg-talpa-accent text-white'
@@ -129,8 +122,8 @@ export const ActionZone: React.FC = () => {
     }
 
     return {
-      text: 'TALEP OLUŞTUR',
-      subtext: 'Etkinliğe katılım isteği gönder',
+      text: 'HEMEN KATIL',
+      subtext: 'Etkinliğe başvuru yap',
       icon: <ArrowRight className="w-8 h-8" />,
       disabled: false,
       colorClass: 'bg-talpa-primary hover:bg-talpa-accent text-white'
@@ -150,21 +143,46 @@ export const ActionZone: React.FC = () => {
           <div className="flex items-center gap-3">
             {isSoldOut ? (
               <span className="inline-flex items-center gap-2 text-talpa-danger font-medium bg-red-50 px-3 py-1 rounded-sm text-sm border border-red-100">
-                <AlertCircle size={16} /> TALEP KAPALI
+                <AlertCircle size={16} /> BAŞVURU KAPALI
               </span>
             ) : (
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">Kalan Kontenjan</span>
-                <div className="flex items-center gap-2">
-                  <span className={`text-2xl font-mono font-bold ${isLowStock ? 'text-talpa-warning' : 'text-talpa-success'}`}>
-                    {event.remaining_stock.toString().padStart(2, '0')}
-                  </span>
-                  <span className="text-sm font-mono text-talpa-border">/ {event.total_quota}</span>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <span className="text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">Asil Kontenjan</span>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-2xl font-mono font-bold ${asilCount >= quotaAsil ? 'text-red-600' : 'text-talpa-success'}`}>
+                        {asilCount || 0}
+                      </span>
+                      <span className="text-sm font-mono text-talpa-border">/ {quotaAsil}</span>
+                    </div>
+                  </div>
+                  {quotaYedek > 0 && (
+                    <div>
+                      <span className="text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">Yedek Kontenjan</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-2xl font-mono font-bold ${yedekCount >= quotaYedek ? 'text-yellow-600' : 'text-talpa-warning'}`}>
+                          {yedekCount || 0}
+                        </span>
+                        <span className="text-sm font-mono text-talpa-border">/ {quotaYedek}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Kalan: {remainingStock} / Toplam: {totalQuota}
                 </div>
               </div>
             )}
           </div>
         </div>
+
+        {/* Booking Status Display */}
+        {booking && (
+          <div className="mb-6">
+            <BookingStatus booking={booking} queuePosition={queuePosition || undefined} />
+          </div>
+        )}
 
         {/* Error Message Display */}
         {errorMsg && (
@@ -200,7 +218,7 @@ export const ActionZone: React.FC = () => {
         {/* Footer Disclaimer */}
         <div className="mt-6 text-center border-t border-dashed border-talpa-border pt-4">
           <p className="text-[10px] md:text-xs text-talpa-secondary font-mono">
-            * TALEBİNİZ ONAYLANDIKTAN SONRA BİLET ALIM İŞLEMİNİ TAMAMLAYABİLİRSİNİZ.
+            * BAŞVURUNUZ ONAYLANDIKTAN SONRA ÖDEME İŞLEMİNİ TAMAMLAYABİLİRSİNİZ.
           </p>
         </div>
 
@@ -208,6 +226,14 @@ export const ActionZone: React.FC = () => {
 
       {/* Modals */}
       {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+      {showBookingModal && eventId && (
+        <BookingModal
+          eventId={eventId}
+          eventPrice={event.price || 0}
+          onClose={() => setShowBookingModal(false)}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </div>
   );
 };

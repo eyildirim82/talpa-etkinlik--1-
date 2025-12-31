@@ -11,44 +11,47 @@ export interface Database {
         Tables: {
             events: {
                 Row: {
-                    id: string
+                    id: number
                     title: string
                     description: string | null
-                    image_url: string | null
+                    banner_image: string | null
                     event_date: string
-                    location: string
+                    location_url: string | null
                     price: number
-                    currency: string
-                    total_quota: number
-                    is_active: boolean
+                    quota_asil: number
+                    quota_yedek: number
+                    cut_off_date: string
+                    status: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
                     created_at: string
                     updated_at: string
                 }
                 Insert: {
-                    id?: string
+                    id?: number
                     title: string
                     description?: string | null
-                    image_url?: string | null
+                    banner_image?: string | null
                     event_date: string
-                    location: string
+                    location_url?: string | null
                     price?: number
-                    currency?: string
-                    total_quota?: number
-                    is_active?: boolean
+                    quota_asil: number
+                    quota_yedek: number
+                    cut_off_date: string
+                    status?: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
                     created_at?: string
                     updated_at?: string
                 }
                 Update: {
-                    id?: string
+                    id?: number
                     title?: string
                     description?: string | null
-                    image_url?: string | null
+                    banner_image?: string | null
                     event_date?: string
-                    location?: string
+                    location_url?: string | null
                     price?: number
-                    currency?: string
-                    total_quota?: number
-                    is_active?: boolean
+                    quota_asil?: number
+                    quota_yedek?: number
+                    cut_off_date?: string
+                    status?: 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
                     created_at?: string
                     updated_at?: string
                 }
@@ -57,11 +60,111 @@ export interface Database {
                 Row: {
                     id: string
                     full_name: string
+                    tckn: string | null
+                    sicil_no: string | null
+                    email: string | null
+                    is_admin: boolean
                     talpa_sicil_no: string | null
                     phone: string | null
-                    role: 'admin' | 'member'
+                    role: 'admin' | 'member' | null
                     created_at: string
                     updated_at: string
+                }
+                Insert: {
+                    id: string
+                    full_name: string
+                    tckn?: string | null
+                    sicil_no?: string | null
+                    email?: string | null
+                    is_admin?: boolean
+                    talpa_sicil_no?: string | null
+                    phone?: string | null
+                    role?: 'admin' | 'member'
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: string
+                    full_name?: string
+                    tckn?: string | null
+                    sicil_no?: string | null
+                    email?: string | null
+                    is_admin?: boolean
+                    talpa_sicil_no?: string | null
+                    phone?: string | null
+                    role?: 'admin' | 'member'
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
+            bookings: {
+                Row: {
+                    id: number
+                    event_id: number
+                    user_id: string
+                    booking_date: string
+                    queue_status: 'ASIL' | 'YEDEK' | 'IPTAL'
+                    payment_status: 'WAITING' | 'PAID'
+                    consent_kvkk: boolean
+                    consent_payment: boolean
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: number
+                    event_id: number
+                    user_id: string
+                    booking_date?: string
+                    queue_status: 'ASIL' | 'YEDEK' | 'IPTAL'
+                    payment_status?: 'WAITING' | 'PAID'
+                    consent_kvkk?: boolean
+                    consent_payment?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    id?: number
+                    event_id?: number
+                    user_id?: string
+                    booking_date?: string
+                    queue_status?: 'ASIL' | 'YEDEK' | 'IPTAL'
+                    payment_status?: 'WAITING' | 'PAID'
+                    consent_kvkk?: boolean
+                    consent_payment?: boolean
+                    created_at?: string
+                    updated_at?: string
+                }
+            }
+            ticket_pool: {
+                Row: {
+                    id: number
+                    event_id: number
+                    file_name: string
+                    file_path: string
+                    assigned_to: string | null
+                    assigned_at: string | null
+                    is_assigned: boolean
+                    created_at: string
+                }
+                Insert: {
+                    id?: number
+                    event_id: number
+                    file_name: string
+                    file_path: string
+                    assigned_to?: string | null
+                    assigned_at?: string | null
+                    is_assigned?: boolean
+                    created_at?: string
+                }
+                Update: {
+                    id?: number
+                    event_id?: number
+                    file_name?: string
+                    file_path?: string
+                    assigned_to?: string | null
+                    assigned_at?: string | null
+                    is_assigned?: boolean
+                    created_at?: string
                 }
             }
             tickets: {
@@ -79,8 +182,63 @@ export interface Database {
         }
         Views: {
             active_event_view: {
-                Row: Database['public']['Tables']['events']['Row'] & {
+                Row: {
+                    id: number
+                    title: string
+                    description: string | null
+                    image_url: string | null
+                    event_date: string
+                    location: string | null
+                    price: number
+                    currency: string
+                    total_quota: number
+                    is_active: boolean
+                    created_at: string
+                    updated_at: string
                     remaining_stock: number
+                }
+            }
+        }
+        Functions: {
+            join_event: {
+                Args: {
+                    event_id_param: number
+                }
+                Returns: {
+                    status: 'success' | 'error'
+                    queue?: 'ASIL' | 'YEDEK'
+                    message: string
+                }
+            }
+            assign_ticket: {
+                Args: {
+                    booking_id_param: number
+                }
+                Returns: {
+                    status: 'success' | 'error'
+                    ticket_id?: number
+                    file_path?: string
+                    message: string
+                }
+            }
+            promote_from_waitlist: {
+                Args: {
+                    event_id_param: number
+                }
+                Returns: {
+                    status: 'success' | 'info' | 'error'
+                    user_id?: string
+                    message: string
+                }
+            }
+            set_active_event: {
+                Args: {
+                    event_id_param: number
+                }
+                Returns: {
+                    success: boolean
+                    error?: string
+                    message?: string
                 }
             }
         }

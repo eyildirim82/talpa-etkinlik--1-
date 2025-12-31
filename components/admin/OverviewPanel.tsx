@@ -76,7 +76,6 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, accen
 
 export const OverviewPanel: React.FC = () => {
     const { data: stats, isLoading: statsLoading } = useAdminStats();
-    const { data: tickets, isLoading: ticketsLoading } = useAdminTickets();
 
     if (statsLoading) {
         return (
@@ -95,8 +94,6 @@ export const OverviewPanel: React.FC = () => {
             </div>
         );
     }
-
-    const recentTickets = tickets?.slice(0, 10) || [];
 
     return (
         <div>
@@ -129,11 +126,18 @@ export const OverviewPanel: React.FC = () => {
                     accentColor="#3B82F6"
                 />
                 <StatCard
-                    title="Satılan Bilet"
-                    value={stats?.totalTicketsSold || 0}
-                    subtitle="Tüm etkinlikler"
-                    icon={<Ticket style={{ width: '24px', height: '24px' }} />}
+                    title="Asil Başvurular"
+                    value={stats?.asilCount || 0}
+                    subtitle={`Yedek: ${stats?.yedekCount || 0}`}
+                    icon={<Users style={{ width: '24px', height: '24px' }} />}
                     accentColor="#10B981"
+                />
+                <StatCard
+                    title="Bilet Gönderilen"
+                    value={stats?.paidCount || 0}
+                    subtitle="Ödeme onayı alınan"
+                    icon={<Ticket style={{ width: '24px', height: '24px' }} />}
+                    accentColor="#3B82F6"
                 />
                 <StatCard
                     title="Toplam Gelir"
@@ -187,125 +191,7 @@ export const OverviewPanel: React.FC = () => {
                 </div>
             )}
 
-            {/* Recent Activity */}
-            <div style={{
-                background: 'linear-gradient(135deg, rgba(13, 33, 55, 0.6) 0%, rgba(10, 25, 41, 0.8) 100%)',
-                border: '1px solid rgba(212, 175, 55, 0.1)',
-                borderRadius: '16px',
-                overflow: 'hidden'
-            }}>
-                <div style={{
-                    padding: '1.25rem 1.5rem',
-                    borderBottom: '1px solid rgba(212, 175, 55, 0.1)'
-                }}>
-                    <h3 style={{
-                        fontWeight: '600',
-                        color: '#E5E5E5',
-                        margin: 0,
-                        fontSize: '1rem'
-                    }}>Son Satışlar</h3>
-                </div>
-
-                {ticketsLoading ? (
-                    <div style={{ padding: '3rem', textAlign: 'center' }}>
-                        <Loader2 style={{
-                            width: '24px',
-                            height: '24px',
-                            animation: 'spin 1s linear infinite',
-                            color: '#D4AF37'
-                        }} />
-                    </div>
-                ) : recentTickets.length === 0 ? (
-                    <div style={{
-                        padding: '3rem',
-                        textAlign: 'center',
-                        color: 'rgba(229, 229, 229, 0.4)'
-                    }}>
-                        Henüz satış yapılmamış
-                    </div>
-                ) : (
-                    <div>
-                        {recentTickets.map((ticket, index) => (
-                            <div
-                                key={ticket.id}
-                                style={{
-                                    padding: '1rem 1.5rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'space-between',
-                                    borderBottom: index < recentTickets.length - 1
-                                        ? '1px solid rgba(255,255,255,0.03)'
-                                        : 'none',
-                                    transition: 'background 0.2s'
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '10px',
-                                        background: 'rgba(212, 175, 55, 0.1)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <Users style={{ width: '18px', height: '18px', color: '#D4AF37' }} />
-                                    </div>
-                                    <div>
-                                        <p style={{
-                                            fontWeight: '500',
-                                            color: '#E5E5E5',
-                                            margin: 0,
-                                            fontSize: '0.9rem'
-                                        }}>{ticket.user_name}</p>
-                                        <p style={{
-                                            fontSize: '0.75rem',
-                                            color: 'rgba(229, 229, 229, 0.4)',
-                                            margin: '0.125rem 0 0 0'
-                                        }}>{ticket.event_title}</p>
-                                    </div>
-                                </div>
-                                <div style={{ textAlign: 'right' }}>
-                                    <span style={{
-                                        display: 'inline-block',
-                                        padding: '0.25rem 0.75rem',
-                                        borderRadius: '20px',
-                                        fontSize: '0.7rem',
-                                        fontWeight: '600',
-                                        background: ticket.status === 'paid'
-                                            ? 'rgba(16, 185, 129, 0.15)'
-                                            : ticket.status === 'pending'
-                                                ? 'rgba(245, 158, 11, 0.15)'
-                                                : 'rgba(239, 68, 68, 0.15)',
-                                        color: ticket.status === 'paid'
-                                            ? '#10B981'
-                                            : ticket.status === 'pending'
-                                                ? '#F59E0B'
-                                                : '#EF4444'
-                                    }}>
-                                        {ticket.status === 'paid' ? 'Ödendi' :
-                                            ticket.status === 'pending' ? 'Beklemede' : 'İptal'}
-                                    </span>
-                                    <p style={{
-                                        fontSize: '0.65rem',
-                                        color: 'rgba(229, 229, 229, 0.3)',
-                                        marginTop: '0.375rem'
-                                    }}>
-                                        {new Date(ticket.purchase_date).toLocaleDateString('tr-TR', {
-                                            day: 'numeric',
-                                            month: 'short',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                        })}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            {/* Recent Activity - Removed for now, can be added back with bookings data */}
 
             <style>{`
         @keyframes spin {
