@@ -1,4 +1,5 @@
 import { createClient } from '../utils/supabase/browser'
+import * as XLSX from 'xlsx';
 
 // Helper to check admin role (updated for is_admin field)
 async function checkAdmin(): Promise<boolean> {
@@ -169,6 +170,67 @@ export async function assignTicket(bookingId: number): Promise<{ success: boolea
     return { success: false, message: data.message || 'Bilet atanamadı.' }
   }
 
+  // Helper to fetch details and send email
+  const sendTicketEmail = async () => {
+    try {
+      // Fetch booking with profile, event and ticket details
+      // Note: RPC assigned the ticket, so we need to find the ticket assigned to this booking
+      const { data: bookingData } = await supabase
+        .from('bookings')
+        .select(`
+                *,
+                profiles(email, full_name),
+                events(title),
+                ticket_pool(file_path, file_name)
+            `)
+        .eq('id', bookingId)
+        .single();
+
+      const booking = bookingData as any;
+      // The ticket_pool relation might assume one ticket. 
+      // Based on schema, booking has one ticket? No, ticket_pool has assigned_to (user_id) or similar? 
+      // Actually ticket_pool has 'assigned_to' (booking_id likely in new schema? or user_id)
+      // Let's check ticket_pool regarding this booking. 
+      // Schema says: ticket_pool.assigned_to -> profile_id? 
+      // Wait, migration check: 
+      // ticket_pool: assigned_to UUID REFERENCES profiles(id)
+      // So we can find ticket by user_id of the booking? 
+      // For now let's try to find the ticket assigned to this user for this event.
+
+      if (booking && booking.profiles?.email) {
+        const { data: ticket } = await supabase
+          .from('ticket_pool')
+          .select('file_path')
+          .eq('assigned_to', booking.user_id)
+          .eq('event_id', booking.event_id)
+          .single();
+
+        if (ticket) {
+          const { data: { publicUrl } } = supabase.storage
+            .from('tickets')
+            .getPublicUrl(ticket.file_path);
+
+          await supabase.functions.invoke('send-email', {
+            body: {
+              type: 'TICKET_ASSIGNED',
+              to: [booking.profiles.email],
+              payload: {
+                eventTitle: booking.events?.title,
+                userName: booking.profiles.full_name,
+                pdfUrl: publicUrl
+              }
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Email trigger error:', err);
+    }
+  };
+
+  // Trigger email asynchronously
+  sendTicketEmail();
+
   return { success: true, message: data.message || 'Bilet başarıyla atandı.' }
 }
 
@@ -199,8 +261,42 @@ export async function promoteFromWaitlist(eventId: number): Promise<{ success: b
 }
 
 /**
+ * Cancel a booking (admin only)
+ * Sets status to IPTAL and triggers promote_from_waitlist
+ */
+export async function cancelBooking(bookingId: number, eventId: number): Promise<{ success: boolean; message: string }> {
+  const isAdmin = await checkAdmin()
+  if (!isAdmin) {
+    return { success: false, message: 'Yetkisiz erişim.' }
+  }
+  const supabase = createClient()
+
+  // 1. Update status to IPTAL
+  const { error: updateError } = await supabase
+    .from('bookings')
+    .update({ queue_status: 'IPTAL', payment_status: 'WAITING' }) // Reset payment status too? Maybe.
+    .eq('id', bookingId)
+
+  if (updateError) {
+    console.error('Cancel Booking Error:', updateError)
+    return { success: false, message: 'İptal işlemi başarısız.' }
+  }
+
+  // 2. Trigger promote_from_waitlist
+  const promoteResult = await promoteFromWaitlist(eventId)
+
+  if (promoteResult.success) {
+    return { success: true, message: `Başvuru iptal edildi. ${promoteResult.message}` }
+  }
+
+  return { success: true, message: 'Başvuru iptal edildi. Yedek listeden geçiş yapılamadı veya liste boş.' }
+}
+
+/**
  * Export bookings to Excel format (for accounting)
  */
+
+
 export async function exportBookingsToExcel(eventId: number): Promise<Blob | null> {
   const isAdmin = await checkAdmin()
   if (!isAdmin) {
@@ -226,28 +322,30 @@ export async function exportBookingsToExcel(eventId: number): Promise<Blob | nul
     return null
   }
 
-  // Convert to CSV format (simple implementation, can be enhanced with Excel library)
-  const headers = ['Sıra', 'Ad Soyad', 'TC Kimlik No', 'Sicil No', 'E-posta', 'Başvuru Tarihi', 'Durum', 'Ödeme Durumu']
+  // Prepare data for Excel
   const rows = bookings.map((booking, index) => {
     const profile = (booking as any).profiles
-    return [
-      index + 1,
-      profile.full_name || '',
-      profile.tckn || '',
-      profile.sicil_no || '',
-      profile.email || '',
-      new Date(booking.booking_date).toLocaleString('tr-TR'),
-      booking.queue_status,
-      booking.payment_status
-    ]
+    return {
+      'Sıra': index + 1,
+      'Ad Soyad': profile.full_name || '',
+      'TC Kimlik No': profile.tckn || '',
+      'Dernek Sicil No': profile.sicil_no || '',
+      'E-posta': profile.email || '',
+      'Başvuru Tarihi': new Date(booking.booking_date).toLocaleString('tr-TR'),
+      'Durum': booking.queue_status === 'ASIL' ? 'ASİL' : (booking.queue_status === 'YEDEK' ? 'YEDEK' : booking.queue_status),
+      'Ödeme Durumu': booking.payment_status === 'PAID' ? 'ÖDENDİ' : 'BEKLİYOR'
+    }
   })
 
-  const csv = [
-    headers.join(','),
-    ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
-  ].join('\n')
+  // Create worksheet and workbook
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Başvurular");
 
-  return new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  // Generate Excel buffer
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+  return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
 }
 
 /**

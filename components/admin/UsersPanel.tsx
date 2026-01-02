@@ -22,9 +22,12 @@ const selectStyle: React.CSSProperties = {
     minWidth: '150px'
 };
 
+import { MemberImport } from './MemberImport';
+
 export const UsersPanel: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [roleFilter, setRoleFilter] = useState<string>('');
+    const [showImport, setShowImport] = useState(false);
     const [roleChangeConfirm, setRoleChangeConfirm] = useState<{
         userId: string;
         userName: string;
@@ -68,10 +71,34 @@ export const UsersPanel: React.FC = () => {
     return (
         <div>
             {/* Header */}
-            <div style={{ marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#E5E5E5', margin: 0 }}>Üyeler</h2>
-                <p style={{ color: 'rgba(229, 229, 229, 0.5)', marginTop: '0.5rem', fontSize: '0.9rem' }}>Kayıtlı üyeleri görüntüleyin ve yönetin</p>
+            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#E5E5E5', margin: 0 }}>Üyeler</h2>
+                    <p style={{ color: 'rgba(229, 229, 229, 0.5)', marginTop: '0.5rem', fontSize: '0.9rem' }}>Kayıtlı üyeleri görüntüleyin ve yönetin</p>
+                </div>
+                <button
+                    onClick={() => setShowImport(!showImport)}
+                    style={{
+                        padding: '0.75rem 1.5rem',
+                        background: showImport ? 'rgba(255,255,255,0.1)' : 'rgba(13, 148, 136, 0.2)',
+                        border: showImport ? '1px solid rgba(255,255,255,0.2)' : '1px solid rgba(13, 148, 136, 0.5)',
+                        color: showImport ? '#E5E5E5' : '#2dd4bf',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    {showImport ? 'İptal' : 'Excel ile Üye Ekle'}
+                </button>
             </div>
+
+            {/* Import Section */}
+            {showImport && (
+                <div style={{ marginBottom: '2rem' }}>
+                    <MemberImport />
+                </div>
+            )}
 
             {/* Filters */}
             <div style={{

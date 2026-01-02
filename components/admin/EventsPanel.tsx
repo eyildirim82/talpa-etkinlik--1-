@@ -71,12 +71,47 @@ export const EventsPanel: React.FC = () => {
     const [editingEvent, setEditingEvent] = useState<AdminEvent | null>(null);
     const [formData, setFormData] = useState<EventFormData>(initialFormData);
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [uploadingBanner, setUploadingBanner] = useState(false);
 
     const handleOpenCreate = () => {
         setEditingEvent(null);
         setFormData(initialFormData);
         setShowModal(true);
     };
+
+    const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingBanner(true);
+        try {
+            // Dynamic import to use the client-side supabase instance
+            const { supabase } = await import('../../src/lib/supabase');
+
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('event-banners')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('event-banners')
+                .getPublicUrl(filePath);
+
+            setFormData(prev => ({ ...prev, banner_image: publicUrl }));
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Yükleme hatası oluştu. Lütfen "event-banners" bucket\'ının oluşturulduğundan emin olun.');
+        } finally {
+            setUploadingBanner(false);
+        }
+    };
+
 
     const handleOpenEdit = (event: AdminEvent) => {
         setEditingEvent(event);
@@ -238,30 +273,30 @@ export const EventsPanel: React.FC = () => {
                                     <div style={{ flex: 1, minWidth: '200px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                                             <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#E5E5E5', margin: 0 }}>{event.title}</h3>
-                            {event.status === 'ACTIVE' && (
-                                <span style={{
-                                    padding: '0.25rem 0.75rem',
-                                    borderRadius: '20px',
-                                    fontSize: '0.65rem',
-                                    fontWeight: '700',
-                                    background: 'rgba(212, 175, 55, 0.2)',
-                                    color: '#D4AF37',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.1em'
-                                }}>Aktif</span>
-                            )}
-                            {event.status === 'DRAFT' && (
-                                <span style={{
-                                    padding: '0.25rem 0.75rem',
-                                    borderRadius: '20px',
-                                    fontSize: '0.65rem',
-                                    fontWeight: '700',
-                                    background: 'rgba(156, 163, 175, 0.2)',
-                                    color: '#9CA3AF',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.1em'
-                                }}>Taslak</span>
-                            )}
+                                            {event.status === 'ACTIVE' && (
+                                                <span style={{
+                                                    padding: '0.25rem 0.75rem',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: '700',
+                                                    background: 'rgba(212, 175, 55, 0.2)',
+                                                    color: '#D4AF37',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.1em'
+                                                }}>Aktif</span>
+                                            )}
+                                            {event.status === 'DRAFT' && (
+                                                <span style={{
+                                                    padding: '0.25rem 0.75rem',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: '700',
+                                                    background: 'rgba(156, 163, 175, 0.2)',
+                                                    color: '#9CA3AF',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: '0.1em'
+                                                }}>Taslak</span>
+                                            )}
                                         </div>
 
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginTop: '0.75rem' }}>
@@ -447,8 +482,37 @@ export const EventsPanel: React.FC = () => {
                             </div>
 
                             <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Afiş Görseli URL</label>
-                                <input type="url" value={formData.banner_image} onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })} style={inputStyle} placeholder="https://..." />
+                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Afiş Görseli</label>
+                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                    <input
+                                        type="text"
+                                        value={formData.banner_image}
+                                        onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })}
+                                        style={{ ...inputStyle, flex: 1 }}
+                                        placeholder="https://..."
+                                    />
+                                    <label style={{
+                                        padding: '0.75rem 1rem',
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(212, 175, 55, 0.2)',
+                                        borderRadius: '10px',
+                                        color: '#D4AF37',
+                                        cursor: 'pointer',
+                                        fontSize: '0.85rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}>
+                                        {uploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
+                                        <span>Yükle</span>
+                                        <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" style={{ display: 'none' }} />
+                                    </label>
+                                </div>
+                                {formData.banner_image && (
+                                    <div style={{ marginTop: '0.5rem', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <img src={formData.banner_image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }} />
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ display: 'flex', gap: '0.75rem' }}>

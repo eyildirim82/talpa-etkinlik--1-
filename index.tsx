@@ -39,7 +39,7 @@ const LoadingState = () => (
 
 // Luxury Navigation Header with Dropdown
 const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User | null; onAuthClick: () => void; onAdminClick?: () => void }) => {
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.is_admin === true;
   const [showDropdown, setShowDropdown] = useState(false);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -675,21 +675,27 @@ const AppWrapper = () => {
         const { createClient } = await import('./utils/supabase/browser');
         const supabase = createClient();
 
-        // Get current user
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-
-        if (authUser) {
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', authUser.id)
-            .single();
-
-          if (profile) {
-            setUser(profile);
+        const fetchUser = async (sessionUser: any) => {
+          if (sessionUser) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', sessionUser.id)
+              .single();
+            if (profile) setUser(profile);
+          } else {
+            setUser(null);
           }
-        }
+        };
+
+        // Initial load
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        await fetchUser(authUser);
+
+        // Listen for changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          fetchUser(session?.user);
+        });
 
         // Fetch active event from view
         const { data: activeEvent } = await supabase
@@ -702,6 +708,9 @@ const AppWrapper = () => {
         } else {
           setEvents([]);
         }
+
+        return () => subscription.unsubscribe();
+
       } catch (error) {
         console.error('[AppWrapper] Error loading data:', error);
         setEvents([]);

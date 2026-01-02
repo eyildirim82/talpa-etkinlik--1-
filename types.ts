@@ -24,7 +24,16 @@ export enum PaymentStatus {
 export type EventData = Database['public']['Views']['active_event_view']['Row'];
 
 // Matches 'profiles' table
-export type User = Database['public']['Tables']['profiles']['Row'];
+export interface User {
+  id: string;
+  full_name: string;
+  talpa_sicil_no: string | null;
+  phone: string | null;
+  is_admin: boolean | null; // Nullable if default false not strictly enforced in types yet
+  created_at: string;
+  updated_at: string;
+  email?: string;
+}
 
 // Matches 'bookings' table
 export type Booking = Database['public']['Tables']['bookings']['Row'];

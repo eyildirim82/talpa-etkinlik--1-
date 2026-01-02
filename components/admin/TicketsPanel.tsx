@@ -43,10 +43,10 @@ export const TicketsPanel: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className="bg-talpa-bg min-h-screen text-talpa-primary">
             <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Başvurular</h2>
-                <p className="text-sm text-gray-600">Etkinlik: {event.title}</p>
+                <h2 className="text-2xl font-bold text-talpa-gold mb-2">Başvurular</h2>
+                <p className="text-sm text-talpa-secondary">Etkinlik: <span className="text-white">{event.title}</span></p>
             </div>
             <BookingsTable eventId={event.id} />
         </div>

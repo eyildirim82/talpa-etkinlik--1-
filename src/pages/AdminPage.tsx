@@ -20,7 +20,7 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     const { user, isLoading } = useProfile();
     const [activeTab, setActiveTab] = useState<AdminTab>('overview');
 
-    const isAdmin = user?.role === 'admin';
+    const isAdmin = user?.is_admin === true;
 
     const handleLogout = async () => {
         const { logout } = await import('../../actions/auth');

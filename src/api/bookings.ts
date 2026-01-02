@@ -40,14 +40,16 @@ export const getBookingsWithFilters = async (
     filters?: {
         queue_status?: 'ASIL' | 'YEDEK' | 'IPTAL';
         payment_status?: 'WAITING' | 'PAID';
+        page?: number;
+        pageSize?: number;
     }
-): Promise<Booking[]> => {
+): Promise<{ data: Booking[]; count: number }> => {
     let query = supabase
         .from('bookings')
         .select(`
             *,
             profiles!inner(full_name, email, tckn, sicil_no)
-        `)
+        `, { count: 'exact' })
         .eq('event_id', eventId)
         .order('booking_date', { ascending: true });
 
@@ -59,9 +61,16 @@ export const getBookingsWithFilters = async (
         query = query.eq('payment_status', filters.payment_status);
     }
 
-    const { data, error } = await query;
+    // Pagination
+    if (filters?.page !== undefined && filters?.pageSize !== undefined) {
+        const from = (filters.page - 1) * filters.pageSize;
+        const to = from + filters.pageSize - 1;
+        query = query.range(from, to);
+    }
+
+    const { data, error, count } = await query;
 
     if (error) throw error;
-    return (data || []) as Booking[];
+    return { data: (data || []) as Booking[], count: count || 0 };
 };
 
