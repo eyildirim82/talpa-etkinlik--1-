@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../contexts/AppContext';
 import { InstrumentBox } from './ui/InstrumentBox';
+import { MapPin } from 'lucide-react';
 
 export const InfoCockpit: React.FC = () => {
   const { event } = useApp();
@@ -14,6 +15,10 @@ export const InfoCockpit: React.FC = () => {
 
   // Mock Duration (In real DB, this could be a calculated field or separate column)
   const duration = "4 Saat";
+
+  // Get location URL - prefer location_url, fallback to location for Google Maps search
+  const locationUrl = (event as any).location_url || 
+    (event.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}` : null);
 
   return (
     <div className="w-full bg-white border-b border-talpa-border">
@@ -41,7 +46,21 @@ export const InfoCockpit: React.FC = () => {
           <div className="col-span-2 md:col-span-1">
             <InstrumentBox
               label="Konum"
-              value={<div className="truncate text-base">{event.location}</div>}
+              value={
+                locationUrl ? (
+                  <a
+                    href={locationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-base hover:text-talpa-primary transition-colors truncate"
+                  >
+                    <MapPin className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{event.location}</span>
+                  </a>
+                ) : (
+                  <div className="truncate text-base">{event.location}</div>
+                )
+              }
             />
           </div>
 
@@ -53,6 +72,21 @@ export const InfoCockpit: React.FC = () => {
             />
           </div>
         </div>
+
+        {/* Description Row */}
+        {event.description && (
+          <div className="grid grid-cols-1 border-b border-talpa-border">
+            <InstrumentBox
+              className="py-6"
+              label="Açıklama"
+              value={
+                <p className="text-sm text-talpa-text-secondary leading-relaxed">
+                  {event.description}
+                </p>
+              }
+            />
+          </div>
+        )}
 
         {/* Price Row */}
         <div className="grid grid-cols-1">

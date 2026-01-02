@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useJoinEvent } from '../src/hooks/useBooking';
 import { QueueStatus } from '../types';
+import { useApp } from '../contexts/AppContext';
 
 interface BookingModalProps {
   eventId: number;
@@ -19,6 +20,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const [consentKvkk, setConsentKvkk] = useState(false);
   const [consentPayment, setConsentPayment] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const { user } = useApp();
   
   const joinEventMutation = useJoinEvent();
 
@@ -52,7 +54,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Etkinliğe Katıl</h2>
+          <h2 className="text-xl font-bold text-gray-900">Başvuru Onayı</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -61,6 +63,15 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <X className="w-6 h-6" />
           </button>
         </div>
+
+        {/* User Information */}
+        {user && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              Sayın <strong>{user.full_name}</strong>, etkinliğe ön kayıt yaptırmak üzeresiniz.
+            </p>
+          </div>
+        )}
 
         {/* Error Message */}
         {errorMsg && (

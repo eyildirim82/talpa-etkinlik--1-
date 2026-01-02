@@ -30,9 +30,21 @@ export const Hero: React.FC<HeroProps> = ({ isLoading = false }) => {
 
   if (!event) return null;
 
-  // Status mapping based on boolean is_active
-  const statusText = event.is_active ? 'SATIŞTA' : 'SATIŞA KAPALI';
-  const statusColor = event.is_active ? 'bg-talpa-success' : 'bg-talpa-danger';
+  // Status mapping based on remaining stock (kontenjan durumu)
+  const remainingStock = event.remaining_stock || 0;
+  let statusText: string;
+  let statusColor: string;
+
+  if (remainingStock <= 0) {
+    statusText = 'KONTENJAN DOLU';
+    statusColor = 'bg-talpa-danger';
+  } else if (remainingStock <= 20) {
+    statusText = 'DOLMAK ÜZERE';
+    statusColor = 'bg-yellow-500';
+  } else {
+    statusText = 'BAŞVURUYA AÇIK';
+    statusColor = 'bg-talpa-success';
+  }
 
   return (
     <div className="relative w-full h-[40vh] md:h-[50vh] bg-gray-100 overflow-hidden rounded-t-xl">

@@ -6,8 +6,9 @@ import { Hero } from './components/Hero';
 import { InfoCockpit } from './components/InfoCockpit';
 import { ActionZone } from './components/ActionZone';
 import { EventData, User } from './types';
-import { LogOut, Settings } from 'lucide-react';
+import { LogOut, Settings, LogIn } from 'lucide-react';
 import AdminPage from './src/pages/AdminPage';
+import { AuthModal } from './components/AuthModal';
 
 interface AppProps {
   initialEvent: EventData | null;
@@ -18,9 +19,10 @@ type Page = 'home' | 'admin';
 
 interface HeaderProps {
   onAdminClick: () => void;
+  onLoginClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onAdminClick }) => {
+const Header: React.FC<HeaderProps> = ({ onAdminClick, onLoginClick }) => {
   const { user, logout } = useApp();
   const isAdmin = user?.role === 'admin';
 
@@ -49,7 +51,7 @@ const Header: React.FC<HeaderProps> = ({ onAdminClick }) => {
             )}
 
             <div className="text-right hidden md:block">
-              <span className="block text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">KAPTAN PİLOT</span>
+              <span className="block text-[10px] font-bold text-talpa-secondary uppercase tracking-wider">Hoşgeldin</span>
               <span className="block text-sm font-semibold text-talpa-primary">{user.full_name}</span>
             </div>
             <button
@@ -61,9 +63,13 @@ const Header: React.FC<HeaderProps> = ({ onAdminClick }) => {
             </button>
           </div>
         ) : (
-          <div className="px-3 py-1 bg-gray-100 rounded-sm border border-gray-200">
-            <span className="text-xs font-mono font-medium text-gray-500">GUEST MODE</span>
-          </div>
+          <button
+            onClick={onLoginClick}
+            className="px-4 py-2 text-sm font-medium text-white bg-talpa-primary hover:bg-talpa-accent transition-colors rounded-sm flex items-center gap-2"
+          >
+            <LogIn className="w-4 h-4" />
+            <span>GİRİŞ YAP</span>
+          </button>
         )}
       </div>
     </header>
@@ -76,16 +82,17 @@ interface MainContentProps {
 
 const MainContent: React.FC<MainContentProps> = ({ onAdminClick }) => {
   const { event, isLoading } = useApp();
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // If not loading and no event, we can't show anything useful (maybe 404 later)
   if (!isLoading && !event) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col pb-12">
-      <Header onAdminClick={onAdminClick} />
+    <div className="min-h-screen bg-gray-50 flex flex-col pb-12 md:pb-12">
+      <Header onAdminClick={onAdminClick} onLoginClick={() => setShowAuthModal(true)} />
 
       {/* Main Container - Card Style */}
-      <main className="flex-grow w-full max-w-4xl mx-auto bg-white shadow-sm md:rounded-b-xl md:mt-0 md:mb-12 overflow-hidden border-x border-b border-talpa-border">
+      <main className="flex-grow w-full max-w-4xl mx-auto bg-white shadow-sm md:rounded-b-xl md:mt-0 md:mb-12 overflow-hidden border-x border-b border-talpa-border pb-32 md:pb-0">
         <Hero isLoading={isLoading} />
 
         <InfoCockpit />
@@ -98,6 +105,9 @@ const MainContent: React.FC<MainContentProps> = ({ onAdminClick }) => {
           © 2025 Türkiye Havayolu Pilotları Derneği
         </p>
       </footer>
+
+      {/* Auth Modal */}
+      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </div>
   );
 };

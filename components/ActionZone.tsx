@@ -133,7 +133,7 @@ export const ActionZone: React.FC = () => {
   const btnContent = getButtonContent();
 
   return (
-    <div className="w-full bg-white py-10">
+    <div className="w-full bg-white py-6 md:py-10 fixed bottom-0 left-0 right-0 z-30 md:relative md:z-auto border-t border-talpa-border md:border-t-0 shadow-lg md:shadow-none">
       <div className="max-w-4xl mx-auto px-6 md:px-0">
 
         {/* Status & User Info Bar */}
