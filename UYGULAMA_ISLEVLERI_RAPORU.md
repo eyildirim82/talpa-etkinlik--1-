@@ -523,11 +523,266 @@ TALPA Etkinlik Platformu, Türkiye Havayolu Pilotları Derneği (TALPA) üyeleri
 
 ---
 
+## Dokümantasyon ve Geliştirme Rehberleri
+
+### 1. Geliştirici Dokümantasyonu
+
+#### 1.1. DEVELOPER_SETUP.md
+**Amaç**: Yeni geliştiriciler için kurulum rehberi
+
+**İçerik**:
+- Gereksinimler (Node.js, npm, Supabase hesabı)
+- Proje kurulumu ve bağımlılık yükleme
+- Supabase projesi oluşturma ve credentials alma
+- Storage bucket'ları oluşturma (event-banners, tickets)
+- Veritabanı şeması oluşturma
+- Environment variables yapılandırması
+- Geliştirme sunucusu başlatma
+- İlk kurulum sonrası adımlar (test admin kullanıcısı, test etkinliği)
+- Yaygın sorunlar ve çözümleri
+
+**Kullanım**: Yeni geliştiriciler bu dokümanı takip ederek projeyi çalıştırabilir.
+
+#### 1.2. MODULAR_MONOLITH_GUIDE.md
+**Amaç**: Modüler monolitik mimariye geçiş rehberi
+
+**İçerik**:
+- Modüler mimari prensipleri
+- Klasör yapısı organizasyonu
+- Modül standartları (Public API Pattern)
+- Faz faz geçiş planı:
+  - Faz 1: Klasör yapısını oluşturma
+  - Faz 2: Shared Infrastructure
+  - Faz 3-7: Modül oluşturma (Auth, Profile, Event, Booking, vb.)
+  - Faz 8: Import'ları güncelleme
+  - Faz 9: Temizlik ve test
+- Dependency injection pattern
+- Type safety yaklaşımı
+
+**Kullanım**: Kod refactoring sırasında referans olarak kullanılır.
+
+### 2. Veritabanı Dokümantasyonu
+
+#### 2.1. DATABASE.md
+**Amaç**: Veritabanı şeması ve iş kuralları dokümantasyonu
+
+**İçerik**:
+- **Tablolar**:
+  - `profiles`: Kullanıcı profilleri (tckn, sicil_no, email unique)
+  - `events`: Etkinlik bilgileri (quota_asil, quota_yedek, cut_off_date, status enum)
+  - `bookings`: Başvurular ve kuyruk durumu (queue_status, payment_status)
+  - `ticket_pool`: PDF bilet havuzu (file_name, file_path, assigned_to)
+- **RPC Fonksiyonları**:
+  - `join_event()`: Kuyruk sistemine başvuru, race condition koruması
+  - `assign_ticket()`: Ödeme onayı sonrası bilet atama
+  - `promote_from_waitlist()`: Yedekten asile otomatik geçiş
+- **Row Level Security (RLS)**: Her tablo için erişim politikaları
+- **İş Kuralları**:
+  - Single Active Event prensibi
+  - Kuyruk yönetimi ve race condition koruması
+  - Bilet atama algoritması
+  - Yedekten asile geçiş mantığı
+- **Performans Optimizasyonları**: İndeksler ve query optimizasyonu
+
+**Kullanım**: Veritabanı yapısını anlamak ve sorgu yazmak için referans.
+
+#### 2.2. MIGRATION_GUIDE.md
+**Amaç**: Veritabanı migrasyonu için adım adım rehber
+
+**İçerik**:
+- Ön hazırlık (backup alma, test ortamı)
+- Adım adım migrasyon:
+  1. Yeni enum tipleri oluşturma
+  2. Profiles tablosunu güncelleme
+  3. Events tablosunu güncelleme
+  4. Ticket pool tablosunu oluşturma
+  5. Bookings tablosunu oluşturma
+  6. RPC fonksiyonlarını oluşturma
+  7. RLS politikalarını güncelleme
+  8. Storage bucket'larını oluşturma
+- Veri migrasyonu (eski tickets → bookings)
+- Geri alma planı (rollback)
+- Doğrulama adımları
+
+**Kullanım**: Production'a geçiş sırasında SQL komutlarını çalıştırmak için.
+
+### 3. Geliştirme ve Uygulama Dokümantasyonu
+
+#### 3.1. IMPLEMENTATION_CHECKLIST.md
+**Amaç**: Uygulama için detaylı kontrol listesi
+
+**İçerik**:
+- **Veritabanı ve Tip Tanımları**:
+  - Enum tipleri, tablo güncellemeleri
+  - TypeScript tip güncellemeleri
+- **Servis Katmanı**:
+  - RPC entegrasyonu
+  - Auth servisi
+  - Storage servisi
+- **Frontend Geliştirmeleri**:
+  - Layout ve routing
+  - Sayfa geliştirmeleri (Login, Landing Page, Admin Panel)
+  - Yeni component'ler (BookingModal, BookingStatus, TicketPoolManager)
+- **Test ve Doğrulama**:
+  - Kuyruk testi
+  - Bilet dağıtım testi
+  - İptal ve yedek yönetimi testi
+  - Excel import testi
+  - Storage testi
+  - RLS testi
+- **Performans ve Optimizasyon**: Database indeksleri, query optimizasyonu
+
+**Kullanım**: Her görev tamamlandığında işaretlenmelidir.
+
+#### 3.2. REVISION_REQUIREMENTS.md
+**Amaç**: Revizyon gereksinimlerinin detaylı analizi
+
+**İçerik**:
+- **Kritik Değişiklikler**:
+  - Bilet satın alma → Başvuru sistemi
+  - Stok yönetimi → Kuyruk yönetimi
+  - QR kod → PDF bilet
+- **Veritabanı Değişiklikleri**: Yeni tablolar, güncellenen tablolar, yeni RPC fonksiyonları
+- **API ve Servis Değişiklikleri**: Yeni Server Actions, güncellenen hooks
+- **Frontend Değişiklikleri**: Yeni component'ler, güncellenen component'ler, sayfa güncellemeleri
+- **Güvenlik Gereksinimleri**: RLS politikaları, race condition koruması, input validation
+- **Performans Gereksinimleri**: Database indeksleri, query optimizasyonu, storage optimizasyonu
+- **Excel Import Gereksinimleri**: Format, iş kuralları, çakışma yönetimi
+
+**Kullanım**: Geliştirme sırasında referans olarak kullanılır.
+
+#### 3.3. REVISION_INDEX.md
+**Amaç**: Revizyon dokümanlarının indeksi
+
+**İçerik**:
+- Revizyon gereksinimleri kaynakları (SRS.md, veritabani.md, UI-UX.md, plan.md)
+- Oluşturulan dokümanların özeti ve kullanım amaçları
+- Revizyon akışı (Hazırlık → Migrasyon → Kod → Test → Dokümantasyon)
+- Önemli notlar (veritabanı değişiklikleri, API değişiklikleri, frontend değişiklikleri)
+- Kaldırılan dokümanlar ve nedenleri
+
+**Kullanım**: Revizyon sürecini anlamak ve hangi dokümana bakılacağını belirlemek için.
+
+### 4. Test Dokümantasyonu
+
+#### 4.1. TESTING.md
+**Amaç**: Test yapısı ve genel test dokümantasyonu
+
+**İçerik**:
+- Test yapısı (Vitest ve React Testing Library)
+- Test kategorileri:
+  - Unit Tests (API fonksiyonları, Hook'lar, Utils)
+  - Component Tests (React component'leri)
+  - Integration Tests (Modüller arası etkileşimler)
+- Test çalıştırma komutları:
+  - `npm test` - Tüm testleri çalıştırma
+  - `npm run test:watch` - Watch mode
+  - `npm run test:ui` - UI mode
+  - `npm run test:coverage` - Coverage raporu
+- Test utilities (Test Data Factory, Supabase Mock, React Query Wrapper)
+- Best practices (Mock stratejisi, test data, isolation, coverage hedefleri)
+- CI/CD entegrasyonu
+
+**Kullanım**: Test yazma ve çalıştırma için genel rehber.
+
+#### 4.2. TEST_GUIDE.md
+**Amaç**: Test yazma rehberi ve örnekler
+
+**İçerik**:
+- Yeni test dosyası oluşturma:
+  - API testi örneği
+  - Hook testi örneği
+  - Component testi örneği
+- Mock kullanımı (Supabase Mock, React Query Mock)
+- Test senaryoları (Başarılı senaryo, hata senaryosu, edge cases)
+- Yaygın hatalar ve çözümler
+- Örnek test dosyaları referansları
+
+**Kullanım**: Yeni test yazarken örnek olarak kullanılır.
+
+#### 4.3. TESTING_GUIDE.md
+**Amaç**: Test senaryoları ve test adımları
+
+**İçerik**:
+- **Test Ortamı Hazırlığı**: Supabase test projesi, test kullanıcıları, test etkinliği, test bilet havuzu
+- **Birim Testleri**:
+  - `join_event` fonksiyonu testleri (başarılı asil, yedek listeye düşme, kontenjan dolu, vb.)
+  - `assign_ticket` fonksiyonu testleri
+  - `promote_from_waitlist` fonksiyonu testleri
+  - RLS politikası testleri
+- **Entegrasyon Testleri**: Başvuru akışı, admin bilet atama, yedekten asile geçiş
+- **Kullanıcı Senaryoları**: 5 farklı senaryo (başarılı başvuru, yedek listeye düşme, kontenjan dolu, admin etkinlik oluşturma, admin bilet atama)
+- **Performans Testleri**: Eşzamanlı başvuru testi, büyük liste performansı, ZIP yükleme performansı
+- **Güvenlik Testleri**: RLS testleri, yetki testleri, SQL injection testi, XSS testi
+- **Test Verileri**: Örnek test kullanıcıları, test etkinliği, test booking'leri
+- **Test Checklist**: Ön hazırlık, birim testler, entegrasyon testler, kullanıcı senaryoları, performans testler, güvenlik testler
+
+**Kullanım**: Her test senaryosu uygulanmalı ve sonuçlar kaydedilmelidir.
+
+### 5. Eksiklikler ve Tespitler
+
+#### 5.1. eksikler.md
+**Amaç**: Kod tabanında tespit edilen eksiklikler
+
+**İçerik**:
+- **Eksik Bileşenler**:
+  - `TicketPoolManager.tsx`: Bilet havuzu yönetimi bileşeni
+  - `BookingsTable.tsx`: Başvurular tablosu bileşeni
+  - `ActionZone.tsx`: Ana sayfa buton mantığı güncellemesi
+- **Eksik Sayfalar**:
+  - `/admin/tickets`: Bilet yönetimi sayfası
+  - `/ticket/[id]`: Bilet görüntüleme sayfası
+- **Eksik Entegrasyonlar**:
+  - Bilet atama UI entegrasyonu
+  - ZIP yükleme UI entegrasyonu
+  - Admin navigasyonu
+- **API Durumu**: Hangi API'lerin uygulandığı ve hangilerinin eksik olduğu
+- **Öncelikli Aksiyonlar**: Eksikliklerin giderilmesi için öneriler
+
+**Kullanım**: Geliştirme önceliklerini belirlemek için.
+
+---
+
+## Dokümantasyon Kullanım Rehberi
+
+### Yeni Geliştirici İçin
+1. **DEVELOPER_SETUP.md** → Projeyi kurmak için
+2. **MODULAR_MONOLITH_GUIDE.md** → Mimariyi anlamak için
+3. **DATABASE.md** → Veritabanı yapısını öğrenmek için
+4. **TESTING.md** ve **TEST_GUIDE.md** → Test yazmak için
+
+### Veritabanı Migrasyonu İçin
+1. **MIGRATION_GUIDE.md** → Adım adım migrasyon rehberi
+2. **DATABASE.md** → Şema referansı
+
+### Geliştirme Süreci İçin
+1. **IMPLEMENTATION_CHECKLIST.md** → Görevleri takip etmek için
+2. **REVISION_REQUIREMENTS.md** → Gereksinimleri anlamak için
+3. **eksikler.md** → Eksiklikleri görmek için
+
+### Test Süreci İçin
+1. **TESTING_GUIDE.md** → Test senaryolarını uygulamak için
+2. **TEST_GUIDE.md** → Test yazma örnekleri için
+
+### Genel Bakış İçin
+1. **REVISION_INDEX.md** → Tüm dokümanların indeksi
+2. **UYGULAMA_ISLEVLERI_RAPORU.md** (bu rapor) → Tüm işlevlerin özeti
+
+---
+
 ## Sonuç
 
 TALPA Etkinlik Platformu, dernek üyeleri için kapsamlı bir etkinlik yönetim ve biletleme sistemi sunmaktadır. Platform, adil bir kuyruk sistemi, güvenli ödeme süreci ve otomatik bilet dağıtımı ile etkinlik yönetimini kolaylaştırmaktadır. Modüler mimari yapısı sayesinde bakımı kolay ve genişletilebilir bir sistemdir.
 
+Platform, kapsamlı bir dokümantasyon seti ile desteklenmektedir:
+- **Geliştirici Rehberleri**: Kurulum, mimari, veritabanı
+- **Geliştirme Dokümantasyonu**: Kontrol listeleri, gereksinimler, eksiklikler
+- **Test Dokümantasyonu**: Test senaryoları, rehberler, örnekler
+- **Migrasyon Rehberleri**: Veritabanı migrasyonu için adım adım kılavuz
+
+Bu dokümantasyon seti, yeni geliştiricilerin projeye hızlıca adapte olmasını, mevcut geliştiricilerin referans bulmasını ve sistemin bakımını kolaylaştırmaktadır.
+
 ---
 
-**Not**: Bu rapor, mevcut kod tabanı ve dokümantasyon analiz edilerek hazırlanmıştır. Sistemin güncel durumu için kod tabanına bakılması önerilir.
+**Not**: Bu rapor, mevcut kod tabanı ve dokümantasyon analiz edilerek hazırlanmıştır. Sistemin güncel durumu için kod tabanına ve ilgili dokümantasyon dosyalarına bakılması önerilir.
 

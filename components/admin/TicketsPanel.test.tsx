@@ -46,7 +46,7 @@ describe('TicketsPanel', () => {
 
   it('should display BookingsTable when active event exists', () => {
     const mockEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       title: 'Test Etkinliği',
     })
 
@@ -64,7 +64,7 @@ describe('TicketsPanel', () => {
 
   it('should display event title in header', () => {
     const mockEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       title: 'Yılbaşı Galası',
     })
 
@@ -96,7 +96,7 @@ describe('TicketsPanel', () => {
 
   it('should handle string event ID', () => {
     const mockEvent = createMockActiveEvent({
-      id: '456',
+      id: 456,
       title: 'Test Event',
     })
 

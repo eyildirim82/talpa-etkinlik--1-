@@ -3,7 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 
-export interface AuthSession {
+// Internal state interface
+interface SessionState {
   user: User | null
   session: Session | null
 }
@@ -15,7 +16,7 @@ export function useSession() {
   const supabase = createBrowserClient()
   const queryClient = useQueryClient()
 
-  const { data: session, isLoading } = useQuery<AuthSession>({
+  const { data: session, isLoading } = useQuery<SessionState>({
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession()

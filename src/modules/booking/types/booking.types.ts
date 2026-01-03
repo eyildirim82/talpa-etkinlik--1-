@@ -7,8 +7,16 @@ export type Booking = Database['public']['Tables']['bookings']['Row']
 export type BookingInsert = Database['public']['Tables']['bookings']['Insert']
 export type BookingUpdate = Database['public']['Tables']['bookings']['Update']
 
-export type QueueStatus = 'ASIL' | 'YEDEK' | 'IPTAL'
-export type PaymentStatus = 'WAITING' | 'PAID'
+export enum QueueStatus {
+  ASIL = 'ASIL',
+  YEDEK = 'YEDEK',
+  IPTAL = 'IPTAL'
+}
+
+export enum PaymentStatus {
+  WAITING = 'WAITING',
+  PAID = 'PAID'
+}
 
 export interface JoinEventResult {
   success: boolean

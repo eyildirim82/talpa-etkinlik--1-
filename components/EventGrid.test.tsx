@@ -31,7 +31,7 @@ describe('EventGrid', () => {
 
   it('should display active event as featured', () => {
     const activeEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       title: 'Aktif Etkinlik',
       remaining_stock: 10,
     })
@@ -46,7 +46,7 @@ describe('EventGrid', () => {
 
   it('should display "Aktif Etkinlik" heading when active event exists', () => {
     const activeEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       remaining_stock: 5,
     })
 
@@ -57,7 +57,7 @@ describe('EventGrid', () => {
 
   it('should display past events section when past events exist', () => {
     const pastEvent = createMockActiveEvent({
-      id: '2',
+      id: 2,
       title: 'Geçmiş Etkinlik',
       remaining_stock: 0,
     })
@@ -72,17 +72,17 @@ describe('EventGrid', () => {
 
   it('should display both active and past events', () => {
     const activeEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       title: 'Aktif Etkinlik',
       remaining_stock: 10,
     })
     const pastEvent1 = createMockActiveEvent({
-      id: '2',
+      id: 2,
       title: 'Geçmiş Etkinlik 1',
       remaining_stock: 0,
     })
     const pastEvent2 = createMockActiveEvent({
-      id: '3',
+      id: 3,
       title: 'Geçmiş Etkinlik 2',
       remaining_stock: 0,
     })
@@ -97,7 +97,7 @@ describe('EventGrid', () => {
 
   it('should not display past events section when no past events', () => {
     const activeEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       remaining_stock: 10,
     })
 
@@ -108,7 +108,7 @@ describe('EventGrid', () => {
 
   it('should not display active event section when no active event', () => {
     const pastEvent = createMockActiveEvent({
-      id: '1',
+      id: 1,
       remaining_stock: 0,
     })
 
@@ -120,9 +120,9 @@ describe('EventGrid', () => {
 
   it('should handle multiple past events', () => {
     const pastEvents = [
-      createMockActiveEvent({ id: '1', title: 'Etkinlik 1', remaining_stock: 0 }),
-      createMockActiveEvent({ id: '2', title: 'Etkinlik 2', remaining_stock: 0 }),
-      createMockActiveEvent({ id: '3', title: 'Etkinlik 3', remaining_stock: 0 }),
+      createMockActiveEvent({ id: 1, title: 'Etkinlik 1', remaining_stock: 0 }),
+      createMockActiveEvent({ id: 2, title: 'Etkinlik 2', remaining_stock: 0 }),
+      createMockActiveEvent({ id: 3, title: 'Etkinlik 3', remaining_stock: 0 }),
     ]
 
     render(<EventGrid events={pastEvents} />)
@@ -134,12 +134,12 @@ describe('EventGrid', () => {
 
   it('should prioritize first active event when multiple active events exist', () => {
     const activeEvent1 = createMockActiveEvent({
-      id: '1',
+      id: 1,
       title: 'İlk Aktif Etkinlik',
       remaining_stock: 5,
     })
     const activeEvent2 = createMockActiveEvent({
-      id: '2',
+      id: 2,
       title: 'İkinci Aktif Etkinlik',
       remaining_stock: 3,
     })

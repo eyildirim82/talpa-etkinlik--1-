@@ -3,6 +3,14 @@ import { EventData } from '../../../types';
 
 // Cinematic Hero Section
 export const CinematicHero = ({ event }: { event: EventData }) => {
+    const formatLocation = (loc: string) => {
+        if (!loc) return '';
+        if (loc.startsWith('http') || loc.length > 50) {
+            return 'KONUM BİLGİSİ';
+        }
+        return loc.split('-')[0].trim().toUpperCase();
+    };
+
     return (
         <section style={{
             position: 'relative',
@@ -52,7 +60,9 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 textAlign: 'center',
-                padding: '0 2rem'
+                padding: '0 2rem',
+                maxWidth: '100vw',
+                overflow: 'hidden'
             }}>
                 {/* Main Title - Serif */}
                 <h1 style={{
@@ -62,7 +72,11 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
                     color: '#D4AF37',
                     lineHeight: '1',
                     marginBottom: '1.5rem',
-                    letterSpacing: '-0.02em'
+                    letterSpacing: '-0.02em',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                 }}>
                     {event.title.split(' ').slice(0, 2).join(' ')}
                 </h1>
@@ -89,7 +103,11 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
                     color: '#E5E5E5',
                     letterSpacing: '0.15em',
                     textTransform: 'uppercase',
-                    marginBottom: '3rem'
+                    marginBottom: '3rem',
+                    maxWidth: '100%',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
                 }}>
                     {new Date(event.event_date).toLocaleDateString('tr-TR', {
                         day: 'numeric',
@@ -100,7 +118,7 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
                         weekday: 'long'
                     }).toUpperCase()}
                     {' · '}
-                    {event.location.split('-')[0].trim().toUpperCase()}
+                    {formatLocation(event.location)}
                     {' · '}
                     {new Date(event.event_date).toLocaleTimeString('tr-TR', {
                         hour: '2-digit',

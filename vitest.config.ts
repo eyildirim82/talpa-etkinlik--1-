@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react() as any],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -48,11 +48,28 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, '.'),
-      '@/modules': path.resolve(__dirname, './src/modules'),
-      '@/shared': path.resolve(__dirname, './src/shared'),
-    },
+    alias: [
+      {
+        find: 'react',
+        replacement: path.resolve(__dirname, 'node_modules/react'),
+      },
+      {
+        find: 'react-dom',
+        replacement: path.resolve(__dirname, 'node_modules/react-dom'),
+      },
+      {
+        find: '@/modules',
+        replacement: path.resolve(__dirname, './src/modules'),
+      },
+      {
+        find: '@/shared',
+        replacement: path.resolve(__dirname, './src/shared'),
+      },
+      {
+        find: '@',
+        replacement: path.resolve(__dirname, '.'),
+      },
+    ],
   },
 })
 

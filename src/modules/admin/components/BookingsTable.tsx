@@ -97,141 +97,166 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
         }
     };
 
+    const clearFilters = () => {
+        setFilters({
+            text: '',
+            status: 'ALL',
+            payment: 'ALL'
+        });
+    };
+
     return (
         <div className="space-y-4">
-            {/* Filters & Actions */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between bg-slate-900/50 p-4 rounded-lg border border-slate-800">
-                <div className="flex gap-2">
-                    <select
-                        className="bg-slate-800 border border-slate-700 text-slate-300 rounded px-3 py-2 text-sm"
-                        value={filters.status}
-                        onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
-                    >
-                        <option value="ALL">Tüm Durumlar</option>
-                        <option value="ASIL">Asil Liste</option>
-                        <option value="YEDEK">Yedek Liste</option>
-                        <option value="IPTAL">İptal Edilenler</option>
-                    </select>
+            {/* Filters Section */}
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-end">
+                    <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-slate-500">Durum</label>
+                            <select
+                                className="w-full md:w-48 bg-white text-slate-900 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all shadow-sm"
+                                value={filters.status}
+                                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
+                            >
+                                <option value="ALL">Tüm Durumlar</option>
+                                <option value="ASIL">Asil Liste</option>
+                                <option value="YEDEK">Yedek Liste</option>
+                                <option value="IPTAL">İptal Edilenler</option>
+                            </select>
+                        </div>
 
-                    <select
-                        className="bg-slate-800 border border-slate-700 text-slate-300 rounded px-3 py-2 text-sm"
-                        value={filters.payment}
-                        onChange={(e) => setFilters(prev => ({ ...prev, payment: e.target.value as any }))}
-                    >
-                        <option value="ALL">Tüm Ödemeler</option>
-                        <option value="WAITING">Bekleyenler</option>
-                        <option value="PAID">Ödenenler</option>
-                    </select>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-medium text-slate-500">Ödeme</label>
+                            <select
+                                className="w-full md:w-48 bg-white text-slate-900 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all shadow-sm"
+                                value={filters.payment}
+                                onChange={(e) => setFilters(prev => ({ ...prev, payment: e.target.value as any }))}
+                            >
+                                <option value="ALL">Tüm Ödemeler</option>
+                                <option value="WAITING">Bekleyenler</option>
+                                <option value="PAID">Ödenenler</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={handleExport}
+                            className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                        >
+                            <Download className="w-4 h-4" /> Excel İndir
+                        </button>
+                    </div>
                 </div>
 
-                <div className="flex gap-2">
-                    <button
-                        onClick={handleExport}
-                        className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded text-sm transition-colors"
-                    >
-                        <Download className="w-4 h-4" /> Excel İndir
-                    </button>
-                    <button
-                        onClick={loadBookings}
-                        className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition-colors"
-                    >
-                        <Search className="w-4 h-4" />
-                    </button>
+                <div className="mt-4 text-sm text-slate-500 font-medium">
+                    Toplam: <span className="text-slate-900 font-bold">{totalCount}</span> kayıt
                 </div>
             </div>
 
-            {/* Table */}
-            <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-950 text-slate-400 uppercase text-xs">
-                            <tr>
-                                <th className="px-6 py-4">Sıra</th>
-                                <th className="px-6 py-4">Kişi Bilgileri</th>
-                                <th className="px-6 py-4">Başvuru Tarihi</th>
-                                <th className="px-6 py-4">Sıra Durumu</th>
-                                <th className="px-6 py-4">Ödeme</th>
-                                <th className="px-6 py-4 text-right">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800">
-                            {bookings.map((booking, index) => {
-                                const profile = booking.profiles;
-                                return (
-                                    <tr key={booking.id} className="hover:bg-slate-800/30 transition-colors">
-                                        <td className="px-6 py-4 text-slate-500 font-mono">
-                                            #{index + 1}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
-                                                    <User className="w-4 h-4" />
-                                                </div>
-                                                <div>
-                                                    <div className="text-white font-medium">{profile?.full_name}</div>
-                                                    <div className="text-slate-500 text-xs">{profile?.email}</div>
-                                                    <div className="text-slate-600 text-xs">TC: {profile?.tckn}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 text-slate-400">
-                                            {new Date(booking.booking_date).toLocaleString('tr-TR')}
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`px-2 py-1 rounded text-xs font-medium ${booking.queue_status === 'ASIL' ? 'bg-green-900/30 text-green-400' :
-                                                    booking.queue_status === 'YEDEK' ? 'bg-yellow-900/30 text-yellow-400' :
-                                                        'bg-red-900/30 text-red-400'
-                                                }`}>
-                                                {booking.queue_status}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`flex items-center gap-1.5 text-xs font-medium ${booking.payment_status === 'PAID' ? 'text-green-400' : 'text-slate-400'
-                                                }`}>
-                                                {booking.payment_status === 'PAID' ? (
-                                                    <><Check className="w-3 h-3" /> Ödendi</>
-                                                ) : (
-                                                    <><CreditCard className="w-3 h-3" /> Bekliyor</>
-                                                )}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2">
-                                                {booking.payment_status === 'WAITING' && booking.queue_status !== 'IPTAL' && (
-                                                    <button
-                                                        onClick={() => handleAssignTicket(booking.id)}
-                                                        disabled={processingId === booking.id}
-                                                        className="p-1.5 hover:bg-green-900/30 text-green-400 rounded transition-colors"
-                                                        title="Ödemeyi Onayla ve Bilet Ata"
-                                                    >
-                                                        <Check className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                                {booking.queue_status !== 'IPTAL' && (
-                                                    <button
-                                                        onClick={() => handleCancel(booking.id)}
-                                                        disabled={processingId === booking.id}
-                                                        className="p-1.5 hover:bg-red-900/30 text-red-400 rounded transition-colors"
-                                                        title="İptal Et"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                            {bookings.length === 0 && !loading && (
+            {/* Content Section */}
+            <div className="bg-white border border-slate-200 rounded-lg overflow-hidden min-h-[400px] relative">
+                {bookings.length > 0 ? (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 uppercase text-xs border-b border-slate-200">
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-500">
-                                        Kayıt bulunamadı.
-                                    </td>
+                                    <th className="px-6 py-4 font-semibold">Sıra</th>
+                                    <th className="px-6 py-4 font-semibold">Kişi Bilgileri</th>
+                                    <th className="px-6 py-4 font-semibold">Başvuru Tarihi</th>
+                                    <th className="px-6 py-4 font-semibold">Sıra Durumu</th>
+                                    <th className="px-6 py-4 font-semibold">Ödeme</th>
+                                    <th className="px-6 py-4 font-semibold text-right">İşlemler</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {bookings.map((booking, index) => {
+                                    const profile = booking.profiles;
+                                    return (
+                                        <tr key={booking.id} className="hover:bg-slate-50 transition-colors">
+                                            <td className="px-6 py-4 text-slate-500 font-mono font-medium">
+                                                #{index + 1}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500">
+                                                        <User className="w-4 h-4" />
+                                                    </div>
+                                                    <div>
+                                                        <div className="text-slate-900 font-medium">{profile?.full_name}</div>
+                                                        <div className="text-slate-500 text-xs">{profile?.email}</div>
+                                                        <div className="text-slate-400 text-xs">TC: {profile?.tckn}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500">
+                                                {new Date(booking.booking_date).toLocaleString('tr-TR')}
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${booking.queue_status === 'ASIL' ? 'bg-green-100 text-green-700' :
+                                                    booking.queue_status === 'YEDEK' ? 'bg-amber-100 text-amber-700' :
+                                                        'bg-red-100 text-red-700'
+                                                    }`}>
+                                                    {booking.queue_status}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`flex items-center gap-1.5 text-xs font-medium ${booking.payment_status === 'PAID' ? 'text-green-600' : 'text-slate-500'
+                                                    }`}>
+                                                    {booking.payment_status === 'PAID' ? (
+                                                        <><Check className="w-3 h-3" /> Ödendi</>
+                                                    ) : (
+                                                        <><CreditCard className="w-3 h-3" /> Bekliyor</>
+                                                    )}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    {booking.payment_status === 'WAITING' && booking.queue_status !== 'IPTAL' && (
+                                                        <button
+                                                            onClick={() => handleAssignTicket(booking.id)}
+                                                            disabled={processingId === booking.id}
+                                                            className="p-1.5 hover:bg-green-50 text-green-600 rounded transition-colors"
+                                                            title="Ödemeyi Onayla ve Bilet Ata"
+                                                        >
+                                                            <Check className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                    {booking.queue_status !== 'IPTAL' && (
+                                                        <button
+                                                            onClick={() => handleCancel(booking.id)}
+                                                            disabled={processingId === booking.id}
+                                                            className="p-1.5 hover:bg-red-50 text-red-600 rounded transition-colors"
+                                                            title="İptal Et"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                            <Search className="w-10 h-10 text-slate-300" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-2">Kayıt bulunamadı</h3>
+                        <p className="text-slate-500 max-w-sm mb-8">
+                            Seçilen kriterlere uygun başvuru veya bilet bulunmamaktadır. Filtreleri değiştirerek tekrar deneyin.
+                        </p>
+                        <button
+                            onClick={clearFilters}
+                            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all shadow-sm"
+                        >
+                            Filtreleri Temizle
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

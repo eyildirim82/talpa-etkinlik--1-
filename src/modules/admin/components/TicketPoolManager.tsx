@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { uploadTicketPool } from '@/api/storage';
+import { uploadTicketPool } from '@/src/api/storage';
 import { getTicketStats, getTicketPool } from '@/modules/ticket/api/ticket.api';
 import type { TicketStats, TicketPool } from '@/modules/ticket/types/ticket.types';
 

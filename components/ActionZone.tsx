@@ -5,7 +5,7 @@ import { BookingModal } from '@/modules/booking';
 import { BookingStatus } from '@/modules/booking';
 import { ArrowRight, AlertCircle, Lock, AlertOctagon, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { useBooking, useBookingQueuePosition } from '@/modules/booking';
-import type { QueueStatus } from '@/modules/booking';
+import { QueueStatus } from '@/modules/booking';
 
 export const ActionZone: React.FC = () => {
   const { event, user } = useApp();

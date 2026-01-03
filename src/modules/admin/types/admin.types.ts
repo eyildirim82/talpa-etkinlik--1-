@@ -59,6 +59,7 @@ export interface AdminTicket {
 export interface AdminUser {
   id: string
   full_name: string
+  email?: string
   talpa_sicil_no: string | null
   phone: string | null
   role: 'admin' | 'member'

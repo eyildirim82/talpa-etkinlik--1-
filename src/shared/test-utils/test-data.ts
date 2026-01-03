@@ -29,8 +29,10 @@ export const createMockProfile = (overrides?: Partial<Profile>): Profile => ({
   is_admin: false,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  tckn: '12345678901', // Default value required
+  is_verified: true,
   ...overrides,
-})
+} as unknown as Profile)
 
 export const createMockEvent = (overrides?: Partial<Event>): Event => ({
   id: 1,
@@ -46,11 +48,12 @@ export const createMockEvent = (overrides?: Partial<Event>): Event => ({
   status: 'ACTIVE',
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  remaining_stock: 50,
   ...overrides,
-})
+} as unknown as Event)
 
 export const createMockActiveEvent = (overrides?: Partial<ActiveEvent>): ActiveEvent => ({
-  id: '1',
+  id: 1, // Changed to number
   title: 'Test Event',
   description: 'Test event description',
   banner_image: 'https://example.com/banner.jpg',
@@ -69,21 +72,27 @@ export const createMockActiveEvent = (overrides?: Partial<ActiveEvent>): ActiveE
   remaining_stock: 30,
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  asil_count: 0,
+  yedek_count: 0,
+  paid_count: 0,
   ...overrides,
-})
+} as unknown as ActiveEvent)
 
-export const createMockBooking = (overrides?: Partial<Booking>): Booking => ({
+// Extend Booking type for tests that include profiles
+export const createMockBooking = (overrides?: Partial<Booking & { profiles?: Profile }>): Booking & { profiles?: Profile } => ({
   id: 1,
   event_id: 1,
   user_id: 'user-1',
   booking_date: '2024-01-15T10:00:00Z',
-  queue_status: 'ASIL',
+  queue_status: 'ASIL', // Type checker will accept string literal if it matches Enum value
   payment_status: 'WAITING',
   created_at: '2024-01-15T10:00:00Z',
   updated_at: '2024-01-15T10:00:00Z',
+  consent_kvkk: true,
+  consent_payment: true,
   profiles: createMockProfile(),
   ...overrides,
-})
+} as unknown as Booking & { profiles?: Profile })
 
 export const createMockAdminEvent = (overrides?: Partial<AdminEvent>): AdminEvent => ({
   id: 1,
