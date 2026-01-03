@@ -6,36 +6,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MUBI-Style Color Variables (Pure B&W) */
+/* MUBI-Style and TALPA Tokens are now handled via Tailwind Config */
 :root {
+  /* Legacy mappings for components not yet refactored */
   --mubi-black: #000000;
   --mubi-white: #FFFFFF;
-  --mubi-gray: #F5F5F5;
-  --mubi-text-secondary: #666666;
-
-  /* TALPA Corporate Colors (From Logo) */
   --talpa-red: #C41E3A;
-  /* Kırmızı - Ana renk (logo'dan) */
   --talpa-red-light: #D64356;
-  /* Açık kırmızı */
-  --talpa-red-dark: #A01729;
-  /* Koyu kırmızı */
-  --talpa-white: #FFFFFF;
-  /* Beyaz */
-  --talpa-gray-bg: #F8F9FA;
-  /* Footer arka plan */
-  --talpa-purple: #7C3AED;
-  /* Mor - Vurgu rengi */
-  --talpa-pink: #EC4899;
-  /* Pembe - Vurgu rengi */
-  --talpa-text-primary: #0F172A;
-  /* Ana metin rengi */
-  --talpa-text-secondary: #64748B;
-  /* İkincil metin rengi */
+  --talpa-gold: #D4AF37;
 }
 
 /* Global Styles */
-body {
+html, body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background-color: var(--mubi-white);
   color: var(--mubi-black);
@@ -43,6 +25,23 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+body {
+  position: relative;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 /* Typography - Cinematic Scale */
@@ -122,33 +121,7 @@ h6 {
   padding: 1rem;
 }
 
-.cta-button {
-  display: block;
-  width: 100%;
-  max-width: 48rem;
-  margin: 0 auto;
-  padding: 1.25rem 2rem;
-  background: var(--talpa-red);
-  color: var(--talpa-white);
-  font-size: 1rem;
-  font-weight: 700;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border: none;
-  border-radius: 0.25rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cta-button:hover {
-  background: var(--talpa-red-light);
-}
-
-.cta-button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+/* .cta-button class is deprecated. Use <Button> component instead. */
 
 /* Past Events Section */
 .past-events {

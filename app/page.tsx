@@ -1,5 +1,5 @@
 import React from 'react';
-import { createClient } from '../utils/supabase/server';
+import { createServerClient } from '@/shared/infrastructure/supabase';
 import App from '../App';
 import { EmptyState } from '../components/EmptyState';
 import { EventData, User } from '../types';
@@ -92,7 +92,7 @@ async function getUser(supabase: any): Promise<User | null> {
 }
 
 export default async function Page() {
-  const supabase = createClient();
+  const supabase = await createServerClient();
   
   // Execute in parallel for performance
   const [activeEvent, currentUser] = await Promise.all([

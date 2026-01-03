@@ -1,9 +1,9 @@
 import React from 'react';
-import { createClient } from '../../utils/supabase/server';
+import { createServerClient } from '@/shared/infrastructure/supabase';
 import { AlertCircle, CreditCard, Users, TrendingUp } from 'lucide-react';
 
 export default async function AdminDashboard() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // Fetch Active Event
   const { data: event } = await supabase

@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<any>(null);
+    const supabase = createBrowserClient();
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -20,7 +21,7 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
         });
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [supabase]);
 
     if (loading) {
         return (

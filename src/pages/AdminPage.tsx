@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '../../utils/react-query';
-import { useProfile } from '../hooks/useProfile';
+import { useProfile } from '@/modules/profile';
 import {
     AdminLayout,
     AdminTab,
@@ -23,7 +23,7 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     const isAdmin = user?.is_admin === true;
 
     const handleLogout = async () => {
-        const { logout } = await import('../../actions/auth');
+        const { logout } = await import('@/modules/auth');
         await logout();
         window.location.reload();
     };

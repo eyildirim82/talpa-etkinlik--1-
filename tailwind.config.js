@@ -22,6 +22,9 @@ export default {
           danger: '#E11D48', // Rose 600
           warning: '#D97706', // Amber 600
           border: '#334155', // Slate 700 (Darker border)
+          red: '#C41E3A', // Primary Brand Red
+          'red-light': '#D64356',
+          'red-dark': '#A01729',
         }
       }
     },
@@ -30,4 +33,3 @@ export default {
     require("tailwindcss-animate"),
   ],
 }
-

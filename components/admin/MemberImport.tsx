@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { supabase } from '../../src/lib/supabase';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
 interface MemberData {
     tckn: string;
@@ -17,6 +17,7 @@ export const MemberImport: React.FC = () => {
     const [data, setData] = useState<MemberData[]>([]);
     const [importing, setImporting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const supabase = createBrowserClient();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];

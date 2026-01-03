@@ -22,9 +22,22 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/modules/*": [
+        "./src/modules/*"
+      ],
+      "@/shared/*": [
+        "./src/shared/*"
       ]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "src/__tests__",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "app"
+  ]
 }

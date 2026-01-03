@@ -19,8 +19,8 @@ import {
     useCreateEvent,
     useUpdateEvent,
     useDeleteEvent,
-    AdminEvent,
-} from '../../src/hooks/useAdmin';
+    type AdminEvent,
+} from '@/modules/admin';
 
 interface EventFormData {
     title: string;

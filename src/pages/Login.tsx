@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
 import { Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
 
 const Login: React.FC = () => {
@@ -10,6 +10,7 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const supabase = createBrowserClient();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();

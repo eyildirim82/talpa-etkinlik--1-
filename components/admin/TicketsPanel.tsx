@@ -1,28 +1,17 @@
 'use client'
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { createClient } from '../../utils/supabase/browser';
+import React, { useState } from 'react';
+import { useActiveEvent } from '@/modules/event';
 import { BookingsTable } from './BookingsTable';
-import { AlertCircle } from 'lucide-react';
+import { TicketPoolManager } from './TicketPoolManager';
+import { AlertCircle, Tickets, Users } from 'lucide-react';
 
 export const TicketsPanel: React.FC = () => {
-    const supabase = createClient();
+    const [activeTab, setActiveTab] = useState<'bookings' | 'pool'>('bookings');
 
     // Get Active Event
-    const { data: event, isLoading } = useQuery({
-        queryKey: ['activeEvent'],
-        queryFn: async () => {
-            const { data, error } = await supabase
-                .from('events')
-                .select('id, title')
-                .eq('status', 'ACTIVE')
-                .maybeSingle();
-
-            if (error) throw error;
-            return data;
-        }
-    });
+    const { data: eventData, isLoading } = useActiveEvent();
+    const event = eventData ? { id: typeof eventData.id === 'string' ? parseInt(eventData.id) : eventData.id, title: eventData.title } : null;
 
     if (isLoading) {
         return (
@@ -44,11 +33,42 @@ export const TicketsPanel: React.FC = () => {
 
     return (
         <div className="bg-talpa-bg min-h-screen text-talpa-primary">
-            <div className="mb-6">
-                <h2 className="text-2xl font-bold text-talpa-gold mb-2">Başvurular</h2>
-                <p className="text-sm text-talpa-secondary">Etkinlik: <span className="text-white">{event.title}</span></p>
+            <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold text-talpa-gold mb-1">Bilet ve Başvuru Yönetimi</h2>
+                    <p className="text-sm text-talpa-secondary">Etkinlik: <span className="text-white">{event.title}</span></p>
+                </div>
+
+                <div className="bg-talpa-card border border-talpa-border/50 p-1 rounded-lg flex items-center shadow-lg shadow-black/20">
+                    <button
+                        onClick={() => setActiveTab('bookings')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'bookings'
+                                ? 'bg-talpa-gold/10 text-talpa-gold shadow-sm border border-talpa-gold/20'
+                                : 'text-talpa-secondary hover:text-talpa-primary hover:bg-white/5'
+                            }`}
+                    >
+                        <Users className="w-4 h-4" />
+                        Başvurular
+                    </button>
+                    <div className="w-px h-4 bg-talpa-border/50 mx-1"></div>
+                    <button
+                        onClick={() => setActiveTab('pool')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${activeTab === 'pool'
+                                ? 'bg-talpa-gold/10 text-talpa-gold shadow-sm border border-talpa-gold/20'
+                                : 'text-talpa-secondary hover:text-talpa-primary hover:bg-white/5'
+                            }`}
+                    >
+                        <Tickets className="w-4 h-4" />
+                        Bilet Havuzu
+                    </button>
+                </div>
             </div>
-            <BookingsTable eventId={event.id} />
+
+            {activeTab === 'bookings' ? (
+                <BookingsTable eventId={event.id} />
+            ) : (
+                <TicketPoolManager eventId={event.id} />
+            )}
         </div>
     );
 };

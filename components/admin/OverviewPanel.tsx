@@ -8,7 +8,7 @@ import {
     Activity,
     Loader2
 } from 'lucide-react';
-import { useAdminStats, useAdminTickets } from '../../src/hooks/useAdmin';
+import { useAdminStats, useAdminTickets } from '@/modules/admin';
 
 interface StatCardProps {
     title: string;

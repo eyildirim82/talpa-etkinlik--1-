@@ -48,15 +48,23 @@ export default defineConfig(({ mode }) => {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
     },
     resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-        // Next.js paketlerini boş modüle yönlendir (Vite bunları işlemesin)
-        'next': path.resolve(__dirname, 'vite-next-stub.js'),
-        'next/server': path.resolve(__dirname, 'vite-next-stub.js'),
-        'next/headers': path.resolve(__dirname, 'vite-next-stub.js'),
-        'next/cache': path.resolve(__dirname, 'vite-next-stub.js'),
-        'next/navigation': path.resolve(__dirname, 'vite-next-stub.js'),
-      },
+      alias: [
+        // Daha spesifik alias'lar önce gelmeli
+        {
+          find: '@/modules',
+          replacement: path.resolve(__dirname, './src/modules'),
+        },
+        {
+          find: '@/shared',
+          replacement: path.resolve(__dirname, './src/shared'),
+        },
+        {
+          find: '@',
+          replacement: path.resolve(__dirname, '.'),
+        },
+      ],
+      extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
+      mainFields: ['module', 'jsnext:main', 'jsnext'],
       // Next.js paketlerini resolve etme
       conditions: [],
     },

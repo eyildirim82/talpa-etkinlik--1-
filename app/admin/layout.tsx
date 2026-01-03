@@ -1,11 +1,11 @@
 import React from 'react';
-import { createClient } from '../../utils/supabase/server';
+import { createServerClient } from '@/shared/infrastructure/supabase';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LayoutDashboard, Calendar, Users, LogOut, Plane } from 'lucide-react';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  const supabase = await createServerClient();
 
   // 1. Security Check
   const { data: { user } } = await supabase.auth.getUser();

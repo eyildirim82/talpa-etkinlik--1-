@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { useJoinEvent } from '../src/hooks/useBooking';
-import { QueueStatus } from '../types';
+import { useJoinEvent } from '@/modules/booking';
+import type { QueueStatus } from '@/modules/booking';
 import { useApp } from '../contexts/AppContext';
 
 interface BookingModalProps {
@@ -27,6 +27,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    // Kullanıcı kontrolü
+    if (!user) {
+      setErrorMsg('İşlem için giriş yapmalısınız. Lütfen sayfayı yenileyip tekrar deneyin.');
+      return;
+    }
 
     if (!consentKvkk || !consentPayment) {
       setErrorMsg('KVKK ve ödeme onaylarını vermelisiniz.');
@@ -65,10 +71,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         </div>
 
         {/* User Information */}
-        {user && (
+        {user ? (
           <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-800">
               Sayın <strong>{user.full_name}</strong>, etkinliğe ön kayıt yaptırmak üzeresiniz.
+            </p>
+          </div>
+        ) : (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">
+              <strong>Uyarı:</strong> Giriş yapmamış görünüyorsunuz. Lütfen sayfayı yenileyip tekrar deneyin.
             </p>
           </div>
         )}

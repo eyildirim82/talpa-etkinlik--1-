@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { EventData, User } from '../types';
-import { logout as logoutAction } from '../actions/auth';
-import { useActiveEvent } from '../src/hooks/useActiveEvent';
-import { useProfile } from '../src/hooks/useProfile';
+import { logout } from '@/modules/auth';
+import { useActiveEvent } from '@/modules/event';
+import { useProfile } from '@/modules/profile';
 
 interface AppContextType {
   user: User | null | undefined;
@@ -26,9 +26,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, initialEvent
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const logout = async () => {
+  const handleLogout = async () => {
     setIsLoading(true);
-    await logoutAction();
+    await logout();
     setIsLoading(false);
     // Note: useProfile hook monitors auth state, so it should auto-update.
     // However, we might want to reload the page or invalidate queries.
@@ -41,7 +41,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, initialEvent
   const globalLoading = isEventLoading || isUserLoading || isLoading;
 
   return (
-    <AppContext.Provider value={{ user: finalUser, event: finalEvent, isLoading: globalLoading, logout }}>
+    <AppContext.Provider value={{ user: finalUser, event: finalEvent, isLoading: globalLoading, logout: handleLogout }}>
       {children}
     </AppContext.Provider>
   );

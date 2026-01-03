@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle, User, Lock } from 'lucide-react';
-import { login, signup } from '../actions/auth';
+import { useQueryClient } from '@tanstack/react-query';
+import { loginWithFormData, signupWithFormData } from '@/modules/auth';
+import { Button } from '../src/components/common/Button';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -12,6 +14,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
   const [activeTab, setActiveTab] = useState<Tab>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -21,12 +24,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
     const formData = new FormData(e.currentTarget);
 
     try {
-      const action = activeTab === 'login' ? login : signup;
+      const action = activeTab === 'login' ? loginWithFormData : signupWithFormData;
       const result = await action(formData);
 
       if (!result.success) {
         setError(result.message);
       } else {
+        // Giriş başarılı olduğunda profile ve booking query'lerini invalidate et
+        // Bu sayede auth state otomatik olarak güncellenecek
+        queryClient.invalidateQueries({ queryKey: ['profile'] });
+        queryClient.invalidateQueries({ queryKey: ['booking'] });
+        queryClient.invalidateQueries({ queryKey: ['activeEvent'] });
         onClose();
       }
     } catch (err) {
@@ -167,17 +175,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
               </div>
 
               <div>
-                <button
+                <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-talpa-primary hover:bg-talpa-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-talpa-primary transition-all duration-200 uppercase tracking-wide disabled:opacity-70 disabled:cursor-wait"
+                  isLoading={isLoading}
+                  fullWidth
+                  variant="primary"
+                  className="uppercase tracking-wide font-bold"
                 >
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white animate-spin rounded-full" />
-                  ) : (
-                    'GİRİŞ YAP'
-                  )}
-                </button>
+                  {activeTab === 'login' ? 'GİRİŞ YAP' : 'KAYIT OL'}
+                </Button>
               </div>
 
             </form>

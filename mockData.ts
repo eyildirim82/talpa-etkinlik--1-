@@ -3,7 +3,7 @@ import { EventData, User } from './types';
 // Mock Event Data - Multiple Events
 export const mockEvents: EventData[] = [
     {
-        id: 'event-001',
+        id: 1,
         title: 'TALPA Yıl Sonu Kokteyl & Networking Etkinliği',
         description: 'Değerli üyelerimiz, 2025 yılını kutlamak ve havacılık camiası olarak bir araya gelmek için düzenlediğimiz özel kokteyl etkinliğimize davetlisiniz.',
         location: 'İstanbul Havacılık Kulübü - Yeşilköy',
@@ -13,10 +13,12 @@ export const mockEvents: EventData[] = [
         price: 500,
         currency: 'TL',
         is_active: true,
-        image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     },
     {
-        id: 'event-002',
+        id: 2,
         title: 'CMXXIV Stand-up Gösterisi',
         description: 'Eğlenceli bir akşam için CMXXIV ile stand-up gösterisine bekliyoruz.',
         location: 'İstanbul Kültür Merkezi',
@@ -26,10 +28,12 @@ export const mockEvents: EventData[] = [
         price: 350,
         currency: 'TL',
         is_active: false,
-        image_url: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     },
     {
-        id: 'event-003',
+        id: 3,
         title: 'BORUSAN İSTANBUL FİLARMONİ ORKESTRASI KONSERİ',
         description: 'Klasik müziğin büyülü atmosferinde unutulmaz bir gece.',
         location: 'Cemal Reşit Rey Konser Salonu',
@@ -39,10 +43,12 @@ export const mockEvents: EventData[] = [
         price: 600,
         currency: 'TL',
         is_active: false,
-        image_url: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     },
     {
-        id: 'event-004',
+        id: 4,
         title: 'Dünya Pilotlar Günü Balosu',
         description: 'Pilotlar Günü özel balo gecesine tüm üyelerimiz davetlidir.',
         location: 'Lütfi Kırdar Kongre Merkezi',
@@ -52,10 +58,12 @@ export const mockEvents: EventData[] = [
         price: 750,
         currency: 'TL',
         is_active: false,
-        image_url: 'https://images.unsplash.com/photo-1519167758481-83f29da8dd8f?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1519167758481-83f29da8dd8f?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     },
     {
-        id: 'event-005',
+        id: 5,
         title: 'SAATLERİ AYARLAMA ENSTİTÜSÜ',
         description: 'Ünlü tiyatro oyunu Saatleri Ayarlama Enstitüsü gösteriminde yerinizi ayırtın.',
         location: 'Zorlu PSM',
@@ -65,10 +73,12 @@ export const mockEvents: EventData[] = [
         price: 400,
         currency: 'TL',
         is_active: false,
-        image_url: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     },
     {
-        id: 'event-006',
+        id: 6,
         title: 'AFİFE TİYATRO',
         description: 'Türk tiyatrosunun öncüsü Afife Jale\'nin hikayesi sahnede.',
         location: 'İstanbul Devlet Tiyatrosu',
@@ -78,7 +88,9 @@ export const mockEvents: EventData[] = [
         price: 350,
         currency: 'TL',
         is_active: false,
-        image_url: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=1200&h=700&fit=crop'
+        image_url: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=1200&h=700&fit=crop',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
     }
 ];
 
@@ -87,8 +99,10 @@ export const mockUser: User = {
     id: 'mock-user-001',
     full_name: 'Ahmet Yılmaz',
     talpa_sicil_no: 'TALPA-2024-1234',
-    role: 'member',
-    phone: '+90 532 123 4567'
+    is_admin: false,
+    phone: '+90 532 123 4567',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
 };
 
 // Function to simulate async data loading

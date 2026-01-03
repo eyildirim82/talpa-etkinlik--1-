@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Upload, FileText, AlertCircle, Loader2, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../src/lib/supabase';
-import { TicketPool } from '../../types';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
+import { getTicketPool, getTicketStats } from '@/modules/ticket';
+import { processTicketZip } from '@/modules/file-processing';
+import type { TicketPool } from '@/modules/ticket';
 
 interface TicketPoolManagerProps {
   eventId: number;
@@ -14,22 +16,12 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const pageSize = 20;
+  const supabase = createBrowserClient();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['ticketPool', eventId, page],
     queryFn: async () => {
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
-
-      const { data, error, count } = await supabase
-        .from('ticket_pool')
-        .select('*', { count: 'exact' })
-        .eq('event_id', eventId)
-        .order('file_name', { ascending: true })
-        .range(from, to);
-
-      if (error) throw error;
-      return { data: (data || []) as TicketPool[], count: count || 0 };
+      return await getTicketPool(eventId, page, pageSize);
     },
     placeholderData: (prev) => prev
   });
@@ -42,17 +34,11 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
   const { data: stats } = useQuery({
     queryKey: ['ticketStats', eventId],
     queryFn: async () => {
-      const { count: total } = await supabase
-        .from('ticket_pool').select('*', { count: 'exact', head: true }).eq('event_id', eventId);
-
-      const { count: assigned } = await supabase
-        .from('ticket_pool').select('*', { count: 'exact', head: true }).eq('event_id', eventId).eq('is_assigned', true);
-
-      return { total: total || 0, assigned: assigned || 0 };
+      return await getTicketStats(eventId);
     }
   });
 
-  const unassignedCount = (stats?.total || 0) - (stats?.assigned || 0);
+  const unassignedCount = stats?.unassigned || 0;
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -81,22 +67,15 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
 
       setStatusMessage('Biletler sunucuda işleniyor (bu işlem birkaç saniye sürebilir)...');
 
-      // 2. Invoke 'process-zip' Edge Function
-      const { data: funcData, error: funcError } = await supabase.functions.invoke('process-zip', {
-        body: {
-          eventId: eventId,
-          filePath: filePath
-        }
-      });
+      // 2. Process ZIP file
+      const result = await processTicketZip(eventId, filePath);
 
-      if (funcError) throw funcError;
-
-      if (!funcData.success) {
-        throw new Error(funcData.error || 'İşlem başarısız oldu.');
+      if (!result.success) {
+        throw new Error(result.message || 'İşlem başarısız oldu.');
       }
 
       setStatusMessage(null);
-      alert(`${funcData.processedCount} bilet başarıyla işlendi ve eklendi.`);
+      alert(`${result.count} bilet başarıyla işlendi ve eklendi.`);
 
       refetch();
 

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../contexts/AppContext';
 import { AuthModal } from './AuthModal';
-import { BookingModal } from './BookingModal';
-import { BookingStatus } from './BookingStatus';
+import { BookingModal } from '@/modules/booking';
+import { BookingStatus } from '@/modules/booking';
 import { ArrowRight, AlertCircle, Lock, AlertOctagon, CheckCircle2, Clock, XCircle } from 'lucide-react';
-import { useBooking, useBookingQueuePosition } from '../src/hooks/useBooking';
-import { QueueStatus } from '../types';
+import { useBooking, useBookingQueuePosition } from '@/modules/booking';
+import type { QueueStatus } from '@/modules/booking';
 
 export const ActionZone: React.FC = () => {
   const { event, user } = useApp();

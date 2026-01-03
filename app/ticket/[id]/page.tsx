@@ -1,5 +1,5 @@
 import React from 'react';
-import { createClient } from '../../../utils/supabase/server';
+import { createServerClient } from '@/shared/infrastructure/supabase';
 import { redirect, notFound } from 'next/navigation';
 import { QrCode, Plane, Download, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function TicketPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   // 1. Get Current User
   const { data: { user } } = await supabase.auth.getUser();

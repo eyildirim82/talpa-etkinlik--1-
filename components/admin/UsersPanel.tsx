@@ -7,7 +7,7 @@ import {
     Loader2,
     AlertCircle,
 } from 'lucide-react';
-import { useAdminUsers, useUpdateUserRole } from '../../src/hooks/useAdmin';
+import { useAdminUsers, useUpdateUserRole } from '@/modules/admin';
 
 const selectStyle: React.CSSProperties = {
     padding: '0.75rem 1rem',
