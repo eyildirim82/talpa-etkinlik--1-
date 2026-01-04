@@ -12,6 +12,7 @@ import {
     X,
     Save,
     AlertCircle,
+    AlertTriangle,
 } from 'lucide-react';
 import {
     useAdminEvents,
@@ -21,6 +22,7 @@ import {
     useDeleteEvent,
     type AdminEvent,
 } from '@/modules/admin';
+import { supabase } from '@/src/lib/supabase';
 
 interface EventFormData {
     title: string;
@@ -48,17 +50,9 @@ const initialFormData: EventFormData = {
     banner_image: '',
 };
 
-const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '0.75rem 1rem',
-    background: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(212, 175, 55, 0.2)',
-    borderRadius: '10px',
-    color: '#E5E5E5',
-    fontSize: '0.9rem',
-    outline: 'none',
-    transition: 'border-color 0.2s'
-};
+// Tailwind input classes
+const inputClasses = "w-full px-4 py-3 bg-white/5 border border-gold/20 rounded-lg text-light text-sm outline-none transition-colors focus:border-gold/50 placeholder:text-light/30";
+const labelClasses = "block text-xs text-light/60 mb-2 uppercase tracking-wider";
 
 export const EventsPanel: React.FC = () => {
     const { data: events, isLoading } = useAdminEvents();
@@ -70,8 +64,13 @@ export const EventsPanel: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingEvent, setEditingEvent] = useState<AdminEvent | null>(null);
     const [formData, setFormData] = useState<EventFormData>(initialFormData);
-    const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+    const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
+    const [activeConfirm, setActiveConfirm] = useState<number | null>(null);
     const [uploadingBanner, setUploadingBanner] = useState(false);
+
+    // Find current active event for confirmation message
+    const currentActiveEvent = events?.find(e => e.status === 'ACTIVE');
+    const eventToActivate = events?.find(e => e.id === activeConfirm);
 
     const handleOpenCreate = () => {
         setEditingEvent(null);
@@ -85,9 +84,6 @@ export const EventsPanel: React.FC = () => {
 
         setUploadingBanner(true);
         try {
-            // Dynamic import to use the client-side supabase instance
-            const { supabase } = await import('../../src/lib/supabase');
-
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
             const filePath = `${fileName}`;
@@ -112,7 +108,6 @@ export const EventsPanel: React.FC = () => {
         }
     };
 
-
     const handleOpenEdit = (event: AdminEvent) => {
         setEditingEvent(event);
         setFormData({
@@ -134,7 +129,6 @@ export const EventsPanel: React.FC = () => {
         e.preventDefault();
         const eventData = {
             ...formData,
-            // Convert datetime-local to ISO string
             event_date: new Date(formData.event_date).toISOString(),
             cut_off_date: formData.cut_off_date ? new Date(formData.cut_off_date).toISOString() : new Date(formData.event_date).toISOString(),
         };
@@ -163,6 +157,7 @@ export const EventsPanel: React.FC = () => {
     const handleSetActive = async (eventId: number) => {
         try {
             await setActiveEvent.mutateAsync(eventId);
+            setActiveConfirm(null);
         } catch (error) {
             console.error('Error setting active event:', error);
         }
@@ -170,8 +165,8 @@ export const EventsPanel: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px' }}>
-                <Loader2 style={{ width: '40px', height: '40px', animation: 'spin 1s linear infinite', color: '#D4AF37' }} />
+            <div className="flex items-center justify-center h-[300px]">
+                <Loader2 className="w-10 h-10 text-gold animate-spin" />
             </div>
         );
     }
@@ -179,209 +174,127 @@ export const EventsPanel: React.FC = () => {
     return (
         <div>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
                 <div>
-                    <h2 style={{ fontSize: '1.75rem', fontWeight: '700', color: '#E5E5E5', margin: 0 }}>Etkinlikler</h2>
-                    <p style={{ color: 'rgba(229, 229, 229, 0.5)', marginTop: '0.5rem', fontSize: '0.9rem' }}>Etkinlikleri yönetin ve düzenleyin</p>
+                    <h2 className="text-2xl font-bold text-light">Etkinlikler</h2>
+                    <p className="text-light/50 mt-2 text-sm">Etkinlikleri yönetin ve düzenleyin</p>
                 </div>
                 <button
                     onClick={handleOpenCreate}
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.75rem 1.5rem',
-                        background: 'linear-gradient(135deg, #D4AF37 0%, #C9A227 100%)',
-                        border: 'none',
-                        borderRadius: '10px',
-                        color: '#0A1929',
-                        fontSize: '0.85rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s, box-shadow 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.3)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    className="flex items-center gap-2 px-6 py-3 bg-gradient-to-br from-gold to-gold-dark border-none rounded-lg text-dark text-sm font-semibold cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gold/30"
                 >
-                    <Plus style={{ width: '18px', height: '18px' }} />
+                    <Plus className="w-5 h-5" />
                     Yeni Etkinlik
                 </button>
             </div>
 
             {/* Events List */}
             {events?.length === 0 ? (
-                <div style={{
-                    background: 'rgba(13, 33, 55, 0.6)',
-                    border: '1px solid rgba(212, 175, 55, 0.1)',
-                    borderRadius: '16px',
-                    padding: '4rem 2rem',
-                    textAlign: 'center'
-                }}>
-                    <Calendar style={{ width: '48px', height: '48px', color: 'rgba(212, 175, 55, 0.3)', margin: '0 auto 1rem' }} />
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#E5E5E5', margin: 0 }}>Henüz etkinlik yok</h3>
-                    <p style={{ color: 'rgba(229, 229, 229, 0.4)', marginTop: '0.5rem' }}>İlk etkinliğinizi oluşturun</p>
+                <div className="bg-primary/60 border border-gold/10 rounded-2xl p-16 text-center">
+                    <Calendar className="w-12 h-12 text-gold/30 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-light">Henüz etkinlik yok</h3>
+                    <p className="text-light/40 mt-2">İlk etkinliğinizi oluşturun</p>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div className="flex flex-col gap-4">
                     {events?.map((event) => (
                         <div
                             key={event.id}
-                            style={{
-                                background: 'linear-gradient(135deg, rgba(13, 33, 55, 0.8) 0%, rgba(10, 25, 41, 0.9) 100%)',
-                                border: event.status === 'ACTIVE'
-                                    ? '1px solid rgba(212, 175, 55, 0.5)'
-                                    : '1px solid rgba(212, 175, 55, 0.1)',
-                                borderRadius: '16px',
-                                overflow: 'hidden',
-                                position: 'relative'
-                            }}
+                            className={`bg-gradient-to-br from-primary/80 to-dark/90 rounded-2xl overflow-hidden relative ${event.status === 'ACTIVE' ? 'border border-gold/50' : 'border border-gold/10'
+                                }`}
                         >
+                            {/* Active indicator bar */}
                             {event.status === 'ACTIVE' && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    right: 0,
-                                    height: '3px',
-                                    background: 'linear-gradient(90deg, #D4AF37 0%, #F5D76E 100%)'
-                                }} />
+                                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-gold to-gold-light" />
                             )}
 
-                            <div style={{ padding: '1.5rem' }}>
-                                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                            <div className="p-6">
+                                <div className="flex gap-6 items-start flex-wrap">
                                     {/* Image */}
                                     {event.image_url && (
-                                        <div style={{
-                                            width: '120px',
-                                            height: '80px',
-                                            borderRadius: '10px',
-                                            overflow: 'hidden',
-                                            flexShrink: 0,
-                                            background: 'rgba(255,255,255,0.05)'
-                                        }}>
-                                            <img src={event.image_url} alt={event.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <div className="w-[120px] h-[80px] rounded-lg overflow-hidden flex-shrink-0 bg-white/5">
+                                            <img src={event.image_url} alt={event.title} className="w-full h-full object-cover" />
                                         </div>
                                     )}
 
                                     {/* Info */}
-                                    <div style={{ flex: 1, minWidth: '200px' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-                                            <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#E5E5E5', margin: 0 }}>{event.title}</h3>
+                                    <div className="flex-1 min-w-[200px]">
+                                        <div className="flex items-center gap-3 flex-wrap">
+                                            <h3 className="text-lg font-semibold text-light">{event.title}</h3>
                                             {event.status === 'ACTIVE' && (
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.65rem',
-                                                    fontWeight: '700',
-                                                    background: 'rgba(212, 175, 55, 0.2)',
-                                                    color: '#D4AF37',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.1em'
-                                                }}>Aktif</span>
+                                                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gold/20 text-gold uppercase tracking-wider">
+                                                    Aktif
+                                                </span>
                                             )}
                                             {event.status === 'DRAFT' && (
-                                                <span style={{
-                                                    padding: '0.25rem 0.75rem',
-                                                    borderRadius: '20px',
-                                                    fontSize: '0.65rem',
-                                                    fontWeight: '700',
-                                                    background: 'rgba(156, 163, 175, 0.2)',
-                                                    color: '#9CA3AF',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: '0.1em'
-                                                }}>Taslak</span>
+                                                <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-gray-500/20 text-gray-400 uppercase tracking-wider">
+                                                    Taslak
+                                                </span>
                                             )}
                                         </div>
 
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', marginTop: '0.75rem' }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)' }}>
-                                                <Calendar style={{ width: '14px', height: '14px' }} />
+                                        <div className="flex flex-wrap gap-5 mt-3">
+                                            <span className="flex items-center gap-1.5 text-xs text-light/50">
+                                                <Calendar className="w-3.5 h-3.5" />
                                                 {new Date(event.event_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                                             </span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)' }}>
-                                                <MapPin style={{ width: '14px', height: '14px' }} />
+                                            <span className="flex items-center gap-1.5 text-xs text-light/50">
+                                                <MapPin className="w-3.5 h-3.5" />
                                                 {event.location}
                                             </span>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: 'rgba(229, 229, 229, 0.5)' }}>
-                                                <Users style={{ width: '14px', height: '14px' }} />
+                                            <span className="flex items-center gap-1.5 text-xs text-light/50">
+                                                <Users className="w-3.5 h-3.5" />
                                                 Asil: {event.asil_count || 0} / {event.quota_asil || 0} | Yedek: {event.yedek_count || 0} / {event.quota_yedek || 0}
                                             </span>
                                         </div>
 
-                                        <p style={{ fontSize: '1.25rem', fontWeight: '700', color: '#D4AF37', marginTop: '0.75rem' }}>
+                                        <p className="text-xl font-bold text-gold mt-3">
                                             {event.price.toLocaleString('tr-TR')} ₺
                                         </p>
                                     </div>
 
                                     {/* Actions */}
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                                    <div className="flex gap-2 flex-shrink-0">
                                         {event.status !== 'ACTIVE' ? (
                                             <button
-                                                onClick={() => handleSetActive(event.id)}
+                                                onClick={() => setActiveConfirm(event.id)}
                                                 disabled={setActiveEvent.isPending}
-                                                style={{
-                                                    padding: '0.625rem',
-                                                    background: 'rgba(16, 185, 129, 0.1)',
-                                                    border: '1px solid rgba(16, 185, 129, 0.2)',
-                                                    borderRadius: '10px',
-                                                    color: '#10B981',
-                                                    cursor: 'pointer'
-                                                }}
+                                                className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-500 cursor-pointer hover:bg-emerald-500/20 transition-colors"
                                                 title="Aktif Yap"
                                             >
-                                                <Power style={{ width: '18px', height: '18px' }} />
+                                                <Power className="w-[18px] h-[18px]" />
                                             </button>
                                         ) : (
-                                            <div style={{ padding: '0.625rem', color: 'rgba(229, 229, 229, 0.2)' }}>
-                                                <PowerOff style={{ width: '18px', height: '18px' }} />
+                                            <div className="p-2.5 text-light/20">
+                                                <PowerOff className="w-[18px] h-[18px]" />
                                             </div>
                                         )}
                                         <button
                                             onClick={() => handleOpenEdit(event)}
-                                            style={{
-                                                padding: '0.625rem',
-                                                background: 'rgba(59, 130, 246, 0.1)',
-                                                border: '1px solid rgba(59, 130, 246, 0.2)',
-                                                borderRadius: '10px',
-                                                color: '#3B82F6',
-                                                cursor: 'pointer'
-                                            }}
+                                            className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-500 cursor-pointer hover:bg-blue-500/20 transition-colors"
                                             title="Düzenle"
                                         >
-                                            <Edit2 style={{ width: '18px', height: '18px' }} />
+                                            <Edit2 className="w-[18px] h-[18px]" />
                                         </button>
                                         <button
                                             onClick={() => setDeleteConfirm(event.id)}
-                                            style={{
-                                                padding: '0.625rem',
-                                                background: 'rgba(239, 68, 68, 0.1)',
-                                                border: '1px solid rgba(239, 68, 68, 0.2)',
-                                                borderRadius: '10px',
-                                                color: '#EF4444',
-                                                cursor: 'pointer'
-                                            }}
+                                            className="p-2.5 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 cursor-pointer hover:bg-red-500/20 transition-colors"
                                             title="Sil"
                                         >
-                                            <Trash2 style={{ width: '18px', height: '18px' }} />
+                                            <Trash2 className="w-[18px] h-[18px]" />
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Progress bar */}
-                            <div style={{ height: '4px', background: 'rgba(255,255,255,0.03)' }}>
-                                <div style={{
-                                    height: '100%',
-                                    width: `${Math.min((((event.asil_count || 0) + (event.yedek_count || 0)) / ((event.quota_asil || 0) + (event.quota_yedek || 0))) * 100, 100)}%`,
-                                    background: 'linear-gradient(90deg, #D4AF37 0%, #10B981 100%)',
-                                    borderRadius: '0 2px 2px 0'
-                                }} />
+                            <div className="h-1 bg-white/5">
+                                <div
+                                    className="h-full bg-gradient-to-r from-gold to-emerald-500 rounded-r-sm"
+                                    style={{
+                                        width: `${Math.min((((event.asil_count || 0) + (event.yedek_count || 0)) / ((event.quota_asil || 0) + (event.quota_yedek || 0))) * 100, 100)}%`
+                                    }}
+                                />
                             </div>
                         </div>
                     ))}
@@ -390,74 +303,47 @@ export const EventsPanel: React.FC = () => {
 
             {/* Create/Edit Modal */}
             {showModal && (
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.8)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    zIndex: 100,
-                    padding: '1rem'
-                }}>
-                    <div style={{
-                        background: 'linear-gradient(135deg, #0D2137 0%, #0A1929 100%)',
-                        border: '1px solid rgba(212, 175, 55, 0.2)',
-                        borderRadius: '20px',
-                        width: '100%',
-                        maxWidth: '500px',
-                        maxHeight: '90vh',
-                        overflow: 'auto'
-                    }}>
-                        <div style={{
-                            padding: '1.25rem 1.5rem',
-                            borderBottom: '1px solid rgba(212, 175, 55, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            position: 'sticky',
-                            top: 0,
-                            background: '#0D2137',
-                            zIndex: 10
-                        }}>
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '600', color: '#E5E5E5', margin: 0 }}>
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+                    <div className="bg-gradient-to-br from-primary to-dark border border-gold/20 rounded-2xl w-full max-w-[500px] max-h-[90vh] overflow-auto">
+                        <div className="px-6 py-5 border-b border-gold/10 flex items-center justify-between sticky top-0 bg-primary z-10">
+                            <h3 className="text-lg font-semibold text-light">
                                 {editingEvent ? 'Etkinliği Düzenle' : 'Yeni Etkinlik'}
                             </h3>
-                            <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', color: 'rgba(229, 229, 229, 0.5)', cursor: 'pointer', padding: '0.25rem' }}>
-                                <X style={{ width: '20px', height: '20px' }} />
+                            <button onClick={() => setShowModal(false)} className="bg-transparent border-none text-light/50 cursor-pointer p-1 hover:text-light">
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} style={{ padding: '1.5rem' }}>
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Etkinlik Adı</label>
-                                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} style={inputStyle} placeholder="Yılbaşı Galası 2025" />
+                        <form onSubmit={handleSubmit} className="p-6">
+                            <div className="mb-4">
+                                <label className={labelClasses}>Etkinlik Adı</label>
+                                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className={inputClasses} placeholder="Yılbaşı Galası 2025" />
                             </div>
 
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Açıklama</label>
-                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} style={{ ...inputStyle, resize: 'vertical', minHeight: '80px' }} placeholder="Detaylar..." />
+                            <div className="mb-4">
+                                <label className={labelClasses}>Açıklama</label>
+                                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className={`${inputClasses} resize-y min-h-[80px]`} placeholder="Detaylar..." />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Tarih</label>
-                                    <input type="datetime-local" required value={formData.event_date} onChange={(e) => setFormData({ ...formData, event_date: e.target.value })} style={inputStyle} />
+                                    <label className={labelClasses}>Tarih</label>
+                                    <input type="datetime-local" required value={formData.event_date} onChange={(e) => setFormData({ ...formData, event_date: e.target.value })} className={inputClasses} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Konum (URL)</label>
-                                    <input type="url" required value={formData.location_url} onChange={(e) => setFormData({ ...formData, location_url: e.target.value })} style={inputStyle} placeholder="https://maps.google.com/..." />
+                                    <label className={labelClasses}>Konum (URL)</label>
+                                    <input type="url" required value={formData.location_url} onChange={(e) => setFormData({ ...formData, location_url: e.target.value })} className={inputClasses} placeholder="https://maps.google.com/..." />
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Fiyat (₺)</label>
-                                    <input type="number" required min="0" step="0.01" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} style={inputStyle} />
+                                    <label className={labelClasses}>Fiyat (₺)</label>
+                                    <input type="number" required min="0" step="0.01" value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} className={inputClasses} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Durum</label>
-                                    <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as any })} style={inputStyle}>
+                                    <label className={labelClasses}>Durum</label>
+                                    <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as EventFormData['status'] })} className={inputClasses}>
                                         <option value="DRAFT">Taslak</option>
                                         <option value="ACTIVE">Aktif</option>
                                         <option value="ARCHIVED">Arşiv</option>
@@ -465,85 +351,51 @@ export const EventsPanel: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Asil Kota</label>
-                                    <input type="number" required min="1" value={formData.quota_asil} onChange={(e) => setFormData({ ...formData, quota_asil: parseInt(e.target.value) || 0 })} style={inputStyle} />
+                                    <label className={labelClasses}>Asil Kota</label>
+                                    <input type="number" required min="1" value={formData.quota_asil} onChange={(e) => setFormData({ ...formData, quota_asil: parseInt(e.target.value) || 0 })} className={inputClasses} />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Yedek Kota</label>
-                                    <input type="number" required min="0" value={formData.quota_yedek} onChange={(e) => setFormData({ ...formData, quota_yedek: parseInt(e.target.value) || 0 })} style={inputStyle} />
+                                    <label className={labelClasses}>Yedek Kota</label>
+                                    <input type="number" required min="0" value={formData.quota_yedek} onChange={(e) => setFormData({ ...formData, quota_yedek: parseInt(e.target.value) || 0 })} className={inputClasses} />
                                 </div>
                             </div>
 
-                            <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Son İptal Tarihi</label>
-                                <input type="datetime-local" required value={formData.cut_off_date} onChange={(e) => setFormData({ ...formData, cut_off_date: e.target.value })} style={inputStyle} />
+                            <div className="mb-4">
+                                <label className={labelClasses}>Son İptal Tarihi</label>
+                                <input type="datetime-local" required value={formData.cut_off_date} onChange={(e) => setFormData({ ...formData, cut_off_date: e.target.value })} className={inputClasses} />
                             </div>
 
-                            <div style={{ marginBottom: '1.5rem' }}>
-                                <label style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(229, 229, 229, 0.6)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Afiş Görseli</label>
-                                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                            <div className="mb-6">
+                                <label className={labelClasses}>Afiş Görseli</label>
+                                <div className="flex gap-4 items-center">
                                     <input
                                         type="text"
                                         value={formData.banner_image}
                                         onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })}
-                                        style={{ ...inputStyle, flex: 1 }}
+                                        className={`${inputClasses} flex-1`}
                                         placeholder="https://..."
                                     />
-                                    <label style={{
-                                        padding: '0.75rem 1rem',
-                                        background: 'rgba(255,255,255,0.05)',
-                                        border: '1px solid rgba(212, 175, 55, 0.2)',
-                                        borderRadius: '10px',
-                                        color: '#D4AF37',
-                                        cursor: 'pointer',
-                                        fontSize: '0.85rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}>
+                                    <label className="px-4 py-3 bg-white/5 border border-gold/20 rounded-lg text-gold cursor-pointer text-sm flex items-center gap-2 hover:bg-white/10 transition-colors">
                                         {uploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                         <span>Yükle</span>
-                                        <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" style={{ display: 'none' }} />
+                                        <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
                                     </label>
                                 </div>
                                 {formData.banner_image && (
-                                    <div style={{ marginTop: '0.5rem', height: '100px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <img src={formData.banner_image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'contain', background: '#000' }} />
+                                    <div className="mt-2 h-[100px] rounded-lg overflow-hidden border border-white/10">
+                                        <img src={formData.banner_image} alt="Preview" className="w-full h-full object-contain bg-black" />
                                     </div>
                                 )}
                             </div>
 
-                            <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                <button type="button" onClick={() => setShowModal(false)} style={{
-                                    flex: 1,
-                                    padding: '0.875rem',
-                                    background: 'transparent',
-                                    border: '1px solid rgba(229, 229, 229, 0.2)',
-                                    borderRadius: '10px',
-                                    color: 'rgba(229, 229, 229, 0.7)',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '500',
-                                    cursor: 'pointer'
-                                }}>İptal</button>
-                                <button type="submit" disabled={createEvent.isPending || updateEvent.isPending} style={{
-                                    flex: 1,
-                                    padding: '0.875rem',
-                                    background: 'linear-gradient(135deg, #D4AF37 0%, #C9A227 100%)',
-                                    border: 'none',
-                                    borderRadius: '10px',
-                                    color: '#0A1929',
-                                    fontSize: '0.85rem',
-                                    fontWeight: '600',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '0.5rem',
-                                    opacity: (createEvent.isPending || updateEvent.isPending) ? 0.7 : 1
-                                }}>
-                                    {(createEvent.isPending || updateEvent.isPending) ? <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <Save style={{ width: '18px', height: '18px' }} />}
+                            <div className="flex gap-3">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-3.5 bg-transparent border border-light/20 rounded-lg text-light/70 text-sm font-medium cursor-pointer hover:border-light/40 transition-colors">
+                                    İptal
+                                </button>
+                                <button type="submit" disabled={createEvent.isPending || updateEvent.isPending} className="flex-1 py-3.5 bg-gradient-to-br from-gold to-gold-dark border-none rounded-lg text-dark text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 disabled:opacity-70">
+                                    {(createEvent.isPending || updateEvent.isPending) ? <Loader2 className="w-[18px] h-[18px] animate-spin" /> : <Save className="w-[18px] h-[18px]" />}
                                     {editingEvent ? 'Güncelle' : 'Oluştur'}
                                 </button>
                             </div>
@@ -552,27 +404,67 @@ export const EventsPanel: React.FC = () => {
                 </div>
             )}
 
-            {/* Delete Confirmation */}
-            {deleteConfirm && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1rem' }}>
-                    <div style={{ background: 'linear-gradient(135deg, #0D2137 0%, #0A1929 100%)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '20px', padding: '2rem', maxWidth: '400px', width: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#EF4444', marginBottom: '1rem' }}>
-                            <AlertCircle style={{ width: '24px', height: '24px' }} />
-                            <h3 style={{ fontSize: '1.1rem', fontWeight: '600', margin: 0 }}>Etkinliği Sil</h3>
+            {/* Set Active Confirmation Modal */}
+            {activeConfirm && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+                    <div className="bg-gradient-to-br from-primary to-dark border border-amber-500/20 rounded-2xl p-8 max-w-[450px] w-full">
+                        <div className="flex items-center gap-3 text-amber-500 mb-4">
+                            <AlertTriangle className="w-6 h-6" />
+                            <h3 className="text-lg font-semibold">Etkinliği Aktif Yap</h3>
                         </div>
-                        <p style={{ color: 'rgba(229, 229, 229, 0.6)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</p>
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                            <button onClick={() => setDeleteConfirm(null)} style={{ flex: 1, padding: '0.75rem', background: 'transparent', border: '1px solid rgba(229, 229, 229, 0.2)', borderRadius: '10px', color: 'rgba(229, 229, 229, 0.7)', cursor: 'pointer' }}>İptal</button>
-                            <button onClick={() => handleDelete(deleteConfirm)} disabled={deleteEvent.isPending} style={{ flex: 1, padding: '0.75rem', background: '#EF4444', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                                {deleteEvent.isPending && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-                                Sil
+
+                        <div className="space-y-3 mb-6">
+                            <p className="text-light/70 text-sm">
+                                <strong className="text-light">"{eventToActivate?.title}"</strong> etkinliğini aktif yapmak istediğinize emin misiniz?
+                            </p>
+
+                            {currentActiveEvent && currentActiveEvent.id !== activeConfirm && (
+                                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+                                    <p className="text-amber-400 text-sm">
+                                        ⚠️ Şu an aktif olan <strong>"{currentActiveEvent.title}"</strong> etkinliği pasife çekilecektir.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button onClick={() => setActiveConfirm(null)} className="flex-1 py-3 bg-transparent border border-light/20 rounded-lg text-light/70 cursor-pointer hover:border-light/40 transition-colors">
+                                İptal
+                            </button>
+                            <button
+                                onClick={() => handleSetActive(activeConfirm)}
+                                disabled={setActiveEvent.isPending}
+                                className="flex-1 py-3 bg-emerald-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center justify-center gap-2 hover:bg-emerald-600 transition-colors disabled:opacity-70"
+                            >
+                                {setActiveEvent.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                                Aktif Yap
                             </button>
                         </div>
                     </div>
                 </div>
             )}
 
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            {/* Delete Confirmation */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4">
+                    <div className="bg-gradient-to-br from-primary to-dark border border-red-500/20 rounded-2xl p-8 max-w-[400px] w-full">
+                        <div className="flex items-center gap-3 text-red-500 mb-4">
+                            <AlertCircle className="w-6 h-6" />
+                            <h3 className="text-lg font-semibold">Etkinliği Sil</h3>
+                        </div>
+                        <p className="text-light/60 mb-6 text-sm">Bu işlem geri alınamaz. Devam etmek istiyor musunuz?</p>
+                        <div className="flex gap-3">
+                            <button onClick={() => setDeleteConfirm(null)} className="flex-1 py-3 bg-transparent border border-light/20 rounded-lg text-light/70 cursor-pointer hover:border-light/40 transition-colors">
+                                İptal
+                            </button>
+                            <button onClick={() => handleDelete(deleteConfirm)} disabled={deleteEvent.isPending} className="flex-1 py-3 bg-red-500 border-none rounded-lg text-white font-semibold cursor-pointer flex items-center justify-center gap-2 hover:bg-red-600 transition-colors disabled:opacity-70">
+                                {deleteEvent.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                                Sil
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -1,12 +1,13 @@
 import React from 'react';
-import { useApp } from '../contexts/AppContext';
+import Image from 'next/image';
+import { EventData } from '../types';
 
 interface HeroProps {
   isLoading?: boolean;
+  event?: EventData | null;
 }
 
-export const Hero: React.FC<HeroProps> = ({ isLoading = false }) => {
-  const { event } = useApp();
+export const Hero: React.FC<HeroProps> = ({ isLoading = false, event }) => {
 
   if (isLoading) {
     return (
@@ -49,10 +50,13 @@ export const Hero: React.FC<HeroProps> = ({ isLoading = false }) => {
   return (
     <div className="relative w-full h-[40vh] md:h-[50vh] bg-gray-100 overflow-hidden rounded-t-xl">
       {/* Background Image */}
-      <img
-        src={event.image_url || ''}
+      <Image
+        src={event.image_url || '/placeholder-event.jpg'}
         alt={event.title}
-        className="w-full h-full object-cover"
+        fill
+        className="object-cover"
+        priority
+        sizes="100vw"
       />
 
       {/* Soft Gradient Overlay for text readability */}

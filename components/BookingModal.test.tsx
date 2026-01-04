@@ -2,15 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@/shared/test-utils/test-utils'
 import userEvent from '@testing-library/user-event'
 import { BookingModal } from './BookingModal'
-import { useApp } from '../contexts/AppContext'
 import { useJoinEvent } from '@/modules/booking'
 import { createMockProfile } from '@/shared/test-utils/test-data'
 
 // Mock dependencies
-vi.mock('../contexts/AppContext', () => ({
-  useApp: vi.fn(),
-}))
-
 vi.mock('@/modules/booking', () => ({
   useJoinEvent: vi.fn(),
 }))
@@ -18,31 +13,24 @@ vi.mock('@/modules/booking', () => ({
 describe('BookingModal', () => {
   const mockOnClose = vi.fn()
   const mockOnSuccess = vi.fn()
+  const mockUser = createMockProfile()
   const defaultProps = {
     eventId: 1,
     eventPrice: 500,
     onClose: mockOnClose,
     onSuccess: mockOnSuccess,
+    user: mockUser,
   }
 
   beforeEach(() => {
     vi.clearAllMocks()
-  })
-
-  it('should render modal with header and close button', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
     vi.mocked(useJoinEvent).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: false,
     } as any)
+  })
 
+  it('should render modal with header and close button', () => {
     render(<BookingModal {...defaultProps} />)
 
     expect(screen.getByText('Başvuru Onayı')).toBeInTheDocument()
@@ -50,56 +38,19 @@ describe('BookingModal', () => {
   })
 
   it('should display user information when user is logged in', () => {
-    const mockUser = createMockProfile({ full_name: 'Ahmet Yılmaz' })
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
-    render(<BookingModal {...defaultProps} />)
+    const customUser = createMockProfile({ full_name: 'Ahmet Yılmaz' })
+    render(<BookingModal {...defaultProps} user={customUser} />)
 
     expect(screen.getByText(/Sayın Ahmet Yılmaz/i)).toBeInTheDocument()
   })
 
   it('should display warning when user is not logged in', () => {
-    vi.mocked(useApp).mockReturnValue({
-      user: null,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
-    render(<BookingModal {...defaultProps} />)
+    render(<BookingModal {...defaultProps} user={null} />)
 
     expect(screen.getByText(/Giriş yapmamış görünüyorsunuz/i)).toBeInTheDocument()
   })
 
   it('should display KVKK and payment consent checkboxes', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
     expect(screen.getByText(/KVKK Aydınlatma Metni/i)).toBeInTheDocument()
@@ -108,19 +59,6 @@ describe('BookingModal', () => {
   })
 
   it('should disable submit button when checkboxes are not checked', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
     const submitButton = screen.getByRole('button', { name: /Onaylıyorum ve Katıl/i })
@@ -129,19 +67,6 @@ describe('BookingModal', () => {
 
   it('should enable submit button when both checkboxes are checked', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
     const kvkkCheckbox = screen.getByLabelText(/KVKK Aydınlatma Metni/i)
@@ -156,25 +81,11 @@ describe('BookingModal', () => {
 
   it('should show error message when submitting without checkboxes', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
-    // Try to submit without checking boxes
+    // Try to submit with only one checkbox
     const kvkkCheckbox = screen.getByLabelText(/KVKK Aydınlatma Metni/i)
     await user.click(kvkkCheckbox)
-    // Don't check payment checkbox
 
     const submitButton = screen.getByRole('button', { name: /Onaylıyorum ve Katıl/i })
     await user.click(submitButton)
@@ -186,19 +97,7 @@ describe('BookingModal', () => {
 
   it('should show error message when user is not logged in and tries to submit', async () => {
     const user = userEvent.setup()
-    vi.mocked(useApp).mockReturnValue({
-      user: null,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
-    render(<BookingModal {...defaultProps} />)
+    render(<BookingModal {...defaultProps} user={null} />)
 
     const kvkkCheckbox = screen.getByLabelText(/KVKK Aydınlatma Metni/i)
     const paymentCheckbox = screen.getByLabelText(/Mesafeli Satış Sözleşmesi/i)
@@ -216,18 +115,10 @@ describe('BookingModal', () => {
 
   it('should call onSuccess and onClose when form submission is successful', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
     const mockMutateAsync = vi.fn().mockResolvedValue({
       success: true,
       queue: 'ASIL' as const,
       message: 'Başvuru başarılı',
-    })
-
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
     })
 
     vi.mocked(useJoinEvent).mockReturnValue({
@@ -259,17 +150,9 @@ describe('BookingModal', () => {
 
   it('should show error message when form submission fails', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
     const mockMutateAsync = vi.fn().mockResolvedValue({
       success: false,
       message: 'Kontenjan dolmuştur',
-    })
-
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
     })
 
     vi.mocked(useJoinEvent).mockReturnValue({
@@ -297,14 +180,6 @@ describe('BookingModal', () => {
   })
 
   it('should show loading state when mutation is pending', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
     vi.mocked(useJoinEvent).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: true,
@@ -317,14 +192,6 @@ describe('BookingModal', () => {
   })
 
   it('should disable close button when mutation is pending', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
     vi.mocked(useJoinEvent).mockReturnValue({
       mutateAsync: vi.fn(),
       isPending: true,
@@ -338,19 +205,6 @@ describe('BookingModal', () => {
 
   it('should close modal when close button is clicked', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
     const closeButton = screen.getByRole('button', { name: /close/i })
@@ -361,19 +215,6 @@ describe('BookingModal', () => {
 
   it('should close modal when cancel button is clicked', async () => {
     const user = userEvent.setup()
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} />)
 
     const cancelButton = screen.getByRole('button', { name: /Vazgeç/i })
@@ -383,22 +224,8 @@ describe('BookingModal', () => {
   })
 
   it('should format price correctly', () => {
-    const mockUser = createMockProfile()
-    vi.mocked(useApp).mockReturnValue({
-      user: mockUser,
-      event: null,
-      isLoading: false,
-      logout: vi.fn(),
-    })
-
-    vi.mocked(useJoinEvent).mockReturnValue({
-      mutateAsync: vi.fn(),
-      isPending: false,
-    } as any)
-
     render(<BookingModal {...defaultProps} eventPrice={1500.50} />)
 
     expect(screen.getByText(/1\.500,50 ₺/i)).toBeInTheDocument()
   })
 })
-

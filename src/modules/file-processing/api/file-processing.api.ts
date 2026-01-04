@@ -54,3 +54,48 @@ export async function processTicketZip(eventId: number, filePath: string): Promi
   }
 }
 
+/**
+ * Upload and process ticket pool ZIP file
+ * @param eventId - Event ID to associate tickets with
+ * @param file - ZIP file to upload
+ * @param onProgress - Progress callback (current, total)
+ */
+export async function uploadTicketPool(
+  eventId: number,
+  file: File,
+  onProgress?: (current: number, total: number) => void
+): Promise<FileProcessingResponse> {
+  const isAdmin = await checkAdmin()
+  if (!isAdmin) {
+    return { success: false, count: 0, message: 'Yetkisiz erişim.' }
+  }
+  const supabase = createBrowserClient()
+
+  try {
+    // Generate unique filename
+    const fileName = `${eventId}/${Date.now()}_${file.name}`
+
+    // Upload to temp-uploads bucket
+    onProgress?.(1, 3)
+    const { error: uploadError } = await supabase.storage
+      .from('temp-uploads')
+      .upload(fileName, file)
+
+    if (uploadError) {
+      console.error('Upload Error:', uploadError)
+      return { success: false, count: 0, message: 'Dosya yüklenemedi.' }
+    }
+
+    onProgress?.(2, 3)
+
+    // Call edge function to process ZIP
+    const result = await processTicketZip(eventId, fileName)
+
+    onProgress?.(3, 3)
+
+    return result
+  } catch (err) {
+    console.error('Unexpected Error:', err)
+    return { success: false, count: 0, message: 'Beklenmeyen bir hata oluştu.' }
+  }
+}

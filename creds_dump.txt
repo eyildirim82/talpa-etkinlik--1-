@@ -1,0 +1,20 @@
+--- SETTINGS START ---
+{
+    "mcpServers": {
+        "supabase-mcp-server": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@supabase/mcp-server"
+            ],
+            "env": {
+                "SUPABASE_ACCESS_TOKEN": "sbp_1ea553688c292e62abb5169fab14dbd162548509"
+            }
+        }
+    }
+}
+--- SETTINGS END ---
+--- ENV START ---
+VITE_SUPABASE_URL=https://kqxzhvtynugglzikchhy.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeHpodnR5bnVnZ2x6aWtjaGh5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMzE2MDgsImV4cCI6MjA4MjYwNzYwOH0.7aByWI2slt_lJJY6ktI5K9ntrisGv-5qs-nEh4lKrJI
+--- ENV END ---

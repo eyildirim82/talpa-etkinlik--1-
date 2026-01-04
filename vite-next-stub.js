@@ -16,3 +16,23 @@ export const revalidatePath = (path) => {
     // No-op in Vite context
 };
 
+// next/image stub - renders a standard img with fill support
+import React from 'react';
+export const Image = React.forwardRef(function Image({ src, alt, fill, priority, sizes, className, ...props }, ref) {
+    const style = fill ? {
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        inset: 0,
+        objectFit: className?.includes('object-cover') ? 'cover' : 'contain',
+    } : {};
+    return React.createElement('img', {
+        ref,
+        src,
+        alt,
+        style,
+        className,
+        loading: priority ? 'eager' : 'lazy',
+        ...props,
+    });
+});

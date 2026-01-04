@@ -1,72 +1,56 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { joinEvent, getUserBooking, cancelBooking, getBookingQueuePosition } from '../api/booking.api'
-import type { Booking, QueueStatus } from '../types/booking.types'
-import { useSession } from '@/modules/auth'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { joinEvent, cancelBooking } from '@/modules/booking/api/booking.api'
+import { createClient } from '@/utils/supabase/client'
+import type { QueueStatus } from '../types/booking.types'
 
-/**
- * Get user's booking for a specific event
- */
-export function useBooking(eventId: number | null) {
-  return useQuery({
-    queryKey: ['booking', eventId],
-    queryFn: () => eventId ? getUserBooking(eventId) : null,
-    enabled: !!eventId,
-  })
-}
-
-/**
- * Join event mutation
- */
 export function useJoinEvent() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ 
-      eventId, 
-      consentKvkk, 
-      consentPayment 
-    }: { 
-      eventId: number
-      consentKvkk: boolean
-      consentPayment: boolean
+    mutationFn: async ({ eventId, consentKvkk, consentPayment }: {
+      eventId: number, consentKvkk: boolean, consentPayment: boolean
     }) => {
-      return await joinEvent(eventId, consentKvkk, consentPayment)
+      const result = await joinEvent(eventId, consentKvkk, consentPayment)
+      if (!result.success) throw new Error(result.message)
+      return result
     },
-    onSuccess: (data, variables) => {
-      if (data.success) {
-        // Invalidate booking query to refetch status
-        queryClient.invalidateQueries({ queryKey: ['booking', variables.eventId] })
-        queryClient.invalidateQueries({ queryKey: ['activeEvent'] })
-      }
-    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-booking'] })
+      queryClient.invalidateQueries({ queryKey: ['active-event'] })
+      // Invalidate profile to update potential quota/role info if needed
+      queryClient.invalidateQueries({ queryKey: ['profile'] })
+    }
   })
 }
 
-/**
- * Cancel booking mutation
- */
 export function useCancelBooking() {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: async (bookingId: number) => {
-      return await cancelBooking(bookingId)
+      const result = await cancelBooking(bookingId)
+      if (!result.success) throw new Error(result.message)
+      return result
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['booking'] })
-      queryClient.invalidateQueries({ queryKey: ['activeEvent'] })
-    },
+      queryClient.invalidateQueries({ queryKey: ['user-booking'] })
+      queryClient.invalidateQueries({ queryKey: ['active-event'] })
+    }
   })
 }
 
-/**
- * Get booking queue position (for yedek list)
- */
-export function useBookingQueuePosition(eventId: number | null, userId: string | null) {
+export function useUserBooking(eventId: number) {
+  const supabase = createClient()
+
   return useQuery({
-    queryKey: ['bookingQueuePosition', eventId, userId],
-    queryFn: () => eventId && userId ? getBookingQueuePosition(eventId, userId) : null,
-    enabled: !!eventId && !!userId,
+    queryKey: ['user-booking', eventId],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('bookings')
+        .select('*')
+        .eq('event_id', eventId)
+        .maybeSingle()
+      return data
+    }
   })
 }
-

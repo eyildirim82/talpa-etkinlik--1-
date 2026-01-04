@@ -2,26 +2,27 @@ import React, { useState } from 'react';
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useJoinEvent } from '@/modules/booking';
 import type { QueueStatus } from '@/modules/booking';
-import { useApp } from '../contexts/AppContext';
+import type { User } from '../types';
 
 interface BookingModalProps {
   eventId: number;
   eventPrice: number;
   onClose: () => void;
   onSuccess: (queue: QueueStatus) => void;
+  user: User | null;
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
   eventId,
   eventPrice,
   onClose,
-  onSuccess
+  onSuccess,
+  user
 }) => {
   const [consentKvkk, setConsentKvkk] = useState(false);
   const [consentPayment, setConsentPayment] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const { user } = useApp();
-  
+
   const joinEventMutation = useJoinEvent();
 
   const handleSubmit = async (e: React.FormEvent) => {

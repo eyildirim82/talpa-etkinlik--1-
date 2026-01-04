@@ -230,6 +230,7 @@ export const ActionZone: React.FC = () => {
         <BookingModal
           eventId={eventId}
           eventPrice={event.price || 0}
+          user={user}
           onClose={() => setShowBookingModal(false)}
           onSuccess={handleBookingSuccess}
         />

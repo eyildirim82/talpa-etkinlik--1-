@@ -1,4 +1,5 @@
 export { AdminLayout } from './AdminLayout';
+export { AdminSidebar } from './AdminSidebar';
 export type { AdminTab } from './AdminLayout';
 export { OverviewPanel } from './OverviewPanel';
 export { EventsPanel } from './EventsPanel';

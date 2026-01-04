@@ -40,5 +40,12 @@
     "src/**/*.test.tsx",
     "app",
     "supabase/functions"
+  ],
+  "include": [
+    "src",
+    "actions",
+    "utils",
+    "middleware.ts",
+    "supabase/functions"
   ]
 }

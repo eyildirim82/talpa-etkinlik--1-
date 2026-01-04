@@ -3,13 +3,13 @@ import { EventData } from '../../../types';
 import { Button } from '../common/Button';
 
 // Sticky Footer CTA
-export const StickyFooter = ({ event }: { event: EventData }) => {
+export const StickyFooter = ({ event, onJoin }: { event: EventData; onJoin?: () => void }) => {
     // Debugging: Always render and log event
     console.log('[StickyFooter] Rendering with event:', event);
     // if (!event || event.remaining_stock === 0) return null;
 
     return (
-        <div 
+        <div
             id="sticky-footer"
             style={{
                 position: 'fixed',
@@ -63,9 +63,10 @@ export const StickyFooter = ({ event }: { event: EventData }) => {
                 <Button
                     variant="secondary"
                     size="lg"
-                    onClick={() => alert('Bilet almak için lütfen giriş yapınız.')}
+                    disabled={event.remaining_stock === 0}
+                    onClick={event.remaining_stock === 0 ? undefined : (onJoin ? onJoin : () => alert('Bilet almak için lütfen giriş yapınız.'))}
                 >
-                    Bilet Al
+                    {event.remaining_stock === 0 ? 'TÜKENDİ' : 'Bilet Al'}
                 </Button>
             </div>
         </div>

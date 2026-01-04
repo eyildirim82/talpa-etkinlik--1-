@@ -1,6 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import type { ActiveEvent, CreateEventData, EventStats, EventResponse } from '../types/event.types'
-import { useAdmin } from '@/modules/profile'
 
 // Helper to check admin role
 async function checkAdmin(): Promise<boolean> {
@@ -20,7 +19,7 @@ async function checkAdmin(): Promise<boolean> {
 
 export const getActiveEvent = async (): Promise<ActiveEvent | null> => {
   const supabase = createBrowserClient()
-  
+
   // Try view first (backward compatibility)
   const { data: viewData, error: viewError } = await supabase
     .from('active_event_view')
