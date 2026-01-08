@@ -1,23 +1,9 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { checkAdmin } from '@/shared/services/authz'
 import * as XLSX from 'xlsx'
 import type { AdminResponse } from '../types/admin.types'
 import { assignTicket } from '@/modules/ticket'
 import { promoteFromWaitlist } from '../utils/admin.utils'
-
-// Helper to check admin role
-async function checkAdmin(): Promise<boolean> {
-  const supabase = createBrowserClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return false
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin, role')
-    .eq('id', user.id)
-    .single()
-
-  return !!(profile?.is_admin || profile?.role === 'admin')
-}
 
 /**
  * Cancel a booking (admin only)

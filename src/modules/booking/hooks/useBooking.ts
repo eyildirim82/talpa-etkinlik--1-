@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { joinEvent, cancelBooking } from '@/modules/booking/api/booking.api'
-import { createClient } from '@/utils/supabase/client'
+import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import type { QueueStatus } from '../types/booking.types'
 
 export function useJoinEvent() {
@@ -39,18 +39,20 @@ export function useCancelBooking() {
   })
 }
 
-export function useUserBooking(eventId: number) {
-  const supabase = createClient()
+export function useUserBooking(eventId: number | null) {
+  const supabase = createBrowserClient()
 
   return useQuery({
     queryKey: ['user-booking', eventId],
     queryFn: async () => {
+      if (!eventId) return null;
       const { data } = await supabase
         .from('bookings')
         .select('*')
         .eq('event_id', eventId)
         .maybeSingle()
       return data
-    }
+    },
+    enabled: !!eventId
   })
 }

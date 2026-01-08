@@ -1,8 +1,8 @@
-import { createClient } from '@/utils/supabase/client'
+import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import type { AuthResponse, LoginCredentials, SignupData } from '../types/auth.types'
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   const { email, password } = credentials
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -18,7 +18,7 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
 }
 
 export async function signup(data: SignupData): Promise<AuthResponse> {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   const { email, password, fullName, sicilNo } = data
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -40,7 +40,7 @@ export async function signup(data: SignupData): Promise<AuthResponse> {
 }
 
 export async function logout(): Promise<AuthResponse> {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   await supabase.auth.signOut()
   return { success: true, message: 'Çıkış başarılı.' }
 }

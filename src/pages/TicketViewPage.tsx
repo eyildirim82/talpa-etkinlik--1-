@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { createClient } from '@/utils/supabase/client';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
 import { Download, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 
 interface TicketDetails {
@@ -16,7 +16,7 @@ export const TicketViewPage: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // Booking ID or Ticket ID? Requirement says /ticket/[id] usually ticket id
     // check implementation plan: "/ticket/:id - Public/Private page for users to view their assigned ticket."
     const navigate = useNavigate();
-    const supabase = createClient();
+    const supabase = createBrowserClient();
     const [ticket, setTicket] = useState<TicketDetails | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

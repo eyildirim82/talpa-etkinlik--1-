@@ -33,7 +33,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    const { container } = render(<BoardingPass ticket={null as any} />)
+    const { container } = render(<BoardingPass ticket={null as any} event={null as any} user={null as any} />)
 
     expect(container.firstChild).toBeNull()
   })
@@ -48,7 +48,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    const { container } = render(<BoardingPass ticket={mockTicket as any} />)
+    const { container } = render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={null as any} />)
 
     expect(container.firstChild).toBeNull()
   })
@@ -63,7 +63,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    const { container } = render(<BoardingPass ticket={mockTicket as any} />)
+    const { container } = render(<BoardingPass ticket={mockTicket as any} event={null as any} user={mockUser} />)
 
     expect(container.firstChild).toBeNull()
   })
@@ -79,7 +79,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('İşlem Başarılı')).toBeInTheDocument()
     expect(screen.getByText('Biletiniz oluşturuldu.')).toBeInTheDocument()
@@ -96,7 +96,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('Test Etkinliği')).toBeInTheDocument()
   })
@@ -114,7 +114,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText(/31 Aralık/i)).toBeInTheDocument()
     expect(screen.getByText(/21:30/i)).toBeInTheDocument()
@@ -131,7 +131,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('Ahmet Yılmaz')).toBeInTheDocument()
   })
@@ -147,7 +147,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('A12')).toBeInTheDocument()
   })
@@ -163,7 +163,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('Ana Salon')).toBeInTheDocument()
   })
@@ -183,7 +183,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={ticketWithoutGate as any} />)
+    render(<BoardingPass ticket={ticketWithoutGate as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('Ana Salon')).toBeInTheDocument()
   })
@@ -199,7 +199,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('QR-CODE-123')).toBeInTheDocument()
   })
@@ -215,7 +215,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     // QrCode icon should be rendered
     const qrIcon = screen.getByRole('img', { hidden: true }) || document.querySelector('svg')
@@ -234,7 +234,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={mockTicket as any} />)
+    render(<BoardingPass ticket={mockTicket as any} event={mockEvent} user={mockUser} />)
 
     const downloadButton = screen.getByText('Bileti İndir')
     await user.click(downloadButton)
@@ -264,7 +264,7 @@ describe('BoardingPass', () => {
       logout: vi.fn(),
     })
 
-    render(<BoardingPass ticket={ticket as any} />)
+    render(<BoardingPass ticket={ticket as any} event={mockEvent} user={mockUser} />)
 
     expect(screen.getByText('Yılbaşı Galası')).toBeInTheDocument()
     expect(screen.getByText('Mehmet Demir')).toBeInTheDocument()

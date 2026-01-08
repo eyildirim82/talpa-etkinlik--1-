@@ -22,7 +22,7 @@ import {
     useDeleteEvent,
     type AdminEvent,
 } from '@/modules/admin';
-import { supabase } from '@/src/lib/supabase';
+import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
 interface EventFormData {
     title: string;
@@ -84,6 +84,7 @@ export const EventsPanel: React.FC = () => {
 
         setUploadingBanner(true);
         try {
+            const supabase = createBrowserClient();
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
             const filePath = `${fileName}`;

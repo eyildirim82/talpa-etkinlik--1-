@@ -1,3 +1,14 @@
+/**
+ * ARCHIVED: Next.js Middleware
+ * 
+ * Bu dosya Next.js middleware implementasyonunu içerir.
+ * Vite projesine geçiş nedeniyle arşivlenmiştir.
+ * 
+ * Route protection artık React Router ve ProtectedRoute component'i ile yapılmaktadır.
+ * 
+ * Arşivlenme Tarihi: 2026-01-XX
+ */
+
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import Image from 'next/image';
 import { EventData } from '../types';
 
 interface HeroProps {
@@ -50,13 +49,11 @@ export const Hero: React.FC<HeroProps> = ({ isLoading = false, event }) => {
   return (
     <div className="relative w-full h-[40vh] md:h-[50vh] bg-gray-100 overflow-hidden rounded-t-xl">
       {/* Background Image */}
-      <Image
+      <img
         src={event.image_url || '/placeholder-event.jpg'}
         alt={event.title}
-        fill
-        className="object-cover"
-        priority
-        sizes="100vw"
+        className="absolute inset-0 w-full h-full object-cover"
+        loading="eager"
       />
 
       {/* Soft Gradient Overlay for text readability */}

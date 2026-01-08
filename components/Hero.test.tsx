@@ -3,13 +3,6 @@ import { render, screen } from '@/shared/test-utils/test-utils'
 import { Hero } from './Hero'
 import { createMockActiveEvent } from '@/shared/test-utils/test-data'
 
-// Mock next/image
-vi.mock('next/image', () => ({
-  default: ({ src, alt, ...props }: { src: string; alt: string;[key: string]: unknown }) => (
-    <img src={src} alt={alt} data-testid="next-image" {...props} />
-  ),
-}))
-
 describe('Hero', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -97,7 +90,7 @@ describe('Hero', () => {
 
     const image = screen.getByAltText(mockEvent.title)
     expect(image).toBeInTheDocument()
-    // With next/image, empty url falls back to placeholder
+    // Empty url falls back to placeholder
     expect(image).toHaveAttribute('src', '/placeholder-event.jpg')
   })
 

@@ -1,21 +1,6 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { checkAdmin } from '@/shared/services/authz'
 import type { ActiveEvent, CreateEventData, EventStats, EventResponse } from '../types/event.types'
-
-// Helper to check admin role
-async function checkAdmin(): Promise<boolean> {
-  const supabase = createBrowserClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return false
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin, role')
-    .eq('id', user.id)
-    .single()
-
-  // Check both is_admin and role for backward compatibility
-  return !!(profile?.is_admin || profile?.role === 'admin')
-}
 
 export const getActiveEvent = async (): Promise<ActiveEvent | null> => {
   const supabase = createBrowserClient()

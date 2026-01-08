@@ -39,8 +39,8 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
         setLoginError(null);
 
         try {
-            const { createClient } = await import('../../../utils/supabase/browser');
-            const supabase = createClient();
+            const { createBrowserClient } = await import('@/shared/infrastructure/supabase');
+            const supabase = createBrowserClient();
 
             if (isSignup) {
                 const { error } = await supabase.auth.signUp({
@@ -196,8 +196,8 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
                                             <button
                                                 onClick={async () => {
                                                     setShowDropdown(false);
-                                                    const { createClient } = await import('../../../utils/supabase/browser');
-                                                    const supabase = createClient();
+                                                    const { createBrowserClient } = await import('@/shared/infrastructure/supabase');
+                                                    const supabase = createBrowserClient();
                                                     await supabase.auth.signOut();
                                                     window.location.reload();
                                                 }}

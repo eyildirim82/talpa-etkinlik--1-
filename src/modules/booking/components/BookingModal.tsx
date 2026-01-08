@@ -54,7 +54,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         onClose()
       } else if (result.success) {
         // Fallback if queue is not present but success is true
-        onSuccess('ONAYLANDI')
+        onSuccess('ASIL')
         onClose()
       } else {
         setErrorMsg(result.message || 'İşlem başarısız.')

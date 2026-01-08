@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
-import type { Booking, JoinEventResult, BookingResponse, BookingFilters, BookingsWithCount, QueueStatus } from '../types/booking.types'
+import type { Booking, JoinEventResult, BookingResponse, BookingFilters, BookingsWithCount, QueueStatus, BookingWithProfile } from '../types/booking.types'
 
 /**
  * Join event queue system
@@ -235,6 +235,6 @@ export const getBookingsWithFilters = async (
   const { data, error, count } = await query
 
   if (error) throw error
-  return { data: (data || []) as Booking[], count: count || 0 }
+  return { data: (data || []) as unknown as BookingWithProfile[], count: count || 0 }
 }
 

@@ -1,0 +1,1 @@
+src/modules/admin/components/BookingsTable.tsx(174,61): error TS2339: Property 'profiles' does not exist on type '{ id: number; event_id: number; user_id: string; booking_date: string; queue_status: "ASIL" | "YEDEK" | "IPTAL"; payment_status: "WAITING" | "PAID"; consent_kvkk: boolean; consent_payment: boolean; created_at: string; updated_at: string; }'.

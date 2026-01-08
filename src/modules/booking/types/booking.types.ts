@@ -7,16 +7,8 @@ export type Booking = Database['public']['Tables']['bookings']['Row']
 export type BookingInsert = Database['public']['Tables']['bookings']['Insert']
 export type BookingUpdate = Database['public']['Tables']['bookings']['Update']
 
-export enum QueueStatus {
-  ASIL = 'ASIL',
-  YEDEK = 'YEDEK',
-  IPTAL = 'IPTAL'
-}
-
-export enum PaymentStatus {
-  WAITING = 'WAITING',
-  PAID = 'PAID'
-}
+import type { QueueStatus, PaymentStatus } from '@/types'
+export { QueueStatus, PaymentStatus } from '@/types'
 
 export interface JoinEventResult {
   success: boolean
@@ -36,8 +28,17 @@ export interface BookingFilters {
   pageSize?: number
 }
 
+export interface BookingWithProfile extends Booking {
+  profiles?: {
+    full_name: string | null
+    email: string | null
+    tckn: string | null
+    sicil_no: string | null
+  } | null
+}
+
 export interface BookingsWithCount {
-  data: Booking[]
+  data: BookingWithProfile[]
   count: number
 }
 

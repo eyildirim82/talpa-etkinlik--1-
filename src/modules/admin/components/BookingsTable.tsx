@@ -7,14 +7,14 @@ import {
 import { getBookingsWithFilters } from '@/modules/booking/api/booking.api';
 import { cancelBooking, exportBookingsToExcel } from '@/modules/admin/api/admin.api';
 import { assignTicket } from '@/modules/ticket/api/ticket.api';
-import type { Booking } from '@/modules/booking/types/booking.types';
+import type { BookingWithProfile } from '@/modules/booking/types/booking.types';
 
 interface BookingsTableProps {
     eventId: number;
 }
 
 export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
-    const [bookings, setBookings] = useState<Booking[]>([]);
+    const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
     const [loading, setLoading] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
     const [filters, setFilters] = useState({

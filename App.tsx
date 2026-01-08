@@ -10,6 +10,7 @@ import { CinematicHero } from './src/components/home/CinematicHero';
 import { StickyFooter } from './src/components/home/StickyFooter';
 import { ThemeLayout } from './src/components/layout/ThemeLayout';
 import TicketViewPage from './src/pages/TicketViewPage';
+import ProtectedRoute from './src/components/ProtectedRoute';
 
 import { BookingModal } from './src/modules/booking/components/BookingModal';
 
@@ -29,8 +30,8 @@ const AppContent = () => {
       try {
         // Import Supabase client
         console.log(`PERF: Import Supabase STARTED at ${Date.now() - start}ms`);
-        const { createClient } = await import('./utils/supabase/browser');
-        const supabase = createClient();
+        const { createBrowserClient } = await import('./src/shared/infrastructure/supabase');
+        const supabase = createBrowserClient();
         console.log(`PERF: Import Supabase FINISHED at ${Date.now() - start}ms`);
 
         const fetchUser = async (sessionUser: any) => {
@@ -116,14 +117,18 @@ const AppContent = () => {
   return (
     <Routes>
       <Route path="/admin" element={
-        <ThemeLayout variant="dark">
-          <AdminPage onBack={handleHomeClick} />
-        </ThemeLayout>
+        <ProtectedRoute requireAdmin>
+          <ThemeLayout variant="dark">
+            <AdminPage onBack={handleHomeClick} />
+          </ThemeLayout>
+        </ProtectedRoute>
       } />
       <Route path="/ticket/:id" element={
-        <ThemeLayout variant="dark">
-          <TicketViewPage />
-        </ThemeLayout>
+        <ProtectedRoute>
+          <ThemeLayout variant="dark">
+            <TicketViewPage />
+          </ThemeLayout>
+        </ProtectedRoute>
       } />
       <Route path="/" element={
         <ThemeLayout variant="dark">

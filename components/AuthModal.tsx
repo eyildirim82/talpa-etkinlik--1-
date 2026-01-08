@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle, User, Lock } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { loginWithFormData, signupWithFormData } from '@/modules/auth';
+import { loginWithFormData, signupWithFormData } from '../src/modules/auth';
 import { Button } from '../src/components/common/Button';
 
 interface AuthModalProps {
@@ -10,7 +10,7 @@ interface AuthModalProps {
 
 type Tab = 'login' | 'signup';
 
-export const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
+export const AuthModal = ({ onClose }: AuthModalProps) => {
   const [activeTab, setActiveTab] = useState<Tab>('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

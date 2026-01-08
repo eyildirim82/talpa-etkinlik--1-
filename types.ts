@@ -1,24 +1,31 @@
 import { Database } from './src/types/supabase';
 
 // Event Status Enum (matches database enum)
-export enum EventStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  ARCHIVED = 'ARCHIVED'
-}
+// Event Status Enum (matches database enum)
+export type EventStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
+
+export const EventStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const;
 
 // Queue Status Enum (matches database enum)
-export enum QueueStatus {
-  ASIL = 'ASIL',
-  YEDEK = 'YEDEK',
-  IPTAL = 'IPTAL'
-}
+export type QueueStatus = 'ASIL' | 'YEDEK' | 'IPTAL';
+
+export const QueueStatus = {
+  ASIL: 'ASIL',
+  YEDEK: 'YEDEK',
+  IPTAL: 'IPTAL'
+} as const;
 
 // Payment Status Enum (matches database enum)
-export enum PaymentStatus {
-  WAITING = 'WAITING',
-  PAID = 'PAID'
-}
+export type PaymentStatus = 'WAITING' | 'PAID';
+
+export const PaymentStatus = {
+  WAITING: 'WAITING',
+  PAID: 'PAID'
+} as const;
 
 // Matches 'active_event_view' structure (backward compatibility)
 export type EventData = Database['public']['Views']['active_event_view']['Row'];

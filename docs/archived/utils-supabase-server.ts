@@ -1,3 +1,15 @@
+/**
+ * ARCHIVED: Server-Side Supabase Client (utils/supabase/server.ts)
+ * 
+ * Bu dosya Next.js server-side Supabase client implementasyonunu içerir.
+ * Vite projesine geçiş nedeniyle arşivlenmiştir.
+ * 
+ * Vite SPA olduğu için server-side client'a gerek yoktur.
+ * Tüm Supabase işlemleri browser client ile yapılmaktadır.
+ * 
+ * Arşivlenme Tarihi: 2026-01-XX
+ */
+
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 

@@ -1,0 +1,28 @@
+components/ActionZone.test.tsx(6,10): error TS2724: '"@/modules/booking"' has no exported member named 'useBooking'. Did you mean 'Booking'?
+components/ActionZone.test.tsx(6,22): error TS2724: '"@/modules/booking"' has no exported member named 'useBookingQueuePosition'. Did you mean 'getBookingQueuePosition'?
+components/ActionZone.tsx(7,10): error TS2724: '"@/modules/booking"' has no exported member named 'useBooking'. Did you mean 'Booking'?
+components/ActionZone.tsx(7,22): error TS2724: '"@/modules/booking"' has no exported member named 'useBookingQueuePosition'. Did you mean 'getBookingQueuePosition'?
+components/admin/BookingsTable.tsx(21,7): error TS2322: Type '"ASIL" | "YEDEK" | "IPTAL"' is not assignable to type 'QueueStatus'.
+  Type '"ASIL"' is not assignable to type 'QueueStatus'.
+components/admin/BookingsTable.tsx(22,7): error TS2322: Type '"WAITING" | "PAID"' is not assignable to type 'PaymentStatus'.
+  Type '"WAITING"' is not assignable to type 'PaymentStatus'.
+components/BoardingPass.test.tsx(36,35): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(51,35): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(66,35): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(82,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(99,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(117,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(134,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(150,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(166,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(186,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(202,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(218,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(237,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+components/BoardingPass.test.tsx(267,13): error TS2739: Type '{ ticket: any; }' is missing the following properties from type 'BoardingPassProps': event, user
+src/modules/admin/components/BookingsTable.tsx(31,17): error TS2322: Type '"ASIL" | "YEDEK" | "IPTAL"' is not assignable to type 'QueueStatus'.
+  Type '"ASIL"' is not assignable to type 'QueueStatus'.
+src/modules/admin/components/BookingsTable.tsx(32,17): error TS2322: Type '"WAITING" | "PAID"' is not assignable to type 'PaymentStatus'.
+  Type '"WAITING"' is not assignable to type 'PaymentStatus'.
+src/modules/admin/components/BookingsTable.tsx(174,61): error TS2339: Property 'profiles' does not exist on type '{ id: number; event_id: number; user_id: string; booking_date: string; queue_status: "ASIL" | "YEDEK" | "IPTAL"; payment_status: "WAITING" | "PAID"; consent_kvkk: boolean; consent_payment: boolean; created_at: string; updated_at: string; }'.
+src/modules/booking/components/BookingModal.tsx(57,19): error TS2345: Argument of type '"ONAYLANDI"' is not assignable to parameter of type 'QueueStatus'.

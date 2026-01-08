@@ -25,7 +25,14 @@ export default {
           red: '#C41E3A', // Primary Brand Red
           'red-light': '#D64356',
           'red-dark': '#A01729',
-        }
+        },
+        // EventsPanel ve Admin sayfaları için renkler
+        light: '#E5E5E5',      // Açık metin rengi
+        dark: '#0A1929',      // Koyu arka plan rengi
+        primary: '#0A1929',   // Ana arka plan rengi (talpa.bg ile aynı)
+        gold: '#D4AF37',       // Altın rengi
+        'gold-dark': '#B5952F', // Koyu altın rengi
+        'gold-light': '#E5C866', // Açık altın rengi
       }
     },
   },
