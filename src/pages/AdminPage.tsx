@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '../../utils/react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { useProfile } from '@/modules/profile';
 import {
     AdminLayout,
@@ -9,8 +8,11 @@ import {
     EventsPanel,
     TicketsPanel,
     UsersPanel,
-} from '../../components/admin';
+} from '@/modules/admin';
 import { Loader2, ShieldX, Lock } from 'lucide-react';
+
+// Create local query client for AdminPage
+const queryClient = new QueryClient();
 
 interface AdminPageProps {
     onBack: () => void;
