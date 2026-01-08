@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { EventData, User } from './types';
-import AdminPage from './src/pages/AdminPage';
-import { EmptyState } from './src/shared/components/ui/EmptyState';
-import { AuthModal } from './src/modules/auth/components/AuthModal';
-import { LoadingState } from './src/components/common/LoadingState';
-import { LuxuryHeader } from './src/components/layout/LuxuryHeader';
-import { CinematicHero } from './src/components/home/CinematicHero';
-import { StickyFooter } from './src/components/home/StickyFooter';
-import { ThemeLayout } from './src/components/layout/ThemeLayout';
-import TicketViewPage from './src/pages/TicketViewPage';
-import ProtectedRoute from './src/components/ProtectedRoute';
+import { EventData, User } from '../../types';
+import AdminPage from '../pages/AdminPage';
+import { EmptyState } from '../shared/components/ui/EmptyState';
+import { AuthModal } from '@/modules/auth/components/AuthModal';
+import { LoadingState } from '../components/common/LoadingState';
+import { LuxuryHeader } from '../components/layout/LuxuryHeader';
+import { CinematicHero } from '../components/home/CinematicHero';
+import { StickyFooter } from '../components/home/StickyFooter';
+import { ThemeLayout } from '../components/layout/ThemeLayout';
+import TicketViewPage from '../pages/TicketViewPage';
+import ProtectedRoute from '../components/ProtectedRoute';
 
-import { BookingModal } from './src/modules/booking/components/BookingModal';
+import { BookingModal } from '@/modules/booking/components/BookingModal';
 
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
@@ -30,7 +30,7 @@ const AppContent = () => {
       try {
         // Import Supabase client
         console.log(`PERF: Import Supabase STARTED at ${Date.now() - start}ms`);
-        const { createBrowserClient } = await import('./src/shared/infrastructure/supabase');
+        const { createBrowserClient } = await import('@/shared/infrastructure/supabase');
         const supabase = createBrowserClient();
         console.log(`PERF: Import Supabase FINISHED at ${Date.now() - start}ms`);
 
@@ -96,7 +96,7 @@ const AppContent = () => {
   }
 
   // Show Active events regardless of stock to display Sold Out state if needed
-  const activeEvent = events && events.length > 0 ? events.find(event => event.status === 'ACTIVE') : null;
+  const activeEvent = events && events.length > 0 ? events.find(event => event.is_active) : null;
 
   const handleAdminClick = () => {
     navigate('/admin');
