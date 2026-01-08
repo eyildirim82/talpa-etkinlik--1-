@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import { checkAdmin } from '@/shared/services/authz'
+import { logger } from '@/shared/utils/logger'
 import * as XLSX from 'xlsx'
 import type { AdminResponse } from '../types/admin.types'
 import { assignTicket } from '@/modules/ticket'
@@ -22,7 +23,7 @@ export async function cancelBooking(bookingId: number, eventId: number): Promise
     .eq('id', bookingId)
 
   if (updateError) {
-    console.error('Cancel Booking Error:', updateError)
+    logger.error('Cancel Booking Error:', updateError)
     return { success: false, message: 'İptal işlemi başarısız.' }
   }
 
@@ -60,7 +61,7 @@ export async function exportBookingsToExcel(eventId: number): Promise<Blob | nul
     .order('booking_date', { ascending: true })
 
   if (error || !bookings) {
-    console.error('Error fetching bookings:', error)
+    logger.error('Error fetching bookings:', error)
     return null
   }
 

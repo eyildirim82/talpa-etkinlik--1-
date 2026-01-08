@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { logger } from '@/shared/utils/logger'
 import type { Profile } from '../types/profile.types'
 
 export const getProfile = async (userId: string): Promise<Profile | null> => {
@@ -10,7 +11,7 @@ export const getProfile = async (userId: string): Promise<Profile | null> => {
         .single()
 
     if (error) {
-        console.error('Error fetching profile:', error)
+        logger.error('Error fetching profile:', error)
         return null
     }
     return data

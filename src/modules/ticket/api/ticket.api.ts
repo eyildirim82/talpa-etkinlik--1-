@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import { checkAdmin } from '@/shared/services/authz'
+import { logger } from '@/shared/utils/logger'
 import type { TicketResponse, TicketPool, TicketStats } from '../types/ticket.types'
 
 /**
@@ -17,7 +18,7 @@ export async function assignTicket(bookingId: number): Promise<TicketResponse> {
   })
 
   if (error) {
-    console.error('Assign Ticket RPC Error:', error)
+    logger.error('Assign Ticket RPC Error:', error)
     return { success: false, message: 'Bağlantı hatası.' }
   }
 

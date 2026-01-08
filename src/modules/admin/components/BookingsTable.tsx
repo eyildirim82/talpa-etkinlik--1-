@@ -4,6 +4,7 @@ import {
     MoreHorizontal, Download,
     CreditCard, Calendar, User
 } from 'lucide-react';
+import { logger } from '@/shared/utils/logger';
 import { getBookingsWithFilters } from '@/modules/booking/api/booking.api';
 import { cancelBooking, exportBookingsToExcel } from '@/modules/admin/api/admin.api';
 import { assignTicket } from '@/modules/ticket/api/ticket.api';
@@ -36,7 +37,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
             setBookings(result.data);
             setTotalCount(result.count);
         } catch (error) {
-            console.error(error);
+            logger.error('Error in BookingsTable:', error);
         } finally {
             setLoading(false);
         }
@@ -59,7 +60,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                 alert('Hata: ' + result.message);
             }
         } catch (error) {
-            console.error(error);
+            logger.error('Error in BookingsTable:', error);
             alert('Beklenmeyen bir hata oluştu');
         } finally {
             setProcessingId(null);
@@ -79,7 +80,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                 alert('Hata: ' + result.message);
             }
         } catch (error) {
-            console.error(error);
+            logger.error('Error in BookingsTable:', error);
             alert('Beklenmeyen bir hata oluştu');
         } finally {
             setProcessingId(null);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { logger } from '@/shared/utils/logger';
 import { uploadTicketPool } from '@/modules/file-processing';
 import { getTicketStats, getTicketPool } from '@/modules/ticket/api/ticket.api';
 import type { TicketStats, TicketPool } from '@/modules/ticket/types/ticket.types';
@@ -26,7 +27,7 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
             setStats(statsData);
             setPool(poolData.data);
         } catch (err) {
-            console.error(err);
+            logger.error('TicketPoolManager error:', err);
             setMessage({ type: 'error', text: 'Veriler yüklenirken hata oluştu.' });
         } finally {
             setLoading(false);

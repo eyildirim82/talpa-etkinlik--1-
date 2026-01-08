@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { logger } from '@/shared/utils/logger';
 import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
 interface MemberData {
@@ -50,7 +51,7 @@ export const MemberImport: React.FC = () => {
                 setData(mappedData);
             }
         } catch (err) {
-            console.error(err);
+            logger.error('MemberImport error:', err);
             setError('Dosya okunurken hata oluştu.');
         }
     };
@@ -94,7 +95,7 @@ export const MemberImport: React.FC = () => {
             alert(`İşlem tamamlandı. ${successCount} kullanıcı işlendi.`);
 
         } catch (err: any) {
-            console.error('Import error:', err);
+            logger.error('MemberImport import error:', err);
             setError('İçe aktarma sırasında sunucu hatası: ' + err.message);
         } finally {
             setImporting(false);

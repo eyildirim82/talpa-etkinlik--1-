@@ -7,6 +7,7 @@ import {
     Loader2,
     AlertCircle,
 } from 'lucide-react';
+import { logger } from '@/shared/utils/logger';
 import { useAdminUsers, useUpdateUserRole } from '@/modules/admin';
 
 const selectStyle: React.CSSProperties = {
@@ -46,7 +47,7 @@ export const UsersPanel: React.FC = () => {
             });
             setRoleChangeConfirm(null);
         } catch (error) {
-            console.error('Error updating user role:', error);
+            logger.error('Error updating user role:', error);
         }
     };
 

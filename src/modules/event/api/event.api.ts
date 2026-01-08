@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import { checkAdmin } from '@/shared/services/authz'
+import { logger } from '@/shared/utils/logger'
 import type { ActiveEvent, CreateEventData, EventStats, EventResponse } from '../types/event.types'
 
 export const getActiveEvent = async (): Promise<ActiveEvent | null> => {
@@ -97,7 +98,7 @@ export async function createEvent(eventData: CreateEventData): Promise<EventResp
     })
 
   if (error) {
-    console.error('Create Event Error:', error)
+    logger.error('Create Event Error:', error)
     return { success: false, message: 'Etkinlik oluşturulamadı.' }
   }
 
@@ -116,7 +117,7 @@ export async function setActiveEvent(eventId: number): Promise<EventResponse> {
   })
 
   if (error) {
-    console.error('Set Active RPC Error:', error)
+    logger.error('Set Active RPC Error:', error)
     return { success: false, message: 'Bağlantı hatası.' }
   }
 

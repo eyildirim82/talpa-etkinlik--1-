@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { logger } from '@/shared/utils/logger'
 import type { Booking, JoinEventResult, BookingResponse, BookingFilters, BookingsWithCount, QueueStatus, BookingWithProfile } from '../types/booking.types'
 
 /**
@@ -31,7 +32,7 @@ export async function joinEvent(
 
     // Handle RPC call errors (network, permission, etc.)
     if (error) {
-      console.error('Join Event RPC Error:', error)
+      logger.error('Join Event RPC Error:', error)
       return { success: false, message: 'Bağlantı hatası. Lütfen tekrar deneyin.' }
     }
 
@@ -48,7 +49,7 @@ export async function joinEvent(
     }
 
   } catch (err) {
-    console.error('Unexpected Error:', err)
+    logger.error('Unexpected Error:', err)
     return { success: false, message: 'Beklenmeyen bir hata oluştu.' }
   }
 }
@@ -71,13 +72,13 @@ export async function getUserBooking(eventId: number): Promise<Booking | null> {
       .maybeSingle()
 
     if (error) {
-      console.error('Error fetching user booking:', error)
+      logger.error('Error fetching user booking:', error)
       return null
     }
 
     return data as Booking | null
   } catch (error) {
-    console.warn('Failed to fetch user booking', error)
+    logger.warn('Failed to fetch user booking', error)
     return null
   }
 }
@@ -122,14 +123,14 @@ export async function cancelBooking(bookingId: number): Promise<BookingResponse>
       .eq('user_id', user.id)
 
     if (updateError) {
-      console.error('Error canceling booking:', updateError)
+      logger.error('Error canceling booking:', updateError)
       return { success: false, message: 'Başvuru iptal edilemedi. Lütfen tekrar deneyin.' }
     }
 
     return { success: true, message: 'Başvurunuz iptal edildi.' }
 
   } catch (err) {
-    console.error('Unexpected Error:', err)
+    logger.error('Unexpected Error:', err)
     return { success: false, message: 'Beklenmeyen bir hata oluştu.' }
   }
 }
@@ -162,7 +163,7 @@ export async function getBookingQueuePosition(eventId: number, userId: string): 
 
     return (count || 0) + 1 // Position (1-indexed)
   } catch (error) {
-    console.error('Error getting queue position:', error)
+    logger.error('Error getting queue position:', error)
     return null
   }
 }

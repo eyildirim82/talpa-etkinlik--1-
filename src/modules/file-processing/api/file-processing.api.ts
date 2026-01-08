@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import { checkAdmin } from '@/shared/services/authz'
+import { logger } from '@/shared/utils/logger'
 import type { FileProcessingResponse } from '../types/file-processing.types'
 
 /**
@@ -21,7 +22,7 @@ export async function processTicketZip(eventId: number, filePath: string): Promi
     })
 
     if (error) {
-      console.error('Process ZIP Error:', error)
+      logger.error('Process ZIP Error:', error)
       return { success: false, count: 0, message: 'ZIP işleme hatası.' }
     }
 
@@ -35,7 +36,7 @@ export async function processTicketZip(eventId: number, filePath: string): Promi
       message: `${data.processedCount || 0} bilet başarıyla işlendi.`
     }
   } catch (err) {
-    console.error('Unexpected Error:', err)
+    logger.error('Unexpected Error:', err)
     return { success: false, count: 0, message: 'Beklenmeyen bir hata oluştu.' }
   }
 }
@@ -68,7 +69,7 @@ export async function uploadTicketPool(
       .upload(fileName, file)
 
     if (uploadError) {
-      console.error('Upload Error:', uploadError)
+      logger.error('Upload Error:', uploadError)
       return { success: false, count: 0, message: 'Dosya yüklenemedi.' }
     }
 
@@ -81,7 +82,7 @@ export async function uploadTicketPool(
 
     return result
   } catch (err) {
-    console.error('Unexpected Error:', err)
+    logger.error('Unexpected Error:', err)
     return { success: false, count: 0, message: 'Beklenmeyen bir hata oluştu.' }
   }
 }

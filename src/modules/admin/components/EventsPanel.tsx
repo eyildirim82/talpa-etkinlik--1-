@@ -22,6 +22,7 @@ import {
     useDeleteEvent,
     type AdminEvent,
 } from '@/modules/admin';
+import { logger } from '@/shared/utils/logger';
 import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
 interface EventFormData {
@@ -102,7 +103,7 @@ export const EventsPanel: React.FC = () => {
             setFormData(prev => ({ ...prev, banner_image: publicUrl }));
 
         } catch (error) {
-            console.error('Upload error:', error);
+            logger.error('Error in EventsPanel:', error);
             alert('Yükleme hatası oluştu. Lütfen "event-banners" bucket\'ının oluşturulduğundan emin olun.');
         } finally {
             setUploadingBanner(false);
@@ -142,7 +143,7 @@ export const EventsPanel: React.FC = () => {
             }
             setShowModal(false);
         } catch (error) {
-            console.error('Error saving event:', error);
+            logger.error('Error saving event:', error);
         }
     };
 
@@ -151,7 +152,7 @@ export const EventsPanel: React.FC = () => {
             await deleteEvent.mutateAsync(eventId);
             setDeleteConfirm(null);
         } catch (error) {
-            console.error('Error deleting event:', error);
+            logger.error('Error deleting event:', error);
         }
     };
 
@@ -160,7 +161,7 @@ export const EventsPanel: React.FC = () => {
             await setActiveEvent.mutateAsync(eventId);
             setActiveConfirm(null);
         } catch (error) {
-            console.error('Error setting active event:', error);
+            logger.error('Error setting active event:', error);
         }
     };
 

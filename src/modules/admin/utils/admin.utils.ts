@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { logger } from '@/shared/utils/logger'
 import type { AdminResponse } from '../types/admin.types'
 
 /**
@@ -12,7 +13,7 @@ export async function promoteFromWaitlist(eventId: number): Promise<AdminRespons
   })
 
   if (error) {
-    console.error('Promote Waitlist RPC Error:', error)
+    logger.error('Promote Waitlist RPC Error:', error)
     return { success: false, message: 'Bağlantı hatası.' }
   }
 
