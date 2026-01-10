@@ -1,5 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
-import { checkAdmin } from '@/shared/services/authz'
+import { checkAdmin } from '@/modules/auth'
 import { logger } from '@/shared/utils/logger'
 import type { FileProcessingResponse } from '../types/file-processing.types'
 

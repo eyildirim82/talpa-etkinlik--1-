@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { useProfile } from '@/modules/profile';
 import {
@@ -11,8 +12,30 @@ import {
 } from '@/modules/admin';
 import { Loader2, ShieldX, Lock } from 'lucide-react';
 
-// Create local query client for AdminPage
-const queryClient = new QueryClient();
+
+// Create local query client for AdminPage - REMOVED, using global client
+// const queryClient = new QueryClient();
+
+// SessionStorage key to remember admin was verified
+const ADMIN_VERIFIED_KEY = '__admin_verified__'
+
+// Check if admin was previously verified in this session
+function wasAdminVerified(): boolean {
+    try {
+        return sessionStorage.getItem(ADMIN_VERIFIED_KEY) === 'true'
+    } catch {
+        return false
+    }
+}
+
+// Mark admin as verified for this session
+function setAdminVerified(): void {
+    try {
+        sessionStorage.setItem(ADMIN_VERIFIED_KEY, 'true')
+    } catch {
+        // Ignore
+    }
+}
 
 interface AdminPageProps {
     onBack: () => void;
@@ -20,9 +43,30 @@ interface AdminPageProps {
 
 const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     const { user, isLoading } = useProfile();
-    const [activeTab, setActiveTab] = useState<AdminTab>('overview');
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    // Track if we've ever successfully loaded admin content
+    const hasBeenVerifiedRef = useRef(wasAdminVerified());
+
+    const activeTab = (searchParams.get('tab') as AdminTab) || 'overview';
+
+    const setActiveTab = (tab: AdminTab) => {
+        setSearchParams({ tab });
+    };
 
     const isAdmin = user?.is_admin === true;
+    
+    // Once admin is verified, remember it
+    useEffect(() => {
+        if (isAdmin && !isLoading) {
+            hasBeenVerifiedRef.current = true;
+            setAdminVerified();
+        }
+    }, [isAdmin, isLoading]);
+
+    // CRITICAL FIX: Skip loading state if admin was previously verified
+    // This prevents the "page refresh" feeling on alt+tab
+    const shouldShowLoading = isLoading && !hasBeenVerifiedRef.current;
 
     const handleLogout = async () => {
         const { logout } = await import('@/modules/auth');
@@ -30,7 +74,7 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
         window.location.reload();
     };
 
-    if (isLoading) {
+    if (shouldShowLoading) {
         return (
             <div style={{
                 minHeight: '100vh',
@@ -60,7 +104,9 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
         );
     }
 
-    if (!user) {
+    // If we're still loading but admin was verified before, show the admin content
+    // with the last known user data (which will be updated once loading completes)
+    if (!user && !hasBeenVerifiedRef.current) {
         return (
             <div style={{
                 minHeight: '100vh',
@@ -136,7 +182,8 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
         );
     }
 
-    if (!isAdmin) {
+    // Only show access denied if admin was never verified AND user is definitely not admin
+    if (!isAdmin && !hasBeenVerifiedRef.current && !isLoading) {
         return (
             <div style={{
                 minHeight: '100vh',
@@ -232,7 +279,7 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onBack={onBack}
-            userName={user.full_name}
+            userName={user?.full_name || 'Admin'}
             onLogout={handleLogout}
         >
             {renderPanel()}
@@ -240,11 +287,10 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     );
 };
 
+
 const AdminPage: React.FC<AdminPageProps> = ({ onBack }) => {
     return (
-        <QueryClientProvider client={queryClient}>
-            <AdminContent onBack={onBack} />
-        </QueryClientProvider>
+        <AdminContent onBack={onBack} />
     );
 };
 

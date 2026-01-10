@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { cancelBooking } from '@/modules/admin'
-import { promoteFromWaitlist } from '@/modules/admin/utils/admin.utils'
+import { promoteFromWaitlist } from '@/modules/admin'
 import { createMockSupabaseClient, setupMockAuth } from '@/shared/test-utils/supabase-mock'
 import { createMockUser } from '@/shared/test-utils/test-data'
 
 // Mock dependencies
-vi.mock('@/modules/admin/utils/admin.utils', () => ({
+vi.mock('@/modules/admin', async (importOriginal) => ({
+  ...await importOriginal(),
   promoteFromWaitlist: vi.fn(),
 }))
 

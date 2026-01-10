@@ -1,8 +1,7 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
-    "./**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -11,29 +10,22 @@ export default {
       },
       colors: {
         talpa: {
-          bg: '#0A1929',      // Deep Navy Background
-          card: '#112240',    // Card/Panel Background
-          primary: '#E5E5E5', // Main Text (Light)
-          secondary: '#94A3B8', // Muted Text
-          gold: '#D4AF37',    // Gold Accent
-          goldHover: '#B5952F', // Gold Hover
-          accent: '#ffffff1a', // Subtle White Border/Overlay
-          success: '#059669', // Emerald 600
-          danger: '#E11D48', // Rose 600
-          warning: '#D97706', // Amber 600
-          border: '#334155', // Slate 700 (Darker border)
-          red: '#C41E3A', // Primary Brand Red
-          'red-light': '#D64356',
-          'red-dark': '#A01729',
+          bg: '#F9FAFB', // Light gray background
+          card: '#FFFFFF',
+          text: {
+            main: '#111827', // Gray 900
+            secondary: '#6B7280', // Gray 500
+            light: '#9CA3AF',
+          },
+          border: '#E5E7EB', // Gray 200
+          primary: '#EF4444', // Red 500 (Brand)
+          secondary: '#1F2937', // Gray 800
+          success: '#10B981', // Green 500
+          warning: '#F59E0B',
+          danger: '#EF4444',
+          gold: '#D4AF37', // Keeping legacy gold just in case
         },
-        // EventsPanel ve Admin sayfaları için renkler
-        light: '#E5E5E5',      // Açık metin rengi
-        dark: '#0A1929',      // Koyu arka plan rengi
-        primary: '#0A1929',   // Ana arka plan rengi (talpa.bg ile aynı)
-        gold: '#D4AF37',       // Altın rengi
-        'gold-dark': '#B5952F', // Koyu altın rengi
-        'gold-light': '#E5C866', // Açık altın rengi
-      }
+      },
     },
   },
   plugins: [

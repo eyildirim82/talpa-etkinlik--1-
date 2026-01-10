@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
 import { createBrowserClient } from '@/shared/infrastructure/supabase';
 
-interface UseAdminCheckResult {
+// Track last visibility change to ignore SIGNED_IN events triggered by tab focus
+let lastVisibilityChangeTime = 0
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      lastVisibilityChangeTime = Date.now()
+    }
+  })
+}
+
+export interface UseAdminCheckResult {
   isAdmin: boolean;
   isLoading: boolean;
   error: Error | null;
@@ -11,6 +21,8 @@ interface UseAdminCheckResult {
  * Hook to check if current user is admin
  * Uses RPC function for server-side validation (secure)
  * Caches result to avoid unnecessary API calls
+ * 
+ * @module auth/hooks
  */
 export function useAdminCheck(): UseAdminCheckResult {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
@@ -76,10 +88,22 @@ export function useAdminCheck(): UseAdminCheckResult {
 
     checkAdminStatus();
 
-    // Listen for auth state changes
+    // Listen for auth state changes - only react to meaningful events
     const supabase = createBrowserClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      checkAdminStatus();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      // Check if this is a spurious SIGNED_IN triggered by tab focus
+      const timeSinceVisibilityChange = Date.now() - lastVisibilityChangeTime
+      const isSpuriousSignIn = event === 'SIGNED_IN' && timeSinceVisibilityChange < 1000
+      
+      // Ignore spurious SIGNED_IN events triggered by tab focus
+      if (isSpuriousSignIn) {
+        return;
+      }
+      
+      // Only check admin status on actual sign in/out - ignore TOKEN_REFRESHED, INITIAL_SESSION, USER_UPDATED
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        checkAdminStatus();
+      }
     });
 
     return () => {

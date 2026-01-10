@@ -1,8 +1,15 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 
 /**
- * Centralized admin check service
- * Used by API functions across all modules
+ * Authorization Service
+ * Centralized admin check service used by API functions across all modules
+ * 
+ * @module auth/services
+ */
+
+/**
+ * Check if the current user has admin privileges
+ * Uses RPC function for server-side validation (preferred) with profile fallback
  */
 export async function checkAdmin(): Promise<boolean> {
     const supabase = createBrowserClient()
@@ -24,7 +31,7 @@ export async function checkAdmin(): Promise<boolean> {
 
         return !!(profile?.is_admin || profile?.role === 'admin')
     } catch (e) {
-        console.error('[authz] Admin check failed:', e)
+        console.error('[authorization] Admin check failed:', e)
         return false
     }
 }

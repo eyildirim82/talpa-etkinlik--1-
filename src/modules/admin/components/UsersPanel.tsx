@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
     Users,
     Search,
@@ -9,6 +9,25 @@ import {
 } from 'lucide-react';
 import { logger } from '@/shared/utils/logger';
 import { useAdminUsers, useUpdateUserRole } from '@/modules/admin';
+
+// SessionStorage key to remember if panel was loaded
+const USERS_PANEL_LOADED_KEY = '__users_panel_loaded__'
+
+function wasUsersPanelLoaded(): boolean {
+    try {
+        return sessionStorage.getItem(USERS_PANEL_LOADED_KEY) === 'true'
+    } catch {
+        return false
+    }
+}
+
+function setUsersPanelLoaded(): void {
+    try {
+        sessionStorage.setItem(USERS_PANEL_LOADED_KEY, 'true')
+    } catch {
+        // Ignore
+    }
+}
 
 const selectStyle: React.CSSProperties = {
     padding: '0.75rem 1rem',
@@ -37,6 +56,15 @@ export const UsersPanel: React.FC = () => {
 
     const { data: users, isLoading } = useAdminUsers();
     const updateUserRole = useUpdateUserRole();
+    const hasBeenLoadedRef = useRef(wasUsersPanelLoaded());
+
+    // Once data is loaded, remember it
+    React.useEffect(() => {
+        if (users && !isLoading) {
+            hasBeenLoadedRef.current = true;
+            setUsersPanelLoaded();
+        }
+    }, [users, isLoading]);
 
     const handleRoleChange = async () => {
         if (!roleChangeConfirm) return;
@@ -61,7 +89,10 @@ export const UsersPanel: React.FC = () => {
         return matchesSearch && matchesRole;
     }) || [];
 
-    if (isLoading) {
+    // Only show loading if panel was never loaded before
+    const shouldShowLoading = isLoading && !hasBeenLoadedRef.current && !users;
+
+    if (shouldShowLoading) {
         return (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '300px' }}>
                 <Loader2 style={{ width: '40px', height: '40px', animation: 'spin 1s linear infinite', color: '#D4AF37' }} />

@@ -28,8 +28,20 @@ export default defineConfig(({ mode }) => {
           replacement: path.resolve(__dirname, './src/modules'),
         },
         {
+          find: '@/pages',
+          replacement: path.resolve(__dirname, './src/pages'),
+        },
+        {
+          find: '@/types',
+          replacement: path.resolve(__dirname, './src/types'),
+        },
+        {
           find: '@/shared',
           replacement: path.resolve(__dirname, './src/shared'),
+        },
+        {
+          find: '@/components',
+          replacement: path.resolve(__dirname, './src/components'),
         },
         {
           find: '@',

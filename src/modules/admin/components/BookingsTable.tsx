@@ -1,14 +1,28 @@
+/**
+ * BookingsTable Component
+ * Admin table for managing event bookings
+ * 
+ * Uses domain module APIs:
+ * - booking: getBookingsAdmin, cancelBookingAdmin, exportBookingsToExcel
+ * - ticket: assignTicket
+ */
 import React, { useState, useEffect } from 'react';
 import {
-    Check, X, Search, Filter,
-    MoreHorizontal, Download,
-    CreditCard, Calendar, User
+    Check, X, Search,
+    Download,
+    CreditCard, User
 } from 'lucide-react';
 import { logger } from '@/shared/utils/logger';
-import { getBookingsWithFilters } from '@/modules/booking/api/booking.api';
-import { cancelBooking, exportBookingsToExcel } from '@/modules/admin/api/admin.api';
-import { assignTicket } from '@/modules/ticket/api/ticket.api';
-import type { BookingWithProfile } from '@/modules/booking/types/booking.types';
+// Domain module imports - using public APIs only
+import {
+    getBookingsAdmin,
+    cancelBookingAdmin,
+    exportBookingsToExcel,
+    downloadExportedFile,
+    type BookingWithProfile,
+    type BookingFilters
+} from '@/modules/booking';
+import { assignTicket } from '@/modules/ticket';
 
 interface BookingsTableProps {
     eventId: number;
@@ -18,26 +32,31 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
     const [bookings, setBookings] = useState<BookingWithProfile[]>([]);
     const [loading, setLoading] = useState(false);
     const [totalCount, setTotalCount] = useState(0);
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<{
+        text: string;
+        status: 'ALL' | 'ASIL' | 'YEDEK' | 'IPTAL';
+        payment: 'ALL' | 'WAITING' | 'PAID';
+    }>({
         text: '',
-        status: 'ALL' as 'ALL' | 'ASIL' | 'YEDEK' | 'IPTAL',
-        payment: 'ALL' as 'ALL' | 'WAITING' | 'PAID'
+        status: 'ALL',
+        payment: 'ALL'
     });
     const [processingId, setProcessingId] = useState<number | null>(null);
 
     const loadBookings = async () => {
         setLoading(true);
         try {
-            const result = await getBookingsWithFilters(eventId, {
+            const bookingFilters: BookingFilters = {
                 queue_status: filters.status !== 'ALL' ? filters.status : undefined,
                 payment_status: filters.payment !== 'ALL' ? filters.payment : undefined,
-                page: 1, // Pagination can be added later
+                page: 1,
                 pageSize: 100
-            });
+            };
+            const result = await getBookingsAdmin(eventId, bookingFilters);
             setBookings(result.data);
             setTotalCount(result.count);
         } catch (error) {
-            logger.error('Error in BookingsTable:', error);
+            logger.error('Error loading bookings:', error);
         } finally {
             setLoading(false);
         }
@@ -60,7 +79,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                 alert('Hata: ' + result.message);
             }
         } catch (error) {
-            logger.error('Error in BookingsTable:', error);
+            logger.error('Error assigning ticket:', error);
             alert('Beklenmeyen bir hata oluştu');
         } finally {
             setProcessingId(null);
@@ -72,7 +91,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
 
         setProcessingId(bookingId);
         try {
-            const result = await cancelBooking(bookingId, eventId);
+            const result = await cancelBookingAdmin(bookingId, eventId);
             if (result.success) {
                 alert(result.message);
                 loadBookings();
@@ -80,7 +99,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                 alert('Hata: ' + result.message);
             }
         } catch (error) {
-            logger.error('Error in BookingsTable:', error);
+            logger.error('Error canceling booking:', error);
             alert('Beklenmeyen bir hata oluştu');
         } finally {
             setProcessingId(null);
@@ -88,13 +107,11 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
     };
 
     const handleExport = async () => {
-        const blob = await exportBookingsToExcel(eventId);
-        if (blob) {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `basvurular-event-${eventId}.xlsx`;
-            a.click();
+        const result = await exportBookingsToExcel(eventId);
+        if (result.success && result.data) {
+            downloadExportedFile(result.data, `basvurular-event-${eventId}.xlsx`);
+        } else {
+            alert(result.error || 'Excel oluşturulurken hata oluştu');
         }
     };
 

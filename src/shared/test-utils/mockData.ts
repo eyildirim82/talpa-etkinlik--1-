@@ -1,4 +1,4 @@
-import { EventData, User } from './types';
+import { EventData, User } from '@/types';
 
 // Mock Event Data - Multiple Events
 export const mockEvents: EventData[] = [

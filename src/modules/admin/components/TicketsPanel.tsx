@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BookingsTable } from './BookingsTable';
 import { TicketPoolManager } from './TicketPoolManager';
-import { getActiveEvent } from '@/modules/event/api/event.api';
+import { getActiveEvent } from '@/modules/event';
 import { useQuery } from '@tanstack/react-query';
 import { Calendar, User, Ticket } from 'lucide-react';
 

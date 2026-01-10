@@ -1,4 +1,11 @@
-import React from 'react';
+/**
+ * OverviewPanel Component
+ * Admin dashboard overview with statistics
+ * 
+ * Uses domain module APIs:
+ * - reporting: useDashboardStats
+ */
+import React, { useRef } from 'react';
 import {
     Calendar,
     Ticket,
@@ -8,7 +15,27 @@ import {
     Activity,
     Loader2
 } from 'lucide-react';
-import { useAdminStats, useAdminTickets } from '@/modules/admin';
+// Domain module import - using public API
+import { useDashboardStats } from '@/modules/reporting';
+
+// SessionStorage key to remember if panel was loaded
+const PANEL_LOADED_KEY = '__overview_panel_loaded__'
+
+function wasPanelLoaded(): boolean {
+    try {
+        return sessionStorage.getItem(PANEL_LOADED_KEY) === 'true'
+    } catch {
+        return false
+    }
+}
+
+function setPanelLoaded(): void {
+    try {
+        sessionStorage.setItem(PANEL_LOADED_KEY, 'true')
+    } catch {
+        // Ignore
+    }
+}
 
 interface StatCardProps {
     title: string;
@@ -75,9 +102,21 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, accen
 );
 
 export const OverviewPanel: React.FC = () => {
-    const { data: stats, isLoading: statsLoading } = useAdminStats();
+    const { data: stats, isLoading: statsLoading } = useDashboardStats();
+    const hasBeenLoadedRef = useRef(wasPanelLoaded());
 
-    if (statsLoading) {
+    // Once data is loaded, remember it
+    React.useEffect(() => {
+        if (stats && !statsLoading) {
+            hasBeenLoadedRef.current = true;
+            setPanelLoaded();
+        }
+    }, [stats, statsLoading]);
+
+    // Only show loading if panel was never loaded before
+    const shouldShowLoading = statsLoading && !hasBeenLoadedRef.current && !stats;
+
+    if (shouldShowLoading) {
         return (
             <div style={{
                 display: 'flex',
@@ -191,13 +230,11 @@ export const OverviewPanel: React.FC = () => {
                 </div>
             )}
 
-            {/* Recent Activity - Removed for now, can be added back with bookings data */}
-
             <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };

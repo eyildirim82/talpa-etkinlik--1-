@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventData } from '../../../types';
+import { EventData } from '@/types';
 import { Button } from '../common/Button';
 
 // Sticky Footer CTA

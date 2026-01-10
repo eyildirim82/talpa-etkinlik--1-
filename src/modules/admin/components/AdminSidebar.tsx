@@ -7,6 +7,7 @@ import {
     LogOut,
     X
 } from 'lucide-react';
+import { Link } from 'react-router-dom'; // If needed, or button
 
 export type AdminTab = 'overview' | 'events' | 'tickets' | 'users';
 
@@ -46,152 +47,79 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     };
 
     return (
-        <aside style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            bottom: 0,
-            width: '280px',
-            background: 'linear-gradient(180deg, #0D2137 0%, #0A1929 100%)',
-            borderRight: '1px solid rgba(212, 175, 55, 0.15)',
-            transform: isOpen ? 'translateX(0)' : 'translateX(-100%)',
-            transition: 'transform 0.3s ease',
-            zIndex: 50,
-            display: 'flex',
-            flexDirection: 'column'
-        }} className="lg-sidebar">
-            {/* Logo */}
-            <div style={{
-                padding: '2rem',
-                borderBottom: '1px solid rgba(212, 175, 55, 0.1)'
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div>
-                        <h1 style={{
-                            fontSize: '1.75rem',
-                            fontWeight: '700',
-                            color: '#D4AF37',
-                            letterSpacing: '-0.02em',
-                            margin: 0
-                        }}>TALPA</h1>
-                        <span style={{
-                            fontSize: '0.65rem',
-                            fontWeight: '500',
-                            letterSpacing: '0.2em',
-                            color: 'rgba(212, 175, 55, 0.6)',
-                            textTransform: 'uppercase'
-                        }}>Admin Panel</span>
+        <aside
+            className={`
+                fixed top-0 left-0 bottom-0 w-[240px] bg-white border-r border-gray-200 z-50 flex flex-col transition-transform duration-300 ease-in-out
+                ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}
+        >
+            {/* Logo Area */}
+            <div className="h-16 flex items-center px-6 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-talpa-red rounded-lg flex items-center justify-center text-white font-bold">
+                        T
                     </div>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            display: 'none',
-                            padding: '0.5rem',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            color: '#E5E5E5'
-                        }}
-                        className="lg-hide"
-                    >
-                        <X style={{ width: '20px', height: '20px' }} />
-                    </button>
+                    <div>
+                        <h1 className="text-lg font-bold text-gray-900 tracking-tight leading-none">TALPA</h1>
+                        <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Admin</span>
+                    </div>
                 </div>
+                <button
+                    onClick={onClose}
+                    className="ml-auto lg:hidden p-2 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100"
+                >
+                    <X className="w-5 h-5" />
+                </button>
             </div>
 
             {/* Navigation */}
-            <nav style={{ flex: 1, padding: '1.5rem 1rem' }}>
-                {MENU_ITEMS.map((item) => (
-                    <button
-                        key={item.id}
-                        onClick={() => handleTabClick(item.id)}
-                        style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem',
-                            padding: '1rem 1.25rem',
-                            marginBottom: '0.5rem',
-                            borderRadius: '12px',
-                            border: 'none',
-                            background: activeTab === item.id
-                                ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%)'
-                                : 'transparent',
-                            color: activeTab === item.id ? '#D4AF37' : 'rgba(229, 229, 229, 0.7)',
-                            fontSize: '0.9rem',
-                            fontWeight: activeTab === item.id ? '600' : '400',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            textAlign: 'left',
-                            borderLeft: activeTab === item.id ? '3px solid #D4AF37' : '3px solid transparent'
-                        }}
-                        onMouseEnter={(e) => {
-                            if (activeTab !== item.id) {
-                                e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                                e.currentTarget.style.color = '#E5E5E5';
-                            }
-                        }}
-                        onMouseLeave={(e) => {
-                            if (activeTab !== item.id) {
-                                e.currentTarget.style.background = 'transparent';
-                                e.currentTarget.style.color = 'rgba(229, 229, 229, 0.7)';
-                            }
-                        }}
-                    >
-                        {item.icon}
-                        <span>{item.label}</span>
-                    </button>
-                ))}
+            <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+                {MENU_ITEMS.map((item) => {
+                    const isActive = activeTab === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            onClick={() => handleTabClick(item.id)}
+                            className={`
+                                w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                                ${isActive
+                                    ? 'bg-gray-900 text-white shadow-sm'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                }
+                            `}
+                        >
+                            {/* Icon styling based on state */}
+                            <span className={isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'}>
+                                {item.icon}
+                            </span>
+                            {item.label}
+                        </button>
+                    );
+                })}
             </nav>
 
-            {/* User & Logout */}
-            <div style={{
-                padding: '1.5rem',
-                borderTop: '1px solid rgba(212, 175, 55, 0.1)'
-            }}>
-                {userName && (
-                    <div style={{ marginBottom: '1rem', paddingLeft: '0.5rem' }}>
-                        <span style={{
-                            fontSize: '0.65rem',
-                            color: 'rgba(229, 229, 229, 0.4)',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.1em'
-                        }}>Hoş geldin</span>
-                        <p style={{
-                            margin: '0.25rem 0 0 0',
-                            fontWeight: '600',
-                            color: '#D4AF37',
-                            fontSize: '0.95rem'
-                        }}>{userName}</p>
+            {/* User Profile Footer */}
+            <div className="p-4 border-t border-gray-100">
+                <div className="flex items-center gap-3 mb-4 px-2">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-600">
+                        {userName ? userName.charAt(0).toUpperCase() : 'U'}
                     </div>
-                )}
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                            {userName || 'Admin User'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                            Yönetici
+                        </p>
+                    </div>
+                </div>
+
                 <button
                     onClick={onLogout}
-                    style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        padding: '0.875rem 1rem',
-                        borderRadius: '10px',
-                        border: '1px solid rgba(196, 30, 58, 0.3)',
-                        background: 'rgba(196, 30, 58, 0.1)',
-                        color: '#C41E3A',
-                        fontSize: '0.85rem',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(196, 30, 58, 0.2)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(196, 30, 58, 0.1)';
-                    }}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                 >
-                    <LogOut style={{ width: '18px', height: '18px' }} />
-                    <span>Çıkış Yap</span>
+                    <LogOut className="w-4 h-4" />
+                    Çıkış Yap
                 </button>
             </div>
         </aside>

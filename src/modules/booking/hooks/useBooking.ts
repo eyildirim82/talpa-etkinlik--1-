@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { joinEvent, cancelBooking } from '@/modules/booking/api/booking.api'
+import { joinEvent, cancelBooking } from '../api/booking.api'
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
 import type { QueueStatus } from '../types/booking.types'
 

@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import {
-    Menu,
-    ChevronLeft
-} from 'lucide-react';
+import { Menu, Search, Bell, ChevronRight } from 'lucide-react';
 import { AdminSidebar, AdminTab } from './AdminSidebar';
+import { Button } from '@/components/common/Button';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -24,27 +22,25 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
+    // Map tab ID to display label for breadcrumbs
+    const tabLabels: Record<AdminTab, string> = {
+        overview: 'Genel Bakış',
+        events: 'Etkinlikler',
+        tickets: 'Bilet Yönetimi',
+        users: 'Kullanıcılar'
+    };
+
     return (
-        <div style={{
-            minHeight: '100vh',
-            background: '#0A1929',
-            display: 'flex',
-            fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif'
-        }}>
-            {/* Mobile sidebar overlay */}
+        <div className="min-h-screen bg-talpa-bg font-sans text-talpa-text-main flex">
+            {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(0,0,0,0.7)',
-                        zIndex: 40
-                    }}
+                    className="fixed inset-0 bg-black/50 z-40 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar Component */}
+            {/* Sidebar */}
             <AdminSidebar
                 activeTab={activeTab}
                 onTabChange={onTabChange}
@@ -54,130 +50,67 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 onClose={() => setSidebarOpen(false)}
             />
 
-            {/* Main content */}
-            <div style={{
-                flex: 1,
-                marginLeft: '280px',
-                display: 'flex',
-                flexDirection: 'column',
-                minWidth: 0
-            }} className="lg-main">
-                {/* Top bar */}
-                <header style={{
-                    background: 'rgba(10, 25, 41, 0.95)',
-                    backdropFilter: 'blur(10px)',
-                    borderBottom: '1px solid rgba(212, 175, 55, 0.1)',
-                    height: '70px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '0 2rem',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 30
-                }}>
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        style={{
-                            display: 'none',
-                            padding: '0.5rem',
-                            marginRight: '1rem',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: 'pointer',
-                            color: '#E5E5E5'
-                        }}
-                        className="lg-show"
-                    >
-                        <Menu style={{ width: '24px', height: '24px' }} />
-                    </button>
+            {/* Main Content Area */}
+            <div className="flex-1 flex flex-col min-w-0 lg:ml-[240px] transition-all duration-300">
 
-                    <button
-                        onClick={onBack}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                            padding: '0.5rem 1rem',
-                            background: 'transparent',
-                            border: '1px solid rgba(212, 175, 55, 0.2)',
-                            borderRadius: '8px',
-                            color: 'rgba(229, 229, 229, 0.7)',
-                            fontSize: '0.8rem',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = '#D4AF37';
-                            e.currentTarget.style.color = '#D4AF37';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.2)';
-                            e.currentTarget.style.color = 'rgba(229, 229, 229, 0.7)';
-                        }}
-                    >
-                        <ChevronLeft style={{ width: '16px', height: '16px' }} />
-                        <span>Ana Sayfa</span>
-                    </button>
+                {/* Header */}
+                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => setSidebarOpen(true)}
+                            className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
 
-                    <div style={{ marginLeft: 'auto' }}>
-                        <span style={{
-                            fontSize: '0.75rem',
-                            color: 'rgba(229, 229, 229, 0.5)',
-                            letterSpacing: '0.05em'
-                        }}>
-                            {new Date().toLocaleDateString('tr-TR', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            })}
-                        </span>
+                        {/* Breadcrumbs */}
+                        <div className="hidden sm:flex items-center text-sm text-gray-500">
+                            <span className="hover:text-gray-900 cursor-pointer" onClick={onBack}>Admin</span>
+                            <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
+                            <span className="font-medium text-gray-900">{tabLabels[activeTab]}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                        {/* Search Bar (Visual Only) */}
+                        <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-64">
+                            <Search className="w-4 h-4 text-gray-400 mr-2" />
+                            <input
+                                type="text"
+                                placeholder="Ara..."
+                                className="bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 w-full"
+                            />
+                        </div>
+
+                        {/* Notifications */}
+                        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full relative">
+                            <Bell className="w-5 h-5" />
+                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                        </button>
+
+                        <div className="h-8 w-px bg-gray-200 mx-2 hidden sm:block"></div>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onBack}
+                            className="text-gray-500 hover:text-gray-900 hidden sm:flex"
+                        >
+                            Ana Sayfaya Dön
+                        </Button>
                     </div>
                 </header>
 
-                {/* Page content */}
-                <main style={{
-                    flex: 1,
-                    padding: '2rem',
-                    overflowY: 'auto'
-                }}>
-                    {children}
+                {/* Page Content */}
+                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
                 </main>
             </div>
-
-            {/* Desktop sidebar visibility */}
-            <style>{`
-        @media (min-width: 1024px) {
-          .lg-sidebar {
-            transform: translateX(0) !important;
-          }
-          .lg-main {
-            margin-left: 280px !important;
-          }
-          .lg-hide {
-            display: none !important;
-          }
-          .lg-show {
-            display: none !important;
-          }
-        }
-        @media (max-width: 1023px) {
-          .lg-main {
-            margin-left: 0 !important;
-          }
-          .lg-show {
-            display: flex !important;
-          }
-          .lg-hide {
-            display: flex !important;
-          }
-        }
-      `}</style>
         </div>
     );
 };
 
-// Re-export AdminTab type for consumers
 export type { AdminTab } from './AdminSidebar';
 export default AdminLayout;

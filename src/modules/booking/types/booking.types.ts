@@ -7,8 +7,22 @@ export type Booking = Database['public']['Tables']['bookings']['Row']
 export type BookingInsert = Database['public']['Tables']['bookings']['Insert']
 export type BookingUpdate = Database['public']['Tables']['bookings']['Update']
 
-import type { QueueStatus, PaymentStatus } from '@/types'
-export { QueueStatus, PaymentStatus } from '@/types'
+// Queue Status Enum (matches database enum)
+export type QueueStatus = 'ASIL' | 'YEDEK' | 'IPTAL'
+
+export const QueueStatus = {
+  ASIL: 'ASIL',
+  YEDEK: 'YEDEK',
+  IPTAL: 'IPTAL'
+} as const
+
+// Payment Status Enum (matches database enum)
+export type PaymentStatus = 'WAITING' | 'PAID'
+
+export const PaymentStatus = {
+  WAITING: 'WAITING',
+  PAID: 'PAID'
+} as const
 
 export interface JoinEventResult {
   success: boolean

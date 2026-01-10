@@ -1,58 +1,69 @@
+/**
+ * MemberImport Component
+ * Excel-based member import UI for admin panel
+ * 
+ * Uses domain module services:
+ * - profile: parseExcelMembers, validateMemberData, importMembers
+ */
 import React, { useState } from 'react';
-import { Upload, AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import { AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
 import { logger } from '@/shared/utils/logger';
-import { createBrowserClient } from '@/shared/infrastructure/supabase';
+// Domain module imports - using public APIs only
+import {
+    parseExcelMembers,
+    validateMemberData,
+    importMembers,
+    type MemberImportData,
+    type MemberImportResult
+} from '@/modules/profile';
 
-interface MemberData {
-    tckn: string;
-    sicil_no: string;
-    email: string;
-    full_name: string;
+interface MemberDisplayData extends MemberImportData {
     status: 'PENDING' | 'SUCCESS' | 'ERROR';
     message?: string;
 }
 
 export const MemberImport: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
-    const [data, setData] = useState<MemberData[]>([]);
+    const [data, setData] = useState<MemberDisplayData[]>([]);
     const [importing, setImporting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const supabase = createBrowserClient();
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (selectedFile) {
             setFile(selectedFile);
-            parseExcel(selectedFile);
+            handleParse(selectedFile);
         }
     };
 
-    const parseExcel = async (file: File) => {
+    const handleParse = async (file: File) => {
         try {
-            const data = await file.arrayBuffer();
-            const workbook = XLSX.read(data);
-            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-
-            // Validate and map data
-            const mappedData: MemberData[] = jsonData.map((row: any) => ({
-                tckn: row['tckn'] || row['TCKN'] || '',
-                sicil_no: row['sicil_no'] || row['SICIL_NO'] || '',
-                email: row['email'] || row['EMAIL'] || '',
-                full_name: row['full_name'] || row['AD_SOYAD'] || '',
-                status: 'PENDING' as const
-            })).filter(item => item.email && item.tckn); // Basic validation
-
-            if (mappedData.length === 0) {
-                setError('Dosyada geçerli veri bulunamadı. Kolon isimlerini kontrol edin: tckn, sicil_no, email, full_name');
-            } else {
-                setError(null);
-                setData(mappedData);
+            setError(null);
+            
+            // Use profile module's Excel parsing service
+            const parsedData = await parseExcelMembers(file);
+            
+            // Validate data
+            const validation = validateMemberData(parsedData);
+            
+            if (!validation.valid) {
+                setError(validation.errors.join('\n'));
+                setData([]);
+                return;
             }
+
+            // Convert to display format
+            const displayData: MemberDisplayData[] = parsedData.map(item => ({
+                ...item,
+                status: 'PENDING' as const
+            }));
+
+            setData(displayData);
+
         } catch (err) {
-            logger.error('MemberImport error:', err);
-            setError('Dosya okunurken hata oluştu.');
+            logger.error('MemberImport parse error:', err);
+            setError(err instanceof Error ? err.message : 'Dosya okunurken hata oluştu.');
+            setData([]);
         }
     };
 
@@ -60,39 +71,50 @@ export const MemberImport: React.FC = () => {
         if (!data.length) return;
 
         setImporting(true);
+        setError(null);
 
         try {
-            // Call Supabase Edge Function
-            const { data: results, error } = await supabase.functions.invoke('import-users', {
-                body: { users: data }
-            });
+            // Convert display data to import format
+            const importData: MemberImportData[] = data.map(d => ({
+                tckn: d.tckn,
+                sicil_no: d.sicil_no,
+                email: d.email,
+                full_name: d.full_name
+            }));
 
-            if (error) throw error;
+            // Use profile module's import service
+            const result = await importMembers(importData);
 
-            // Process results to update UI
+            if (!result.success && result.error) {
+                setError(result.error);
+                return;
+            }
+
+            // Update UI with results
             const updatedData = [...data];
 
-            // Map results back to data grid
-            // Expecting results array like: [{ email: '...', status: 'success' | 'error' }]
-            if (Array.isArray(results)) {
-                results.forEach((res: any) => {
-                    const index = updatedData.findIndex(d => d.email === res.email);
-                    if (index !== -1) {
-                        if (res.status === 'success') {
-                            updatedData[index] = { ...updatedData[index], status: 'SUCCESS', message: 'Kullanıcı oluşturuldu.' };
-                        } else if (res.status === 'exists') {
-                            updatedData[index] = { ...updatedData[index], status: 'SUCCESS', message: 'Kullanıcı zaten mevcut.' };
-                        } else {
-                            updatedData[index] = { ...updatedData[index], status: 'ERROR', message: res.message || 'Hata oluştu.' };
-                        }
+            result.results.forEach((res: MemberImportResult) => {
+                const index = updatedData.findIndex(d => d.email === res.email);
+                if (index !== -1) {
+                    if (res.status === 'success' || res.status === 'exists') {
+                        updatedData[index] = { 
+                            ...updatedData[index], 
+                            status: 'SUCCESS', 
+                            message: res.status === 'exists' ? 'Kullanıcı zaten mevcut.' : 'Kullanıcı oluşturuldu.' 
+                        };
+                    } else {
+                        updatedData[index] = { 
+                            ...updatedData[index], 
+                            status: 'ERROR', 
+                            message: res.message || 'Hata oluştu.' 
+                        };
                     }
-                });
-            }
+                }
+            });
 
             setData(updatedData);
 
-            const successCount = results.filter((r: any) => r.status === 'success' || r.status === 'exists').length;
-            alert(`İşlem tamamlandı. ${successCount} kullanıcı işlendi.`);
+            alert(`İşlem tamamlandı. ${result.successCount} kullanıcı işlendi, ${result.errorCount} hata.`);
 
         } catch (err: any) {
             logger.error('MemberImport import error:', err);
@@ -129,9 +151,9 @@ export const MemberImport: React.FC = () => {
 
                 {/* Error Message */}
                 {error && (
-                    <div className="mt-4 p-4 bg-red-50 text-red-700 rounded flex items-center gap-2">
-                        <AlertCircle size={20} />
-                        {error}
+                    <div className="mt-4 p-4 bg-red-50 text-red-700 rounded flex items-start gap-2">
+                        <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                        <pre className="whitespace-pre-wrap text-sm">{error}</pre>
                     </div>
                 )}
 
@@ -169,7 +191,7 @@ export const MemberImport: React.FC = () => {
                                             <td className="px-4 py-2">{row.sicil_no}</td>
                                             <td className="px-4 py-2">
                                                 {row.status === 'PENDING' && <span className="text-gray-500">Bekliyor</span>}
-                                                {row.status === 'SUCCESS' && <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> Tamamlandı</span>}
+                                                {row.status === 'SUCCESS' && <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> {row.message}</span>}
                                                 {row.status === 'ERROR' && <span className="text-red-600 flex items-center gap-1" title={row.message}><AlertCircle size={14} /> Hata</span>}
                                             </td>
                                         </tr>

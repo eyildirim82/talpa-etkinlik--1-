@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventData } from '../../../types';
+import { EventData } from '@/types';
 
 // Cinematic Hero Section
 export const CinematicHero = ({ event }: { event: EventData }) => {

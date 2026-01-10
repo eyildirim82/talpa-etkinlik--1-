@@ -1,26 +1,11 @@
-import { createBrowserClient } from '@/shared/infrastructure/supabase'
-import { logger } from '@/shared/utils/logger'
-import type { AdminResponse } from '../types/admin.types'
-
 /**
- * Promote first yedek to asil (admin only)
+ * @deprecated Admin Utils - Use domain module APIs instead
+ * 
+ * This file is kept for backward compatibility only.
+ * New code should import from domain modules:
+ * 
+ * - promoteFromWaitlist: @/modules/booking
  */
-export async function promoteFromWaitlist(eventId: number): Promise<AdminResponse> {
-  const supabase = createBrowserClient()
 
-  const { data, error } = await supabase.rpc('promote_from_waitlist', {
-    event_id_param: eventId
-  })
-
-  if (error) {
-    logger.error('Promote Waitlist RPC Error:', error)
-    return { success: false, message: 'Bağlantı hatası.' }
-  }
-
-  if (data.status === 'error') {
-    return { success: false, message: data.message || 'Yedekten asile geçiş yapılamadı.' }
-  }
-
-  return { success: true, message: data.message || 'Yedek listeden asile çıkarıldı.' }
-}
-
+// Re-export from domain modules for backward compatibility
+export { promoteFromWaitlist } from '@/modules/booking'

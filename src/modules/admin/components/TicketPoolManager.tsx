@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { logger } from '@/shared/utils/logger';
 import { uploadTicketPool } from '@/modules/file-processing';
-import { getTicketStats, getTicketPool } from '@/modules/ticket/api/ticket.api';
-import type { TicketStats, TicketPool } from '@/modules/ticket/types/ticket.types';
+import { getTicketStats, getTicketPool } from '@/modules/ticket';
+import type { TicketStats, TicketPool } from '@/modules/ticket';
 
 interface TicketPoolManagerProps {
     eventId: number;
