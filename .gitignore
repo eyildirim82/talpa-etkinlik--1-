@@ -26,3 +26,11 @@ dist-ssr
 
 # Gemini AI settings (contains sensitive tokens)
 .gemini/
+
+# Architecture drift detection artifacts
+# Keep baseline.json committed for tracking
+.architecture/history/
+.architecture/drift-reports/
+.architecture/reports/
+!.architecture/baseline.json
+!.architecture/.gitkeep

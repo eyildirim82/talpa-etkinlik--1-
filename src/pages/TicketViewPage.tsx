@@ -112,8 +112,8 @@ export const TicketViewPage: React.FC = () => {
     };
 
     if (loading) return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
-            <Loader2 className="animate-spin w-8 h-8 text-yellow-500" />
+        <div className="min-h-screen bg-white flex items-center justify-center">
+            <Loader2 className="animate-spin w-8 h-8 text-primary" />
         </div>
     );
 

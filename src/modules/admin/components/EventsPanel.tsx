@@ -202,7 +202,7 @@ export const EventsPanel: React.FC = () => {
     if (shouldShowLoading) {
         return (
             <div className="flex items-center justify-center h-64">
-                <Loader2 className="w-8 h-8 text-talpa-gold animate-spin" />
+                <Loader2 className="w-8 h-8 text-brand-primary animate-spin" />
             </div>
         );
     }
@@ -212,115 +212,124 @@ export const EventsPanel: React.FC = () => {
     ) || [];
 
     return (
-        <div className="space-y-6">
+        <div className="flex flex-col gap-10">
             {/* Header / Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
                     title="Toplam Etkinlik"
                     value={totalEvents}
-                    icon={<Calendar className="w-5 h-5 text-purple-500" />}
+                    icon="event_available"
                     trend={{ value: '12%', direction: 'up' }}
                 />
                 <StatsCard
-                    title="Aktif Etkinlikler"
+                    title="Aktif Etkinlik"
                     value={activeListings}
-                    icon={<Power className="w-5 h-5 text-emerald-500" />}
-                    trend={{ value: '5%', direction: 'up' }}
+                    icon="campaign"
+                    description={activeListings === 1 ? "Şu anda aktif" : "Aktif etkinlik yok"}
                 />
                 <StatsCard
                     title="Tükendi"
                     value={soldOutEvents}
-                    icon={<AlertCircle className="w-5 h-5 text-red-500" />}
+                    icon="confirmation_number"
+                    description="En iyi performans"
                 />
             </div>
 
-            {/* Content Area */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                {/* Toolbar */}
-                <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center sm:h-16">
-                    <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Etkinlik ara..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-talpa-red/20 focus:border-talpa-red transition-all"
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto">
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <Filter className="w-4 h-4" />
-                            Filtrele
-                        </button>
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
-                            <Calendar className="w-4 h-4" />
-                            Tarih
-                        </button>
-                        <Button onClick={handleOpenCreate} size="sm" className="bg-black hover:bg-gray-800 text-white border-0 ml-auto sm:ml-2">
-                            <Plus className="w-4 h-4 mr-1" />
-                            Yeni Etkinlik
-                        </Button>
-                    </div>
+            {/* Search and Filter */}
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-center pt-2">
+                <div className="w-full md:max-w-xs relative group">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-primary transition-colors text-[20px]">search</span>
+                    <input
+                        type="text"
+                        placeholder="Etkinlik ara..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full h-10 pl-10 pr-4 bg-transparent border-b border-ui-border-subtle focus:border-brand-primary outline-none text-sm text-text-primary placeholder-text-muted/60 font-medium transition-all"
+                    />
                 </div>
+                <div className="flex gap-4 w-full md:w-auto">
+                    <button className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary transition-colors text-sm font-medium">
+                        <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                        <span>Durum</span>
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary transition-colors text-sm font-medium">
+                        <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                        <span>Tarih</span>
+                    </button>
+                    <button
+                        onClick={handleOpenCreate}
+                        className="flex items-center gap-2 cursor-pointer h-10 px-5 bg-brand-primary hover:bg-brand-primary/90 text-white text-sm font-medium rounded-full transition-all duration-300 shadow-subtle hover:shadow-lg ml-auto md:ml-0"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">add</span>
+                        <span>Etkinlik Oluştur</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="bg-ui-surface rounded-3xl border border-ui-border-subtle shadow-subtle overflow-hidden">
 
                 {/* Table */}
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                        <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
-                            <tr>
-                                <th className="px-6 py-3 w-[300px]">ETKİNLİK</th>
-                                <th className="px-6 py-3">TARİH</th>
-                                <th className="px-6 py-3 w-[200px]">DOLULUK</th>
-                                <th className="px-6 py-3">DURUM</th>
-                                <th className="px-6 py-3 text-right">İŞLEMLER</th>
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-ui-border-subtle">
+                                <th className="py-6 px-8 text-xs font-semibold uppercase tracking-widest text-text-muted w-1/3">Etkinlik</th>
+                                <th className="py-6 px-8 text-xs font-semibold uppercase tracking-widest text-text-muted">Tarih</th>
+                                <th className="py-6 px-8 text-xs font-semibold uppercase tracking-widest text-text-muted">Doluluk</th>
+                                <th className="py-6 px-8 text-xs font-semibold uppercase tracking-widest text-text-muted">Durum</th>
+                                <th className="py-6 px-8 text-xs font-semibold uppercase tracking-widest text-text-muted text-right"></th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-ui-border-subtle">
                             {filteredEvents.map((event) => {
                                 const total = (event.quota_asil || 0) + (event.quota_yedek || 0);
                                 const current = (event.asil_count || 0) + (event.yedek_count || 0);
 
                                 return (
-                                    <tr key={event.id} className="group hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
-                                                    {event.image_url ? (
-                                                        <img src={event.image_url} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <Calendar className="w-5 h-5 text-gray-400 m-auto" />
+                                    <tr key={event.id} className="group hover:bg-ui-background transition-colors">
+                                        <td className="py-5 px-8">
+                                            <div className="flex items-center gap-5">
+                                                <div 
+                                                    className={`h-14 w-14 rounded-xl bg-cover bg-center shrink-0 shadow-sm ${event.image_url ? '[background-image:var(--event-image-bg)]' : 'bg-ui-background'}`}
+                                                    style={event.image_url ? {
+                                                        '--event-image-bg': `url(${event.image_url})`
+                                                    } as React.CSSProperties & { '--event-image-bg': string } : undefined}
+                                                >
+                                                    {!event.image_url && (
+                                                        <Calendar className="w-7 h-7 text-text-muted m-auto mt-3.5" />
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <p className="font-medium text-gray-900 group-hover:text-talpa-red transition-colors">{event.title}</p>
-                                                    <p className="text-xs text-gray-500">#{event.id}</p>
+                                                    <p className="text-text-primary font-semibold text-sm mb-1">{event.title}</p>
+                                                    <p className="text-text-muted text-xs font-mono">#{event.id}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <p className="text-gray-900 font-medium">
-                                                {new Date(event.event_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                            </p>
-                                            <p className="text-xs text-gray-500">
-                                                {new Date(event.event_date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                                            </p>
+                                        <td className="py-5 px-8">
+                                            <div className="flex flex-col">
+                                                <span className="text-text-primary text-sm">
+                                                    {new Date(event.event_date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                </span>
+                                                <span className="text-text-muted text-xs">
+                                                    {new Date(event.event_date).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="py-5 px-8 align-middle">
                                             <ProgressBar current={current} total={total} />
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="py-5 px-8">
                                             <StatusBadge
                                                 status={current >= total ? 'SOLD_OUT' : event.status}
                                             />
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <td className="py-5 px-8 text-right">
+                                            <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {event.status === 'ACTIVE' ? (
                                                     <button
                                                         onClick={() => setActiveConfirm(event.id)}
-                                                        className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded"
+                                                        className="p-2 rounded-full hover:bg-interactive-hover-surface text-text-muted hover:text-text-primary transition-colors"
                                                         title="Pasife Al"
                                                     >
                                                         <PowerOff className="w-4 h-4" />
@@ -328,7 +337,7 @@ export const EventsPanel: React.FC = () => {
                                                 ) : (
                                                     <button
                                                         onClick={() => setActiveConfirm(event.id)}
-                                                        className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded"
+                                                        className="p-2 rounded-full hover:bg-interactive-hover-surface text-text-muted hover:text-text-primary transition-colors"
                                                         title="Aktif Et"
                                                     >
                                                         <Power className="w-4 h-4" />
@@ -336,13 +345,15 @@ export const EventsPanel: React.FC = () => {
                                                 )}
                                                 <button
                                                     onClick={() => handleOpenEdit(event)}
-                                                    className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                                                    className="p-2 rounded-full hover:bg-interactive-hover-surface text-text-muted hover:text-text-primary transition-colors"
+                                                    title="Düzenle"
                                                 >
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => setDeleteConfirm(event.id)}
-                                                    className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                                                    className="p-2 rounded-full hover:bg-state-error-bg text-text-muted hover:text-state-error transition-colors"
+                                                    title="Sil"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -355,18 +366,23 @@ export const EventsPanel: React.FC = () => {
                     </table>
 
                     {filteredEvents.length === 0 && (
-                        <div className="p-8 text-center text-gray-500">
+                        <div className="p-8 text-center text-text-muted">
                             Etkinlik bulunamadı.
                         </div>
                     )}
                 </div>
 
-                {/* Pagination Placeholders */}
-                <div className="p-4 border-t border-gray-200 flex items-center justify-between text-sm text-gray-500">
-                    <span>Showing 1-{filteredEvents.length} of {totalEvents}</span>
-                    <div className="flex gap-2">
-                        <button disabled className="px-3 py-1 border border-gray-200 rounded disabled:opacity-50">Previous</button>
-                        <button disabled className="px-3 py-1 border border-gray-200 rounded disabled:opacity-50">Next</button>
+                {/* Pagination */}
+                <div className="flex items-center justify-between p-6 bg-ui-surface">
+                    <p className="text-text-muted text-sm">Gösteriliyor <span className="text-text-primary font-medium">1-{filteredEvents.length}</span> / {totalEvents}</p>
+                    <div className="flex items-center gap-2">
+                        <button className="flex items-center justify-center h-8 w-8 rounded-full text-text-muted hover:bg-interactive-hover-surface transition-colors disabled:opacity-30" disabled>
+                            <span className="material-symbols-outlined text-sm">chevron_left</span>
+                        </button>
+                        <span className="text-sm font-medium text-text-primary px-2">Sayfa 1</span>
+                        <button className="flex items-center justify-center h-8 w-8 rounded-full text-text-muted hover:bg-interactive-hover-surface transition-colors">
+                            <span className="material-symbols-outlined text-sm">chevron_right</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -376,98 +392,98 @@ export const EventsPanel: React.FC = () => {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
                     {/* ... Keeping existing form logic but wrapping in white clean modal ... */}
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-[500px] max-h-[90vh] overflow-auto">
-                        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
-                            <h3 className="text-lg font-bold text-gray-900">
+                        <div className="px-6 py-4 border-b border-ui-border-subtle flex items-center justify-between sticky top-0 bg-ui-surface z-10">
+                            <h3 className="text-lg font-bold text-text-primary">
                                 {editingEvent ? 'Etkinliği Düzenle' : 'Yeni Etkinlik'}
                             </h3>
-                            <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+                            <button onClick={() => setShowModal(false)} className="text-text-muted hover:text-text-primary">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             {/* Reusing existing inputs but with updated clean classes */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Etkinlik Adı</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Etkinlik Adı</label>
                                 <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-talpa-red focus:border-talpa-red outline-none"
+                                    className="w-full px-3 py-2 border border-ui-border rounded-lg focus:ring-1 focus:ring-brand-accent focus:border-brand-accent outline-none"
                                 />
                             </div>
                             {/* ... more fields ... (omitted for brevity in this snippet, will include below) */}
                             {/* For brevity, I'll include the essential fields. In a real rewrite I'd copy all. */}
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Açıklama</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Açıklama</label>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none min-h-[80px] resize-y"
+                                    className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none min-h-[80px] resize-y bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     placeholder="Etkinlik detayları..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Tarih</label>
+                                    <label className="block text-sm font-medium text-text-primary mb-1">Tarih</label>
                                     <input type="datetime-local" required value={formData.event_date} onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                        className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Fiyat (₺)</label>
+                                    <label className="block text-sm font-medium text-text-primary mb-1">Fiyat (₺)</label>
                                     <input type="number" required value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                        className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Konum (URL)</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Konum (URL)</label>
                                 <input type="url" required value={formData.location_url} onChange={(e) => setFormData({ ...formData, location_url: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                    className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     placeholder="https://maps.google.com/..."
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Asil Kota</label>
+                                    <label className="block text-sm font-medium text-text-primary mb-1">Asil Kota</label>
                                     <input type="number" required value={formData.quota_asil} onChange={(e) => setFormData({ ...formData, quota_asil: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                        className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Yedek Kota</label>
+                                    <label className="block text-sm font-medium text-text-primary mb-1">Yedek Kota</label>
                                     <input type="number" required value={formData.quota_yedek} onChange={(e) => setFormData({ ...formData, quota_yedek: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                        className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Son İptal Tarihi</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Son İptal Tarihi</label>
                                 <input type="datetime-local" required value={formData.cut_off_date} onChange={(e) => setFormData({ ...formData, cut_off_date: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                    className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                 />
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Afiş Görseli</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Afiş Görseli</label>
                                 <div className="flex gap-4 items-center">
                                     <input
                                         type="text"
                                         value={formData.banner_image}
                                         onChange={(e) => setFormData({ ...formData, banner_image: e.target.value })}
-                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                        className="flex-1 px-3 py-2 border border-ui-border rounded-lg outline-none bg-ui-surface text-text-primary focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border"
                                         placeholder="https://..."
                                     />
-                                    <label className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-pointer text-sm flex items-center gap-2 hover:bg-gray-200 transition-colors">
+                                    <label className="px-4 py-2 bg-ui-background border border-ui-border rounded-lg text-text-primary cursor-pointer text-sm flex items-center gap-2 hover:bg-interactive-hover-surface transition-colors">
                                         {uploadingBanner ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
                                         <span>Yükle</span>
                                         <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
                                     </label>
                                 </div>
                                 {formData.banner_image && (
-                                    <div className="mt-2 h-[100px] rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                    <div className="mt-2 h-[100px] rounded-lg overflow-hidden border border-ui-border bg-ui-background">
                                         <img src={formData.banner_image} alt="Preview" className="w-full h-full object-contain" />
                                     </div>
                                 )}
@@ -487,8 +503,12 @@ export const EventsPanel: React.FC = () => {
                             <div className="pt-4 flex gap-3">
                                 <Button type="button" variant="outline" fullWidth onClick={() => setShowModal(false)}>İptal</Button>
                                 {/* Fixed Button Color */}
-                                <Button type="submit" variant="primary" fullWidth className="bg-red-600 hover:bg-red-700 text-white border-transparent">
-                                    {(createEvent.isPending || updateEvent.isPending) ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                <Button 
+                                    type="submit" 
+                                    variant="primary" 
+                                    fullWidth 
+                                    isLoading={createEvent.isPending || updateEvent.isPending}
+                                >
                                     Kaydet
                                 </Button>
                             </div>

@@ -47,13 +47,13 @@ test.describe('Authentication Scenarios', () => {
         await page.getByRole('button', { name: 'Giriş Yap' }).first().click();
 
         // Fill credentials
-        await page.getByPlaceholder('E-posta').fill('test@example.com');
-        await page.getByPlaceholder('Şifre').fill('password123');
+        await page.getByPlaceholder('user@example.com').fill('test@example.com');
+        await page.getByPlaceholder('••••••••').fill('password123');
 
         // Handle reload: we expect the page to reload upon successful login
-        const reloadPromise = page.waitForEvent('load');
+        const reloadPromise = page.waitForEvent('load', { timeout: 5000 });
 
-        await page.getByRole('button', { name: 'Giriş Yap', exact: true }).click();
+        await page.getByRole('button', { name: /GİRİŞ YAP/i }).click();
 
         // Wait for reload
         await reloadPromise;
@@ -82,9 +82,9 @@ test.describe('Authentication Scenarios', () => {
         await page.goto('/');
         await page.getByRole('button', { name: 'Giriş Yap' }).first().click();
 
-        await page.getByPlaceholder('E-posta').fill('wrong@example.com');
-        await page.getByPlaceholder('Şifre').fill('wrongpass');
-        await page.getByRole('button', { name: 'Giriş Yap', exact: true }).click();
+        await page.getByPlaceholder('user@example.com').fill('wrong@example.com');
+        await page.getByPlaceholder('••••••••').fill('wrongpass');
+        await page.getByRole('button', { name: /GİRİŞ YAP/i }).click();
 
         await expect(page.getByText(/Invalid login credentials|hata oluştu/i)).toBeVisible();
     });
@@ -116,7 +116,7 @@ test.describe('Authentication Scenarios', () => {
         await page.getByRole('button', { name: 'Hesabım' }).click();
 
         // Wait for logout call and reload
-        const reloadPromise = page.waitForEvent('load');
+        const reloadPromise = page.waitForEvent('load', { timeout: 5000 });
 
         // Change mock to unauthenticated for the reload
         // Note: This is tricky if the request flies before we change the handler.

@@ -17,16 +17,16 @@ describe('Button Component', () => {
 
     it('renders variants correctly', () => {
         const { rerender } = render(<Button variant="primary">Primary</Button>);
-        expect(screen.getByRole('button')).toHaveClass('bg-talpa-red');
+        expect(screen.getByRole('button')).toHaveClass('bg-brand-accent');
 
         rerender(<Button variant="secondary">Secondary</Button>);
-        expect(screen.getByRole('button')).toHaveClass('bg-talpa-gold');
+        expect(screen.getByRole('button')).toHaveClass('bg-brand-gold');
 
         rerender(<Button variant="outline">Outline</Button>);
-        expect(screen.getByRole('button')).toHaveClass('border-talpa-border');
+        expect(screen.getByRole('button')).toHaveClass('border-ui-border');
 
         rerender(<Button variant="danger">Danger</Button>);
-        expect(screen.getByRole('button')).toHaveClass('bg-talpa-danger');
+        expect(screen.getByRole('button')).toHaveClass('bg-state-error');
     });
 
     it('shows loading state', () => {

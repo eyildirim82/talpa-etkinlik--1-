@@ -79,7 +79,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className={`transition-colors ${activeTab === 'login' ? 'text-talpa-primary' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`transition-colors ${activeTab === 'login' ? 'text-brand-accent' : 'text-gray-400 hover:text-gray-600'}`}
                 >
                   GİRİŞ YAP
                 </button>
@@ -87,7 +87,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                 <button
                   type="button"
                   onClick={() => setActiveTab('signup')}
-                  className={`transition-colors ${activeTab === 'signup' ? 'text-talpa-primary' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`transition-colors ${activeTab === 'signup' ? 'text-brand-accent' : 'text-gray-400 hover:text-gray-600'}`}
                 >
                   KAYIT OL
                 </button>
@@ -105,7 +105,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                         name="fullName"
                         type="text"
                         required
-                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-talpa-primary focus:border-talpa-primary sm:text-sm transition-colors"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-ui-border rounded-md leading-5 bg-ui-background text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors"
                         placeholder="Ad Soyad"
                       />
                     </div>
@@ -120,7 +120,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                         name="sicilNo"
                         type="text"
                         required
-                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-talpa-primary focus:border-talpa-primary sm:text-sm transition-colors"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-ui-border rounded-md leading-5 bg-ui-background text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors"
                         placeholder="12345"
                       />
                     </div>
@@ -153,7 +153,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                     Şifre
                   </label>
                   {activeTab === 'login' && (
-                    <a className="text-xs font-medium text-talpa-primary hover:text-talpa-accent transition-colors cursor-pointer">
+                    <a className="text-xs font-medium text-brand-accent hover:text-brand-accent/80 transition-colors cursor-pointer">
                       Şifremi Unuttum?
                     </a>
                   )}

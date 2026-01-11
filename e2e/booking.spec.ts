@@ -81,9 +81,9 @@ test.describe('Booking Scenarios', () => {
         // Expect Booking Modal
         await expect(page.getByText('Başvuru Onayı')).toBeVisible();
 
-        // Fill form
-        await page.getByText('KVKK Aydınlatma Metni').click();
-        await page.getByText('Mesafeli Satış Sözleşmesi').click();
+        // Fill form - click on labels containing checkboxes
+        await page.locator('label').filter({ hasText: 'KVKK Aydınlatma Metni' }).click();
+        await page.locator('label').filter({ hasText: 'Mesafeli Satış Sözleşmesi' }).click();
 
         // Submit
         await page.getByRole('button', { name: /Onaylıyorum/i }).click();
@@ -94,8 +94,13 @@ test.describe('Booking Scenarios', () => {
         // App.tsx does window.location.reload() on success.
         // We can mock that or wait for it.
         // But since tests run in browser context, reload happens. 
-        // We just need to wait for it.
-        await page.waitForTimeout(1000);
+        // Wait for reload with timeout
+        try {
+            await page.waitForEvent('load', { timeout: 3000 });
+        } catch {
+            // If reload doesn't happen, modal should be gone
+            await expect(page.getByText('Başvuru Onayı')).not.toBeVisible({ timeout: 2000 });
+        }
     });
 
     test('BOOK-02: Yedek Booking', async ({ page }) => {
@@ -151,11 +156,17 @@ test.describe('Booking Scenarios', () => {
 
         await page.goto('/');
         await page.getByRole('button', { name: 'Bilet Al' }).click();
-        await page.getByText('KVKK Aydınlatma Metni').click();
-        await page.getByText('Mesafeli Satış Sözleşmesi').click();
+        await page.locator('label').filter({ hasText: 'KVKK Aydınlatma Metni' }).click();
+        await page.locator('label').filter({ hasText: 'Mesafeli Satış Sözleşmesi' }).click();
         await page.getByRole('button', { name: /Onaylıyorum/i }).click();
 
-        await page.waitForTimeout(1000);
+        // Wait for reload with timeout
+        try {
+            await page.waitForEvent('load', { timeout: 3000 });
+        } catch {
+            // If reload doesn't happen, modal should be gone
+            await expect(page.getByText('Başvuru Onayı')).not.toBeVisible({ timeout: 2000 });
+        }
     });
 
     test('BOOK-03: Duplicate Booking', async ({ page }) => {
@@ -206,8 +217,8 @@ test.describe('Booking Scenarios', () => {
 
         await page.goto('/');
         await page.getByRole('button', { name: 'Bilet Al' }).click();
-        await page.getByText('KVKK Aydınlatma Metni').click();
-        await page.getByText('Mesafeli Satış Sözleşmesi').click();
+        await page.locator('label').filter({ hasText: 'KVKK Aydınlatma Metni' }).click();
+        await page.locator('label').filter({ hasText: 'Mesafeli Satış Sözleşmesi' }).click();
         await page.getByRole('button', { name: /Onaylıyorum/i }).click();
 
         // Should see error

@@ -76,30 +76,13 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
 
     if (shouldShowLoading) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #0A1929 0%, #0D2137 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <Loader2 style={{
-                        width: '48px',
-                        height: '48px',
-                        animation: 'spin 1s linear infinite',
-                        color: '#D4AF37'
-                    }} />
-                    <p style={{
-                        marginTop: '1.5rem',
-                        color: 'rgba(229, 229, 229, 0.5)',
-                        fontSize: '0.85rem',
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase'
-                    }}>Yükleniyor...</p>
+            <div className="min-h-screen bg-gradient-admin flex items-center justify-center font-sans">
+                <div className="text-center">
+                    <Loader2 className="w-12 h-12 text-brand-primary animate-spin mx-auto" />
+                    <p className="mt-6 text-text-inverse-muted text-sm uppercase tracking-wider">
+                        Yükleniyor...
+                    </p>
                 </div>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         );
     }
@@ -108,72 +91,20 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     // with the last known user data (which will be updated once loading completes)
     if (!user && !hasBeenVerifiedRef.current) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #0A1929 0%, #0D2137 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1.5rem',
-                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, rgba(13, 33, 55, 0.8) 0%, rgba(10, 25, 41, 0.9) 100%)',
-                    border: '1px solid rgba(212, 175, 55, 0.2)',
-                    borderRadius: '24px',
-                    padding: '3rem 2.5rem',
-                    maxWidth: '420px',
-                    width: '100%',
-                    textAlign: 'center'
-                }}>
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '20px',
-                        background: 'rgba(245, 158, 11, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1.5rem'
-                    }}>
-                        <Lock style={{ width: '40px', height: '40px', color: '#F59E0B' }} />
+            <div className="min-h-screen bg-gradient-admin flex items-center justify-center p-6 font-sans">
+                <div className="bg-gradient-admin-card border border-brand-gold/20 rounded-3xl p-12 max-w-[420px] w-full text-center">
+                    <div className="w-20 h-20 rounded-2xl bg-state-warning/10 flex items-center justify-center mx-auto mb-6">
+                        <Lock className="w-10 h-10 text-state-warning" />
                     </div>
-                    <h1 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        color: '#E5E5E5',
-                        margin: '0 0 0.75rem 0'
-                    }}>Giriş Gerekli</h1>
-                    <p style={{
-                        color: 'rgba(229, 229, 229, 0.5)',
-                        marginBottom: '2rem',
-                        fontSize: '0.9rem',
-                        lineHeight: 1.6
-                    }}>
+                    <h1 className="text-2xl font-bold text-text-inverse mb-3">
+                        Giriş Gerekli
+                    </h1>
+                    <p className="text-text-inverse-muted mb-8 text-sm leading-relaxed">
                         Admin paneline erişmek için giriş yapmanız gerekmektedir.
                     </p>
                     <button
                         onClick={onBack}
-                        style={{
-                            width: '100%',
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, #D4AF37 0%, #C9A227 100%)',
-                            border: 'none',
-                            borderRadius: '12px',
-                            color: '#0A1929',
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'transform 0.2s, box-shadow 0.2s'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(212, 175, 55, 0.25)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'none';
-                        }}
+                        className="w-full py-4 bg-gradient-gold rounded-xl text-ui-background-dark text-sm font-semibold cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-gold-glow"
                     >
                         Ana Sayfaya Dön
                     </button>
@@ -185,72 +116,20 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
     // Only show access denied if admin was never verified AND user is definitely not admin
     if (!isAdmin && !hasBeenVerifiedRef.current && !isLoading) {
         return (
-            <div style={{
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #0A1929 0%, #0D2137 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1.5rem',
-                fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, sans-serif'
-            }}>
-                <div style={{
-                    background: 'linear-gradient(135deg, rgba(13, 33, 55, 0.8) 0%, rgba(10, 25, 41, 0.9) 100%)',
-                    border: '1px solid rgba(239, 68, 68, 0.2)',
-                    borderRadius: '24px',
-                    padding: '3rem 2.5rem',
-                    maxWidth: '420px',
-                    width: '100%',
-                    textAlign: 'center'
-                }}>
-                    <div style={{
-                        width: '80px',
-                        height: '80px',
-                        borderRadius: '20px',
-                        background: 'rgba(239, 68, 68, 0.1)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1.5rem'
-                    }}>
-                        <ShieldX style={{ width: '40px', height: '40px', color: '#EF4444' }} />
+            <div className="min-h-screen bg-gradient-admin flex items-center justify-center p-6 font-sans">
+                <div className="bg-gradient-admin-card border border-state-error/20 rounded-3xl p-12 max-w-[420px] w-full text-center">
+                    <div className="w-20 h-20 rounded-2xl bg-state-error/10 flex items-center justify-center mx-auto mb-6">
+                        <ShieldX className="w-10 h-10 text-state-error" />
                     </div>
-                    <h1 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        color: '#E5E5E5',
-                        margin: '0 0 0.75rem 0'
-                    }}>Erişim Engellendi</h1>
-                    <p style={{
-                        color: 'rgba(229, 229, 229, 0.5)',
-                        marginBottom: '2rem',
-                        fontSize: '0.9rem',
-                        lineHeight: 1.6
-                    }}>
+                    <h1 className="text-2xl font-bold text-text-inverse mb-3">
+                        Erişim Engellendi
+                    </h1>
+                    <p className="text-text-inverse-muted mb-8 text-sm leading-relaxed">
                         Bu sayfaya erişmek için admin yetkisine sahip olmanız gerekmektedir.
                     </p>
                     <button
                         onClick={onBack}
-                        style={{
-                            width: '100%',
-                            padding: '1rem',
-                            background: 'transparent',
-                            border: '1px solid rgba(212, 175, 55, 0.3)',
-                            borderRadius: '12px',
-                            color: '#D4AF37',
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'all 0.2s'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)';
-                            e.currentTarget.style.borderColor = '#D4AF37';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.borderColor = 'rgba(212, 175, 55, 0.3)';
-                        }}
+                        className="w-full py-4 bg-transparent border border-brand-gold/30 rounded-xl text-brand-gold text-sm font-semibold cursor-pointer transition-all duration-200 hover:bg-brand-gold/10 hover:border-brand-gold"
                     >
                         Ana Sayfaya Dön
                     </button>

@@ -1,0 +1,58 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - navigation [ref=e6]:
+        - button "Etkinlikler" [ref=e7] [cursor=pointer]
+        - button "Giriş Yap ▼" [ref=e9] [cursor=pointer]:
+          - text: Giriş Yap
+          - generic [ref=e10]: ▼
+      - img "TALPA" [ref=e12]
+      - navigation [ref=e13]:
+        - button "İletişim" [ref=e14] [cursor=pointer]
+  - generic [ref=e15]:
+    - img "Test Event" [ref=e17]
+    - generic [ref=e19]:
+      - heading "Test Event" [level=1] [ref=e20]
+      - paragraph [ref=e21]: TALPA Members Only
+      - generic [ref=e22]: 31 ARA WEDNESDAY · TEST VENUE · 20:00
+      - generic [ref=e23]:
+        - button "Detaylar" [ref=e24] [cursor=pointer]
+        - button "Üyelik" [ref=e25] [cursor=pointer]
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]: Test Event
+      - generic [ref=e30]: 150 / 150 Kalan · 100 TRY
+    - button "Bilet Al" [active] [ref=e31]
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - generic [ref=e35]:
+        - heading "Hoşgeldiniz" [level=2] [ref=e36]
+        - paragraph [ref=e37]: Hesabınıza giriş yaparak etkinlikleri takip edin.
+      - generic [ref=e39]:
+        - generic [ref=e40]:
+          - button "GİRİŞ YAP" [ref=e41]
+          - button "KAYIT OL" [ref=e43]
+        - generic [ref=e44]:
+          - generic [ref=e45]: E-Posta veya Kullanıcı Adı
+          - generic [ref=e46]:
+            - generic:
+              - img
+            - textbox "E-Posta veya Kullanıcı Adı" [ref=e47]:
+              - /placeholder: user@example.com
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: Şifre
+            - generic [ref=e51] [cursor=pointer]: Şifremi Unuttum?
+          - generic [ref=e52]:
+            - generic:
+              - img
+            - textbox "Şifre" [ref=e53]:
+              - /placeholder: ••••••••
+        - button "GİRİŞ YAP" [ref=e55]
+    - button "Pencereyi Kapat" [ref=e57]:
+      - img [ref=e58]
+      - text: Pencereyi Kapat
+```

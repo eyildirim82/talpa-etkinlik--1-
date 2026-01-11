@@ -49,10 +49,13 @@ serve(async (req) => {
             }
         }
 
-        const { event_id, storage_path } = await req.json()
+        const body = await req.json()
+        // Support both camelCase (from API) and snake_case (backward compatibility)
+        const event_id = body.eventId || body.event_id
+        const storage_path = body.filePath || body.storage_path
 
         if (!event_id || !storage_path) {
-            throw new Error('Missing event_id or storage_path')
+            throw new Error('Missing eventId/event_id or filePath/storage_path')
         }
 
         console.log(`Processing ZIP for Event ${event_id} from ${storage_path}`)
@@ -78,7 +81,7 @@ serve(async (req) => {
         const validExtensions = ['.pdf', '.png', '.jpg', '.jpeg']
 
         // 3. Process each file
-        const promises = []
+        const promises: Promise<void>[] = []
 
         // Iterate over files
         for (const [relativePath, zipEntry] of Object.entries(unzipped.files)) {
@@ -145,8 +148,16 @@ serve(async (req) => {
         // 4. Cleanup ZIP from temp-uploads
         await supabase.storage.from('temp-uploads').remove([storage_path])
 
+        // Return standardized response format
+        const response = {
+            success: results.errors.length === 0 && results.total > 0,
+            processedCount: results.success,
+            total: results.total,
+            errors: results.errors
+        }
+
         return new Response(
-            JSON.stringify(results),
+            JSON.stringify(response),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 200,
@@ -155,7 +166,13 @@ serve(async (req) => {
 
     } catch (error: any) {
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ 
+                success: false,
+                processedCount: 0,
+                total: 0,
+                errors: [error.message],
+                error: error.message 
+            }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 400,

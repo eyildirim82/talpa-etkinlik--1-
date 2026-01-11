@@ -23,17 +23,33 @@ export async function processTicketZip(eventId: number, filePath: string): Promi
 
     if (error) {
       logger.error('Process ZIP Error:', error)
-      return { success: false, count: 0, message: 'ZIP işleme hatası.' }
+      return { success: false, count: 0, message: `ZIP işleme hatası: ${error.message || 'Bilinmeyen hata'}` }
     }
 
-    if (!data.success) {
-      return { success: false, count: 0, message: data.error || 'İşlem başarısız oldu.' }
+    // Handle standardized response format from Edge Function
+    if (!data || !data.success) {
+      const errorMessage = data?.error || data?.errors?.join(', ') || 'İşlem başarısız oldu.'
+      const processedCount = data?.processedCount || 0
+      const total = data?.total || 0
+      
+      if (processedCount > 0) {
+        return { 
+          success: false, 
+          count: processedCount, 
+          message: `${processedCount}/${total} bilet işlendi, ancak hatalar oluştu: ${errorMessage}` 
+        }
+      }
+      
+      return { success: false, count: 0, message: errorMessage }
     }
 
+    const processedCount = data.processedCount || 0
+    const total = data.total || 0
+    
     return {
       success: true,
-      count: data.processedCount || 0,
-      message: `${data.processedCount || 0} bilet başarıyla işlendi.`
+      count: processedCount,
+      message: `${processedCount}${total > processedCount ? `/${total}` : ''} bilet başarıyla işlendi.`
     }
   } catch (err) {
     logger.error('Unexpected Error:', err)

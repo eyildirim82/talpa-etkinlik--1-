@@ -1,36 +1,66 @@
 @import "tailwindcss";
-@config "../tailwind.config.js";
+@config "../tailwind.config.ts";
 
 
-/* MUBI-Style and TALPA Tokens are now handled via Tailwind Config */
-:root {
-  --talpa-gold: #D4AF37;
-  --talpa-red: #C41E3A;
-  --talpa-bg: #F9FAFB;
-  --talpa-text: #111827;
-}
+/* All color tokens are now handled via Tailwind Config */
 
 body {
-  background-color: var(--talpa-bg);
-  color: var(--talpa-text);
+  background-color: #ffffff;
+  color: #111111;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  font-weight: 400;
 }
 
-/* Scrollbar Customization */
+/* Selection colors */
+::selection {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Scrollbar Customization (from code.html) */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: #ffffff; 
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
-  border-radius: 4px;
+  background: #e5e5e5; 
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #ccc; 
+}
+
+/* Glass Header and Hero Text Shadow are now handled via Tailwind utilities */
+
+/* Material Symbols Outlined */
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
 }

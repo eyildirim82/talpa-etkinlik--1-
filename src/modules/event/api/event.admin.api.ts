@@ -79,6 +79,7 @@ export async function getAllEventsAdmin(): Promise<AdminEvent[]> {
 
 /**
  * Create a new event (admin only)
+ * If status is ACTIVE, ensures single active event by calling set_active_event RPC
  */
 export async function createEventAdmin(eventData: CreateEventData): Promise<Event> {
     const isAdmin = await checkAdmin()
@@ -87,6 +88,8 @@ export async function createEventAdmin(eventData: CreateEventData): Promise<Even
     }
 
     const supabase = createBrowserClient()
+    
+    // Create event first (status can be ACTIVE, RPC will handle deactivating others)
     const { data, error } = await supabase
         .from('events')
         .insert({
@@ -109,11 +112,37 @@ export async function createEventAdmin(eventData: CreateEventData): Promise<Even
         throw error
     }
 
+    // If status is ACTIVE, call set_active_event RPC to ensure single active event
+    if (eventData.status === 'ACTIVE' && data) {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('set_active_event', {
+            p_event_id: data.id
+        })
+
+        if (rpcError || !rpcData?.success) {
+            // Rollback: delete the created event if RPC fails
+            await supabase.from('events').delete().eq('id', data.id)
+            logger.error('Set Active Event RPC Error:', rpcError || rpcData)
+            throw new Error(rpcData?.error || 'Etkinlik aktif edilemedi.')
+        }
+
+        // Refresh the event data to get updated status
+        const { data: refreshedData, error: refreshError } = await supabase
+            .from('events')
+            .select('*')
+            .eq('id', data.id)
+            .single()
+
+        if (!refreshError && refreshedData) {
+            return refreshedData
+        }
+    }
+
     return data
 }
 
 /**
  * Update an event (admin only)
+ * If status is being changed to ACTIVE, ensures single active event by calling set_active_event RPC
  */
 export async function updateEventAdmin(eventId: number, updates: Partial<AdminEvent>): Promise<Event> {
     const isAdmin = await checkAdmin()
@@ -122,6 +151,22 @@ export async function updateEventAdmin(eventId: number, updates: Partial<AdminEv
     }
 
     const supabase = createBrowserClient()
+
+    // Check if status is being changed to ACTIVE
+    const isChangingToActive = updates.status === 'ACTIVE' || 
+        (updates.is_active === true && updates.status === undefined)
+
+    // If changing to ACTIVE, call set_active_event RPC first
+    if (isChangingToActive) {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('set_active_event', {
+            p_event_id: eventId
+        })
+
+        if (rpcError || !rpcData?.success) {
+            logger.error('Set Active Event RPC Error:', rpcError || rpcData)
+            throw new Error(rpcData?.error || 'Etkinlik aktif edilemedi.')
+        }
+    }
 
     // Map backward compatibility fields
     const updateData: EventUpdate = {}
@@ -136,25 +181,54 @@ export async function updateEventAdmin(eventId: number, updates: Partial<AdminEv
     if (updates.quota_asil !== undefined) updateData.quota_asil = updates.quota_asil
     if (updates.quota_yedek !== undefined) updateData.quota_yedek = updates.quota_yedek
     if (updates.cut_off_date !== undefined) updateData.cut_off_date = updates.cut_off_date
-    if (updates.status !== undefined) updateData.status = updates.status
-    if (updates.is_active !== undefined) {
-        // Backward compatibility: convert is_active to status
-        updateData.status = updates.is_active ? 'ACTIVE' : 'ARCHIVED'
+    
+    // Handle status updates
+    // If we already called set_active_event, status is already ACTIVE, so we can skip it
+    if (isChangingToActive) {
+        // Status is already set by RPC, but we still need to handle other status changes
+        // Only update status if it's being changed to something other than ACTIVE
+        if (updates.status && updates.status !== 'ACTIVE') {
+            updateData.status = updates.status
+        }
+    } else {
+        // Normal status update
+        if (updates.status !== undefined) updateData.status = updates.status
+        if (updates.is_active !== undefined) {
+            // Backward compatibility: convert is_active to status
+            updateData.status = updates.is_active ? 'ACTIVE' : 'ARCHIVED'
+        }
     }
 
-    const { data, error } = await supabase
-        .from('events')
-        .update(updateData)
-        .eq('id', eventId)
-        .select()
-        .single()
+    // Only update if there's something to update
+    if (Object.keys(updateData).length > 0) {
+        const { data, error } = await supabase
+            .from('events')
+            .update(updateData)
+            .eq('id', eventId)
+            .select()
+            .single()
 
-    if (error) {
-        logger.error('Update Event Error:', error)
-        throw error
+        if (error) {
+            logger.error('Update Event Error:', error)
+            throw error
+        }
+
+        return data
+    } else {
+        // No other fields to update, just refresh the event data
+        const { data, error } = await supabase
+            .from('events')
+            .select('*')
+            .eq('id', eventId)
+            .single()
+
+        if (error) {
+            logger.error('Refresh Event Error:', error)
+            throw error
+        }
+
+        return data
     }
-
-    return data
 }
 
 /**

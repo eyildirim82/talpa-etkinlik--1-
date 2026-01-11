@@ -55,7 +55,7 @@ export const AppRoutes: React.FC<AppRoutesProps> = ({ user, activeEvent }) => {
                 </ProtectedRoute>
             } />
             <Route path="/" element={
-                <ThemeLayout variant="dark">
+                <ThemeLayout variant="light">
                     <LuxuryHeader
                         user={user}
                         onAuthClick={() => setShowAuthModal(true)}

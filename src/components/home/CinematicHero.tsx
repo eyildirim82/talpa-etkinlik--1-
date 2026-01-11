@@ -1,7 +1,7 @@
 import React from 'react';
 import { EventData } from '@/types';
 
-// Cinematic Hero Section
+// Cinematic Hero Section - LUXE Design
 export const CinematicHero = ({ event }: { event: EventData }) => {
     const formatLocation = (loc: string) => {
         if (!loc) return '';
@@ -11,175 +11,61 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
         return loc.split('-')[0].trim().toUpperCase();
     };
 
+    const handleReserveSeat = () => {
+        // Scroll to footer or trigger booking
+        const footer = document.getElementById('sticky-footer');
+        if (footer) {
+            footer.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    const handleWatchTrailer = () => {
+        alert('Video önizlemesi yakında...');
+    };
+
     return (
-        <section style={{
-            position: 'relative',
-            width: '100%',
-            height: '100vh',
-            overflow: 'hidden'
-        }}>
+        <section className="relative h-[85vh] min-h-[600px] w-full flex items-center justify-center overflow-hidden pt-16 pb-24">
             {/* Background Image */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 0
-            }}>
-                <img
-                    src={event.image_url}
-                    alt={event.title}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        filter: 'brightness(0.4)'
-                    }}
+            <div className="absolute inset-0 z-0">
+                <div 
+                    className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-[20s] hover:scale-105 [background-image:var(--hero-bg-image)]"
+                    style={{ '--hero-bg-image': `url('${event.image_url}')` } as React.CSSProperties & { '--hero-bg-image': string }}
                 />
             </div>
-
+            
             {/* Dark Overlay */}
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(to bottom, rgba(10,25,41,0.3) 0%, rgba(10,25,41,0.8) 100%)',
-                zIndex: 1
-            }}></div>
+            <div className="absolute inset-0 bg-black/30 z-10"></div>
 
             {/* Content */}
-            <div style={{
-                position: 'relative',
-                zIndex: 2,
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                padding: '0 2rem',
-                maxWidth: '100vw',
-                overflow: 'hidden'
-            }}>
-                {/* Main Title - Serif */}
-                <h1 style={{
-                    fontFamily: 'Georgia, "Times New Roman", serif',
-                    fontSize: 'clamp(3rem, 10vw, 8rem)',
-                    fontWeight: '400',
-                    color: '#D4AF37',
-                    lineHeight: '1',
-                    marginBottom: '1.5rem',
-                    letterSpacing: '-0.02em',
-                    maxWidth: '100%',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                }}>
-                    {event.title.split(' ').slice(0, 2).join(' ')}
+            <div className="relative z-20 container mx-auto px-6 lg:px-12 text-center flex flex-col items-center justify-center gap-6">
+                {/* Featured Event Badge */}
+                <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-semibold tracking-[0.3em] text-white uppercase mb-2">
+                    Öne Çıkan Etkinlik
+                </span>
+
+                {/* Main Title - Minimal & Serious */}
+                <h1 className="text-display-2 md:text-display-1 lg:text-display-3 font-sans font-light text-white leading-tight tracking-tight text-shadow-hero">
+                    {event.title}
                 </h1>
 
-                {/* Subtitle */}
-                <p style={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '0.875rem',
-                    fontWeight: '400',
-                    color: '#E5E5E5',
-                    letterSpacing: '0.3em',
-                    textTransform: 'uppercase',
-                    marginBottom: '4rem',
-                    opacity: 0.9
-                }}>
-                    TALPA Members Only
+                {/* Description */}
+                <p className="text-white/90 text-body md:text-body-lg font-light font-sans tracking-normal max-w-xl mx-auto leading-relaxed text-shadow-hero">
+                    {event.description || 'Özel erişim ve seçkin deneyimler. Lüksün doruk noktası.'}
                 </p>
 
-                {/* Event Details - Editorial */}
-                <div style={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: '1rem',
-                    fontWeight: '300',
-                    color: '#E5E5E5',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                    marginBottom: '3rem',
-                    maxWidth: '100%',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
-                }}>
-                    {new Date(event.event_date).toLocaleDateString('tr-TR', {
-                        day: 'numeric',
-                        month: 'short'
-                    }).toUpperCase().replace('.', '')}
-                    {' '}
-                    {new Date(event.event_date).toLocaleDateString('en-US', {
-                        weekday: 'long'
-                    }).toUpperCase()}
-                    {' · '}
-                    {formatLocation(event.location)}
-                    {' · '}
-                    {new Date(event.event_date).toLocaleTimeString('tr-TR', {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}
-                </div>
-
                 {/* CTA Buttons */}
-                <div style={{ display: 'flex', gap: '1.5rem' }}>
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button
-                        onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-                        style={{
-                            background: 'transparent',
-                            color: '#E5E5E5',
-                            border: '2px solid #E5E5E5',
-                            padding: '1rem 2.5rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s',
-                            fontFamily: '"Inter", sans-serif'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#E5E5E5';
-                            e.currentTarget.style.color = '#0A1929';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = '#E5E5E5';
-                        }}
+                        onClick={handleReserveSeat}
+                        className="bg-white text-black h-12 px-8 rounded-sm font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-gray-100 flex items-center justify-center gap-2"
                     >
-                        Detaylar
+                        <span>Rezervasyon Yap</span>
                     </button>
-
                     <button
-                        onClick={() => alert('Üyelik işlemleri için lütfen TALPA ile iletişime geçiniz.')}
-                        style={{
-                            background: 'transparent',
-                            color: '#D4AF37',
-                            border: '2px solid #D4AF37',
-                            padding: '1rem 2.5rem',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            letterSpacing: '0.15em',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s',
-                            fontFamily: '"Inter", sans-serif'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#D4AF37';
-                            e.currentTarget.style.color = '#0A1929';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = '#D4AF37';
-                        }}
+                        onClick={handleWatchTrailer}
+                        className="bg-transparent border border-white text-white h-12 px-8 rounded-sm font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-white hover:text-black flex items-center justify-center gap-2"
                     >
-                        Üyelik
+                        <span>Fragman İzle</span>
                     </button>
                 </div>
             </div>

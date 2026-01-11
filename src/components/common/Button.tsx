@@ -25,15 +25,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ...props
     }, ref) => {
 
-        const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-talpa-gold disabled:pointer-events-none disabled:opacity-50";
+        const baseStyles = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:pointer-events-none disabled:opacity-50";
 
         const variants = {
-            primary: "bg-talpa-red text-white hover:bg-talpa-red-light shadow-sm border border-transparent",
-            secondary: "bg-talpa-gold text-talpa-bg hover:bg-talpa-goldHover shadow-sm",
-            outline: "border border-gray-300 bg-transparent text-gray-700 hover:bg-gray-50",
-            ghost: "hover:bg-gray-100 text-gray-600 hover:text-gray-900",
-            danger: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
-            black: "bg-gray-900 text-white hover:bg-gray-800 shadow-sm", // New black variant
+            primary: "bg-brand-accent text-white hover:bg-brand-accent/90 shadow-sm border border-transparent",
+            secondary: "bg-brand-gold text-ui-background-dark hover:bg-brand-gold-hover shadow-sm",
+            outline: "border border-ui-border bg-transparent text-text-primary hover:bg-ui-background",
+            ghost: "hover:bg-ui-background text-text-secondary hover:text-text-primary",
+            danger: "bg-state-error text-white hover:bg-state-error/90 shadow-sm",
+            black: "bg-brand-primary text-white hover:bg-brand-primary/90 shadow-sm",
         };
 
         const sizes = {

@@ -13,37 +13,37 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label }) => {
         switch (s) {
             case 'ACTIVE':
                 return {
-                    bg: 'bg-emerald-50',
-                    text: 'text-emerald-700',
-                    dot: 'bg-emerald-500',
+                    bg: 'bg-state-success-bg',
+                    text: 'text-state-success-text',
+                    dot: 'bg-state-success',
                     label: 'Aktif'
                 };
             case 'SOLD_OUT':
                 return {
-                    bg: 'bg-red-50',
-                    text: 'text-red-700',
-                    dot: 'bg-red-500',
+                    bg: 'bg-state-error-bg',
+                    text: 'text-state-error-text',
+                    dot: 'bg-state-error',
                     label: 'Tükendi'
                 };
             case 'DRAFT':
                 return {
-                    bg: 'bg-gray-100',
-                    text: 'text-gray-600',
-                    dot: 'bg-gray-400',
+                    bg: 'bg-ui-background',
+                    text: 'text-text-muted',
+                    dot: 'bg-text-muted',
                     label: 'Taslak'
                 };
             case 'ARCHIVED':
                 return {
-                    bg: 'bg-blue-50',
-                    text: 'text-blue-700',
-                    dot: 'bg-blue-500',
+                    bg: 'bg-state-info-bg',
+                    text: 'text-state-info-text',
+                    dot: 'bg-state-info',
                     label: 'Arşiv'
                 };
             default:
                 return {
-                    bg: 'bg-gray-100',
-                    text: 'text-gray-600',
-                    dot: 'bg-gray-400',
+                    bg: 'bg-ui-background',
+                    text: 'text-text-muted',
+                    dot: 'bg-text-muted',
                     label: s
                 };
         }

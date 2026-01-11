@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { createBrowserClient } from '@/shared/infrastructure/supabase';
-import { useAdminCheck } from '@/shared/hooks/useAdminCheck';
+import { useAdminCheck } from '@/modules/auth';
 import type { User } from '@supabase/supabase-js';
 
 interface ProtectedRouteProps {
@@ -64,8 +64,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // Show loading state while checking auth or admin status
     if (loading || (requireAdmin && isAdminLoading)) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="w-8 h-8 border-3 border-talpa-primary/30 border-t-talpa-primary rounded-full animate-spin"></div>
+            <div className="flex items-center justify-center min-h-screen bg-white">
+                <div className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin"></div>
             </div>
         );
     }

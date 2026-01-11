@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Menu, Search, Bell, ChevronRight } from 'lucide-react';
+import { Menu } from 'lucide-react';
 import { AdminSidebar, AdminTab } from './AdminSidebar';
-import { Button } from '@/components/common/Button';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -31,7 +30,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     };
 
     return (
-        <div className="min-h-screen bg-talpa-bg font-sans text-talpa-text-main flex">
+        <div className="min-h-screen bg-ui-background text-text-primary font-body antialiased flex">
             {/* Mobile Sidebar Overlay */}
             {sidebarOpen && (
                 <div
@@ -51,63 +50,35 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             />
 
             {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0 lg:ml-[240px] transition-all duration-300">
-
-                {/* Header */}
-                <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => setSidebarOpen(true)}
-                            className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md"
-                        >
-                            <Menu className="w-5 h-5" />
-                        </button>
-
-                        {/* Breadcrumbs */}
-                        <div className="hidden sm:flex items-center text-sm text-gray-500">
-                            <span className="hover:text-gray-900 cursor-pointer" onClick={onBack}>Admin</span>
-                            <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-                            <span className="font-medium text-gray-900">{tabLabels[activeTab]}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        {/* Search Bar (Visual Only) */}
-                        <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-64">
-                            <Search className="w-4 h-4 text-gray-400 mr-2" />
-                            <input
-                                type="text"
-                                placeholder="Ara..."
-                                className="bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 w-full"
-                            />
+            <main className="flex-1 flex flex-col h-full overflow-hidden relative lg:ml-60">
+                <div className="flex-1 overflow-y-auto p-8 lg:p-12">
+                    <div className="max-w-[1400px] mx-auto flex flex-col gap-10">
+                        {/* Breadcrumbs and Title */}
+                        <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+                            <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2 text-text-muted text-caption font-medium uppercase tracking-wider mb-1">
+                                    <span className="hover:text-text-primary cursor-pointer" onClick={onBack}>Admin</span>
+                                    <span className="material-symbols-outlined text-body-sm">chevron_right</span>
+                                    <span className="text-text-primary">{tabLabels[activeTab]}</span>
+                                </div>
+                                <h1 className="text-h1 md:text-display-2 font-display font-light text-text-primary tracking-tight">
+                                    {tabLabels[activeTab]}
+                                </h1>
+                            </div>
+                            {/* Mobile menu button */}
+                            <button
+                                onClick={() => setSidebarOpen(true)}
+                                className="lg:hidden p-2 text-text-muted hover:text-text-primary hover:bg-gray-50 rounded-lg"
+                            >
+                                <Menu className="w-5 h-5" />
+                            </button>
                         </div>
 
-                        {/* Notifications */}
-                        <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full relative">
-                            <Bell className="w-5 h-5" />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                        </button>
-
-                        <div className="h-8 w-px bg-gray-200 mx-2 hidden sm:block"></div>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={onBack}
-                            className="text-gray-500 hover:text-gray-900 hidden sm:flex"
-                        >
-                            Ana Sayfaya Dön
-                        </Button>
-                    </div>
-                </header>
-
-                {/* Page Content */}
-                <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-                    <div className="max-w-7xl mx-auto">
+                        {/* Page Content */}
                         {children}
                     </div>
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 };

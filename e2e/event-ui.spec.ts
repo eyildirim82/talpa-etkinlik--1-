@@ -1,8 +1,17 @@
 import { test, expect } from '@playwright/test';
 
+// Helper: Mock unauthenticated user
+async function mockUnauthenticatedUser(page: any) {
+    await page.route('**/auth/v1/user', async (route: any) => {
+        await route.fulfill({ status: 401, body: JSON.stringify({}) });
+    });
+}
+
 test.describe('Event UI Scenarios', () => {
 
     test('UI-01: Active Event Display', async ({ page }) => {
+        await mockUnauthenticatedUser(page);
+        
         // Mock active_event_view
         await page.route('**/rest/v1/active_event_view*', async route => {
             await route.fulfill({
@@ -30,6 +39,9 @@ test.describe('Event UI Scenarios', () => {
         });
 
         await page.goto('/');
+        
+        // Header yüklenene kadar bekle
+        await expect(page.locator('header')).toBeVisible({ timeout: 15000 });
 
         // Verify Title in Hero (h1)
         await expect(page.locator('h1')).toContainText('Test Event');
@@ -40,6 +52,8 @@ test.describe('Event UI Scenarios', () => {
     });
 
     test('UI-02: No Active Event (Empty State)', async ({ page }) => {
+        await mockUnauthenticatedUser(page);
+        
         await page.route('**/rest/v1/active_event_view*', async route => {
             await route.fulfill({
                 status: 200,
@@ -49,10 +63,13 @@ test.describe('Event UI Scenarios', () => {
         });
 
         await page.goto('/');
+        await expect(page.locator('header')).toBeVisible({ timeout: 15000 });
         await expect(page.getByText(/aktif bir etkinlik bulunmamaktadır/i)).toBeVisible();
     });
 
     test('UI-03: Quota Available', async ({ page }) => {
+        await mockUnauthenticatedUser(page);
+        
         await page.route('**/rest/v1/active_event_view*', async route => {
             await route.fulfill({
                 status: 200,
@@ -81,6 +98,8 @@ test.describe('Event UI Scenarios', () => {
         });
 
         await page.goto('/');
+        await expect(page.locator('header')).toBeVisible({ timeout: 15000 });
+        
         // Expect Sticky Footer "Bilet Al" enabled
         const button = page.getByRole('button', { name: 'Bilet Al' });
         await expect(button).toBeEnabled();
@@ -88,6 +107,8 @@ test.describe('Event UI Scenarios', () => {
     });
 
     test('UI-05: Sold Out', async ({ page }) => {
+        await mockUnauthenticatedUser(page);
+        
         await page.route('**/rest/v1/active_event_view*', async route => {
             await route.fulfill({
                 status: 200,
@@ -109,6 +130,7 @@ test.describe('Event UI Scenarios', () => {
         });
 
         await page.goto('/');
+        await expect(page.locator('header')).toBeVisible({ timeout: 15000 });
 
         // Sticky Footer: Should say "TÜKENDİ" and be disabled
         const button = page.getByRole('button', { name: 'TÜKENDİ' });

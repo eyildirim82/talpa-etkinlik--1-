@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { User } from '@/types';
 import { Settings } from 'lucide-react';
+import { Input } from '@/shared/components/ui/Input';
 
-// Luxury Navigation Header with Dropdown
+// Luxury Navigation Header with Dropdown - LUXE Design
 export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User | null; onAuthClick: () => void; onAdminClick?: () => void }) => {
     const isAdmin = user?.is_admin === true;
     const [showDropdown, setShowDropdown] = useState(false);
@@ -71,128 +72,97 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
     };
 
     return (
-        <header style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 1000,
-            background: 'rgba(10, 25, 41, 0.95)',
-            backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(229, 229, 229, 0.1)',
-            padding: '0.75rem 3rem'
-        }}>
-            <div style={{
-                maxWidth: '1600px',
-                margin: '0 auto',
-                display: 'grid',
-                gridTemplateColumns: '1fr auto 1fr',
-                alignItems: 'center',
-                gap: '2rem'
-            }}>
-                {/* Left Navigation */}
-                <nav style={{
-                    display: 'flex',
-                    gap: '2rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase'
-                }}>
+        <header className="fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b border-ui-border-subtle bg-ui-surface/95 backdrop-blur-lg">
+            <div className="max-w-[1440px] mx-auto px-6 lg:px-12 h-16 flex items-center justify-between">
+                {/* Left: Logo */}
+                <div className="flex items-center gap-2">
+                    <img
+                        src="/Logo.png"
+                        alt="TALPA"
+                        className="h-8 w-auto"
+                    />
+                </div>
+
+                {/* Center: Navigation */}
+                <nav className="hidden md:flex items-center gap-10">
                     <button
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        style={{
-                            color: '#E5E5E5',
-                            textDecoration: 'none',
-                            transition: 'color 0.3s',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: '0.75rem',
-                            fontWeight: '500',
-                            letterSpacing: '0.1em',
-                            textTransform: 'uppercase'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#D4AF37'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#E5E5E5'}
+                        className="text-text-secondary hover:text-brand-primary text-caption font-medium uppercase tracking-widest transition-colors"
                     >
                         Etkinlikler
                     </button>
+                    <button
+                        onClick={() => alert('Hizmetler yakında...')}
+                        className="text-text-secondary hover:text-brand-primary text-caption font-medium uppercase tracking-widest transition-colors"
+                    >
+                        Hizmetler
+                    </button>
+                    <button
+                        onClick={() => alert('Üyelik bilgileri için lütfen iletişime geçiniz.')}
+                        className="text-text-secondary hover:text-brand-primary text-caption font-medium uppercase tracking-widest transition-colors"
+                    >
+                        Üyelik
+                    </button>
+                </nav>
 
-                    {/* Account Button with Dropdown */}
-                    <div className="account-dropdown-container" style={{ position: 'relative' }}>
+                {/* Right: Actions */}
+                <div className="flex items-center gap-5">
+                    <button className="text-text-secondary hover:text-brand-primary transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">search</span>
+                    </button>
+                    <button className="text-text-secondary hover:text-brand-primary transition-colors relative">
+                        <span className="material-symbols-outlined text-[20px]">notifications</span>
+                        <span className="absolute top-0 right-0 size-1.5 bg-brand-accent rounded-full"></span>
+                    </button>
+                    
+                    {/* Account Dropdown */}
+                    <div className="account-dropdown-container relative">
                         <button
                             onClick={handleAccountClick}
+                            className="size-8 rounded-full bg-cover bg-center ring-2 ring-ui-border-subtle cursor-pointer hover:ring-ui-border transition-all bg-ui-background [background-image:var(--avatar-bg-image)]"
                             style={{
-                                color: user ? '#D4AF37' : '#E5E5E5',
-                                textDecoration: 'none',
-                                transition: 'color 0.3s',
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontSize: '0.75rem',
-                                fontWeight: '500',
-                                letterSpacing: '0.1em',
-                                textTransform: 'uppercase',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.color = '#D4AF37'}
-                            onMouseLeave={(e) => e.currentTarget.style.color = user ? '#D4AF37' : '#E5E5E5'}
-                        >
-                            {user ? 'Hesabım' : 'Giriş Yap'}
-                            <span style={{
-                                fontSize: '0.6rem',
-                                transition: 'transform 0.2s',
-                                transform: showDropdown ? 'rotate(180deg)' : 'rotate(0deg)'
-                            }}>▼</span>
-                        </button>
+                                '--avatar-bg-image': user?.avatar_url 
+                                    ? `url('${user.avatar_url}')` 
+                                    : 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBcZnoS3yNTBh7mxo8vZLFRifJVHL-RTn85cOhRuc310Soqqul0WHkSt7aSLXfuKcsDHZ3BSRYHUcC4ZnfVFT8l7zeQkLd6RcjW-MsCdVQbE56AmC4VfBsRWhh6qCFsDZ52wLXcyfT9jRD64X-G-7v1dR3ll1QT-fuz2tspSseFT6iCZY-AIUUyZ77UZccp1gMH8szRjDu1s6mj6ALerSKiIICRgx8pqQXtdi6WnVRBB-txnOfq4J3PC5DUXXFiHvCgtJrCPs8hdug")'
+                            } as React.CSSProperties & { '--avatar-bg-image': string }}
+                        />
 
                         {/* Dropdown Menu */}
                         {showDropdown && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                left: '0',
-                                marginTop: '0.75rem',
-                                background: 'rgba(10, 25, 41, 0.98)',
-                                border: '1px solid rgba(212, 175, 55, 0.3)',
-                                borderRadius: '4px',
-                                minWidth: user ? '200px' : '280px',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
-                                zIndex: 1001,
-                                overflow: 'hidden'
-                            }}>
+                            <div className="absolute top-full right-0 mt-3 bg-ui-surface border border-ui-border rounded-sm min-w-[280px] shadow-lg z-50 overflow-hidden">
                                 {user ? (
                                     /* Logged In - Account Menu */
                                     <>
-                                        <div style={{
-                                            padding: '1rem',
-                                            borderBottom: '1px solid rgba(229, 229, 229, 0.1)',
-                                            background: 'rgba(212, 175, 55, 0.05)'
-                                        }}>
-                                            <div style={{ color: '#D4AF37', fontSize: '0.875rem', fontWeight: '600' }}>
+                                        <div className="px-4 py-3 border-b border-ui-border-subtle bg-ui-background">
+                                            <div className="text-text-primary text-body-sm font-semibold">
                                                 {user.full_name}
                                             </div>
-                                            <div style={{ color: '#888', fontSize: '0.7rem', marginTop: '0.25rem' }}>
+                                            <div className="text-text-secondary text-caption mt-1">
                                                 Sicil: {user.talpa_sicil_no || 'N/A'}
                                             </div>
                                         </div>
-                                        <div style={{ padding: '0.5rem 0' }}>
+                                        <div className="py-2">
                                             <button
                                                 onClick={() => { setShowDropdown(false); alert('Profil sayfası yakında...'); }}
-                                                style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#E5E5E5', fontSize: '0.75rem', textAlign: 'left', cursor: 'pointer' }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                                            >👤 Profilim</button>
+                                                className="block w-full px-4 py-2 text-left text-body-sm text-text-primary hover:bg-ui-background transition-colors"
+                                            >
+                                                👤 Profilim
+                                            </button>
                                             <button
                                                 onClick={() => { setShowDropdown(false); alert('Biletlerim sayfası yakında...'); }}
-                                                style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#E5E5E5', fontSize: '0.75rem', textAlign: 'left', cursor: 'pointer' }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(212, 175, 55, 0.1)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                                            >🎫 Biletlerim</button>
-                                            <div style={{ height: '1px', background: 'rgba(229,229,229,0.1)', margin: '0.5rem 0' }} />
+                                                className="block w-full px-4 py-2 text-left text-body-sm text-text-primary hover:bg-ui-background transition-colors"
+                                            >
+                                                🎫 Biletlerim
+                                            </button>
+                                            {isAdmin && onAdminClick && (
+                                                <button
+                                                    onClick={() => { setShowDropdown(false); onAdminClick(); }}
+                                                    className="block w-full px-4 py-2 text-left text-body-sm text-text-primary hover:bg-ui-background transition-colors"
+                                                >
+                                                    ⚙️ Admin
+                                                </button>
+                                            )}
+                                            <div className="h-px bg-ui-border-subtle my-2" />
                                             <button
                                                 onClick={async () => {
                                                     setShowDropdown(false);
@@ -201,75 +171,87 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
                                                     await supabase.auth.signOut();
                                                     window.location.reload();
                                                 }}
-                                                style={{ display: 'block', width: '100%', padding: '0.75rem 1rem', background: 'none', border: 'none', color: '#C41E3A', fontSize: '0.75rem', textAlign: 'left', cursor: 'pointer' }}
-                                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(196, 30, 58, 0.1)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
-                                            >🚪 Çıkış Yap</button>
+                                                className="block w-full px-4 py-2 text-left text-sm text-brand-accent hover:bg-state-error/10 transition-colors"
+                                            >
+                                                🚪 Çıkış Yap
+                                            </button>
                                         </div>
                                     </>
                                 ) : (
                                     /* Not Logged In - Login Form */
-                                    <div style={{ padding: '1.25rem' }}>
+                                    <div className="p-5">
                                         {/* Tab Switcher */}
-                                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', borderBottom: '1px solid rgba(229,229,229,0.1)', paddingBottom: '0.75rem' }}>
+                                        <div className="flex gap-4 mb-4 border-b border-ui-border-subtle pb-3">
                                             <button
                                                 onClick={() => setIsSignup(false)}
-                                                style={{ background: 'none', border: 'none', color: isSignup ? '#888' : '#D4AF37', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                                            >Giriş Yap</button>
+                                                className={`text-caption font-semibold uppercase tracking-wider transition-colors ${
+                                                    !isSignup ? 'text-brand-accent' : 'text-text-secondary'
+                                                }`}
+                                            >
+                                                Giriş Yap
+                                            </button>
                                             <button
                                                 onClick={() => setIsSignup(true)}
-                                                style={{ background: 'none', border: 'none', color: isSignup ? '#D4AF37' : '#888', fontSize: '0.75rem', fontWeight: '600', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.1em' }}
-                                            >Kayıt Ol</button>
+                                                className={`text-caption font-semibold uppercase tracking-wider transition-colors ${
+                                                    isSignup ? 'text-brand-accent' : 'text-text-secondary'
+                                                }`}
+                                            >
+                                                Kayıt Ol
+                                            </button>
                                         </div>
 
                                         {loginError && (
-                                            <div style={{ padding: '0.5rem', marginBottom: '0.75rem', background: loginError.includes('başarılı') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)', border: `1px solid ${loginError.includes('başarılı') ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`, borderRadius: '4px', color: loginError.includes('başarılı') ? '#22c55e' : '#ef4444', fontSize: '0.7rem' }}>
+                                            <div className={`p-2 mb-3 rounded text-caption ${
+                                                loginError.includes('başarılı') 
+                                                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                                                    : 'bg-red-50 text-red-700 border border-red-200'
+                                            }`}>
                                                 {loginError}
                                             </div>
                                         )}
 
-                                        <form onSubmit={handleLogin}>
+                                        <form onSubmit={handleLogin} className="space-y-3">
                                             {isSignup && (
                                                 <>
-                                                    <input
+                                                    <Input
                                                         type="text"
                                                         placeholder="Ad Soyad"
                                                         value={signupName}
                                                         onChange={(e) => setSignupName(e.target.value)}
                                                         required
-                                                        style={{ width: '100%', padding: '0.625rem', marginBottom: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(229,229,229,0.2)', borderRadius: '4px', color: '#E5E5E5', fontSize: '0.8rem', outline: 'none' }}
+                                                        size="sm"
                                                     />
-                                                    <input
+                                                    <Input
                                                         type="text"
                                                         placeholder="Sicil No"
                                                         value={signupSicil}
                                                         onChange={(e) => setSignupSicil(e.target.value)}
                                                         required
-                                                        style={{ width: '100%', padding: '0.625rem', marginBottom: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(229,229,229,0.2)', borderRadius: '4px', color: '#E5E5E5', fontSize: '0.8rem', outline: 'none' }}
+                                                        size="sm"
                                                     />
                                                 </>
                                             )}
-                                            <input
+                                            <Input
                                                 type="email"
                                                 placeholder="E-posta"
                                                 value={loginEmail}
                                                 onChange={(e) => setLoginEmail(e.target.value)}
                                                 required
-                                                style={{ width: '100%', padding: '0.625rem', marginBottom: '0.5rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(229,229,229,0.2)', borderRadius: '4px', color: '#E5E5E5', fontSize: '0.8rem', outline: 'none' }}
+                                                size="sm"
                                             />
-                                            <input
+                                            <Input
                                                 type="password"
                                                 placeholder="Şifre"
                                                 value={loginPassword}
                                                 onChange={(e) => setLoginPassword(e.target.value)}
                                                 required
                                                 minLength={6}
-                                                style={{ width: '100%', padding: '0.625rem', marginBottom: '0.75rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(229,229,229,0.2)', borderRadius: '4px', color: '#E5E5E5', fontSize: '0.8rem', outline: 'none' }}
+                                                size="sm"
                                             />
                                             <button
                                                 type="submit"
                                                 disabled={loginLoading}
-                                                style={{ width: '100%', padding: '0.75rem', background: '#D4AF37', color: '#0A1929', border: 'none', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', cursor: loginLoading ? 'wait' : 'pointer', opacity: loginLoading ? 0.7 : 1 }}
+                                                className="w-full py-2 bg-brand-primary text-white text-caption font-bold uppercase tracking-wider rounded-sm hover:bg-brand-primary/90 transition-colors disabled:opacity-70 disabled:cursor-wait"
                                             >
                                                 {loginLoading ? 'İşleniyor...' : (isSignup ? 'Kayıt Ol' : 'Giriş Yap')}
                                             </button>
@@ -279,80 +261,7 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
                             </div>
                         )}
                     </div>
-                </nav>
-
-                {/* Centered Logo */}
-                <div style={{ textAlign: 'center' }}>
-                    <img
-                        src="/Logo.png"
-                        alt="TALPA"
-                        style={{ height: '50px', width: 'auto' }}
-                    />
                 </div>
-
-                {/* Right Navigation */}
-                <nav style={{
-                    display: 'flex',
-                    gap: '2rem',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: '500',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase'
-                }}>
-                    {user && (
-                        <>
-                            {isAdmin && onAdminClick && (
-                                <button
-                                    onClick={onAdminClick}
-                                    style={{
-                                        background: '#C41E3A',
-                                        color: '#FFFFFF',
-                                        border: 'none',
-                                        padding: '0.625rem 1.5rem',
-                                        borderRadius: '2px',
-                                        fontSize: '0.7rem',
-                                        fontWeight: '600',
-                                        letterSpacing: '0.1em',
-                                        textTransform: 'uppercase',
-                                        cursor: 'pointer',
-                                        transition: 'background 0.3s',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                    onMouseEnter={(e) => e.currentTarget.style.background = '#A01729'}
-                                    onMouseLeave={(e) => e.currentTarget.style.background = '#C41E3A'}
-                                >
-                                    <Settings style={{ width: '14px', height: '14px' }} />
-                                    Admin
-                                </button>
-                            )}
-                            <span style={{ color: '#D4AF37' }}>{user.full_name}</span>
-                        </>
-                    )}
-                    <button
-                        onClick={() => alert('İletişim bilgileri için: info@talpa.org')}
-                        style={{
-                            background: '#C41E3A',
-                            color: '#FFFFFF',
-                            border: 'none',
-                            padding: '0.75rem 2rem',
-                            borderRadius: '2px',
-                            fontSize: '0.75rem',
-                            fontWeight: '600',
-                            letterSpacing: '0.1em',
-                            textTransform: 'uppercase',
-                            cursor: 'pointer',
-                            transition: 'background 0.3s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#A01729'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = '#C41E3A'}
-                    >
-                        İletişim
-                    </button>
-                </nav>
             </div>
         </header>
     );

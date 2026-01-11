@@ -112,7 +112,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               type="checkbox"
               checked={consentKvkk}
               onChange={(e) => setConsentKvkk(e.target.checked)}
-              className="mt-1 w-5 h-5 text-talpa-primary border-gray-300 rounded focus:ring-talpa-primary"
+              className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
               disabled={joinMutation.isPending}
             />
             <span className="text-sm text-gray-700">
@@ -126,7 +126,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               type="checkbox"
               checked={consentPayment}
               onChange={(e) => setConsentPayment(e.target.checked)}
-              className="mt-1 w-5 h-5 text-talpa-primary border-gray-300 rounded focus:ring-talpa-primary"
+              className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
               disabled={joinMutation.isPending}
             />
             <span className="text-sm text-gray-700">
@@ -156,7 +156,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <button
               type="submit"
               disabled={!canSubmit}
-              className="flex-1 px-4 py-2 bg-talpa-primary text-white rounded-lg font-semibold hover:bg-talpa-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-brand-accent text-white rounded-lg font-semibold hover:bg-brand-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {joinMutation.isPending ? (
                 <>

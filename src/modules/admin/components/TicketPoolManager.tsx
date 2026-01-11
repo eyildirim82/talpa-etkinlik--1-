@@ -121,7 +121,7 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
                         <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-blue-600 transition-all duration-300"
-                                style={{ width: `${uploadProgress ? (uploadProgress.current / uploadProgress.total) * 100 : 0}%` }}
+                                style={{ width: `${uploadProgress ? (uploadProgress.current / uploadProgress.total) * 100 : 0}%` } as React.CSSProperties}
                             />
                         </div>
                         <p className="text-xs text-slate-400 mt-2">

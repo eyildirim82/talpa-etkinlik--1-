@@ -13,8 +13,25 @@
     "test:watch": "vitest --watch",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:headed": "playwright test --headed",
+    "e2e:debug": "playwright test --debug",
+    "e2e:report": "playwright show-report",
+    "e2e:install": "playwright install",
+    "test:all": "npm test && npm run e2e",
     "check:boundaries": "vitest run src/__tests__/architecture",
-    "check:circular": "npx madge --circular --extensions ts,tsx src/modules"
+    "check:circular": "npx madge --circular --extensions ts,tsx src/modules",
+    "arch:baseline": "npx tsx scripts/architecture/baseline.ts --save",
+    "arch:baseline:check": "npx tsx scripts/architecture/baseline.ts",
+    "arch:drift": "npx tsx scripts/architecture/drift-detector.ts",
+    "arch:drift:fail": "npx tsx scripts/architecture/drift-detector.ts --fail-on-drift",
+    "arch:metrics": "npx tsx scripts/architecture/metrics-reporter.ts",
+    "arch:metrics:json": "npx tsx scripts/architecture/metrics-reporter.ts --format=json",
+    "arch:metrics:md": "npx tsx scripts/architecture/metrics-reporter.ts --format=markdown --save",
+    "arch:guard": "npx tsx scripts/architecture/ci-guard.ts",
+    "arch:guard:strict": "npx tsx scripts/architecture/ci-guard.ts --strict",
+    "arch:all": "npm run check:circular && npm run check:boundaries && npm run arch:guard"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
@@ -46,8 +63,10 @@
     "jsdom": "^27.4.0",
     "madge": "^8.0.0",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.19.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.19.0",
-    "vite": "^6.2.0"
+    "vite": "^6.2.0",
+    "vitest": "^3.0.0"
   }
 }

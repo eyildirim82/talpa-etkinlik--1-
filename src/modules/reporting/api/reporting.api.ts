@@ -78,7 +78,18 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     if (eventsError) throw eventsError
 
-    const activeEvent = events?.find(e => e.status === 'ACTIVE') || null
+    // Get active event directly from database (more secure, ensures single active event)
+    const { data: activeEventData, error: activeEventError } = await supabase
+      .from('events')
+      .select('*')
+      .eq('status', 'ACTIVE')
+      .maybeSingle()
+
+    if (activeEventError && activeEventError.code !== 'PGRST116') {
+      logger.error('Get Active Event Error:', activeEventError)
+    }
+
+    const activeEvent = activeEventData || null
 
     // Get all bookings
     const { data: bookings, error: bookingsError } = await supabase

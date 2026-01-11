@@ -48,7 +48,20 @@ export default tseslint.config(
       ],
       // Disable some strict rules for gradual adoption
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      // Typography standardization - prefer custom scale over raw Tailwind
+      // Note: This is a warning to encourage migration, not an error
+      'no-restricted-syntax': [
+        'warn',
+        {
+          selector: 'Literal[value=/^text-(xs|sm|base|lg|xl|2xl|3xl|4xl|5xl|6xl|7xl|8xl|9xl)$/]',
+          message: 'Use custom typography scale (text-h1, text-body, text-label, etc.) instead of raw Tailwind typography classes. See docs/DESIGN_SYSTEM.md for available typography tokens.'
+        },
+        {
+          selector: 'TemplateLiteral',
+          message: 'Avoid arbitrary Tailwind values in template literals. Use design system tokens instead. For dynamic values, use CSS variables pattern.'
+        }
+      ]
     }
   },
   {
