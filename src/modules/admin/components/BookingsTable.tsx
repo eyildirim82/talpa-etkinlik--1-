@@ -130,9 +130,9 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-end">
                     <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                         <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-text-secondary">Durum</label>
+                            <label className="text-caption font-medium text-text-secondary">Durum</label>
                             <select
-                                className="w-full md:w-48 bg-ui-surface text-text-primary border border-ui-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border transition-all shadow-sm"
+                                className="w-full md:w-48 bg-ui-surface text-text-primary border border-ui-border rounded-lg px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border transition-all duration-normal ease-motion-default shadow-sm"
                                 value={filters.status}
                                 onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value as any }))}
                             >
@@ -144,9 +144,9 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label className="text-xs font-medium text-text-secondary">Ödeme</label>
+                            <label className="text-caption font-medium text-text-secondary">Ödeme</label>
                             <select
-                                className="w-full md:w-48 bg-ui-surface text-text-primary border border-ui-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border transition-all shadow-sm"
+                                className="w-full md:w-48 bg-ui-surface text-text-primary border border-ui-border rounded-lg px-3 py-2 text-body-sm focus:outline-none focus:ring-2 focus:ring-interactive-focus-ring focus:border-interactive-focus-border transition-all duration-normal ease-motion-default shadow-sm"
                                 value={filters.payment}
                                 onChange={(e) => setFilters(prev => ({ ...prev, payment: e.target.value as any }))}
                             >
@@ -160,14 +160,14 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleExport}
-                            className="flex items-center gap-2 px-4 py-2 bg-brand-gold hover:bg-brand-gold-hover text-ui-background-dark rounded-lg text-sm font-medium transition-colors shadow-sm"
+                            className="flex items-center gap-2 px-4 py-2 bg-brand-gold hover:bg-brand-gold-hover text-ui-background-dark rounded-lg text-body-sm font-medium transition-colors duration-normal ease-motion-default shadow-sm"
                         >
                             <Download className="w-4 h-4" /> Excel İndir
                         </button>
                     </div>
                 </div>
 
-                <div className="mt-4 text-sm text-text-secondary font-medium">
+                <div className="mt-4 text-body-sm text-text-secondary font-medium">
                     Toplam: <span className="text-text-primary font-bold">{totalCount}</span> kayıt
                 </div>
             </div>
@@ -176,8 +176,8 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
             <div className="bg-ui-surface border border-ui-border rounded-lg overflow-hidden min-h-[400px] relative">
                 {bookings.length > 0 ? (
                     <div className="overflow-x-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-ui-background text-text-secondary uppercase text-xs border-b border-ui-border">
+                        <table className="w-full text-body-sm text-left">
+                            <thead className="bg-ui-background text-text-secondary uppercase text-caption border-b border-ui-border">
                                 <tr>
                                     <th className="px-6 py-4 font-semibold">Sıra</th>
                                     <th className="px-6 py-4 font-semibold">Kişi Bilgileri</th>
@@ -202,8 +202,8 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                                                     </div>
                                                     <div>
                                                         <div className="text-text-primary font-medium">{profile?.full_name}</div>
-                                                        <div className="text-text-secondary text-xs">{profile?.email}</div>
-                                                        <div className="text-text-muted text-xs">TC: {profile?.tckn}</div>
+                                                        <div className="text-text-secondary text-caption">{profile?.email}</div>
+                                                        <div className="text-text-muted text-caption">TC: {profile?.tckn}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -211,7 +211,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                                                 {new Date(booking.booking_date).toLocaleString('tr-TR')}
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${booking.queue_status === 'ASIL' ? 'bg-state-success-bg text-state-success-text' :
+                                                <span className={`px-2.5 py-1 rounded-full text-caption font-semibold ${booking.queue_status === 'ASIL' ? 'bg-state-success-bg text-state-success-text' :
                                                     booking.queue_status === 'YEDEK' ? 'bg-state-warning-bg text-state-warning-text' :
                                                         'bg-state-error-bg text-state-error-text'
                                                     }`}>
@@ -219,7 +219,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`flex items-center gap-1.5 text-xs font-medium ${booking.payment_status === 'PAID' ? 'text-state-success' : 'text-text-secondary'
+                                                <span className={`flex items-center gap-1.5 text-caption font-medium ${booking.payment_status === 'PAID' ? 'text-state-success' : 'text-text-secondary'
                                                     }`}>
                                                     {booking.payment_status === 'PAID' ? (
                                                         <><Check className="w-3 h-3" /> Ödendi</>
@@ -263,7 +263,7 @@ export const BookingsTable: React.FC<BookingsTableProps> = ({ eventId }) => {
                         <div className="w-20 h-20 bg-ui-background rounded-full flex items-center justify-center mb-6">
                             <Search className="w-10 h-10 text-text-muted" />
                         </div>
-                        <h3 className="text-xl font-bold text-text-primary mb-2">Kayıt bulunamadı</h3>
+                        <h3 className="text-h3 font-bold text-text-primary mb-2">Kayıt bulunamadı</h3>
                         <p className="text-text-secondary max-w-sm mb-8">
                             Seçilen kriterlere uygun başvuru veya bilet bulunmamaktadır. Filtreleri değiştirerek tekrar deneyin.
                         </p>
