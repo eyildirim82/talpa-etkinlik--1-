@@ -1,83 +1,62 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/src/lib/utils';
+import { AlertCircle } from 'lucide-react';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+    extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: string;
     helperText?: string;
-    size?: 'sm' | 'md' | 'lg';
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    fullWidth?: boolean;
+    containerClassName?: string;
 }
 
-const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ className, type = 'text', label, error, helperText, size = 'md', leftIcon, rightIcon, ...props }, ref) => {
-        const sizeClasses = {
-            sm: 'h-8 px-2.5 text-body-sm',
-            md: 'h-10 px-3 py-2 text-body',
-            lg: 'h-12 px-4 text-body-lg',
-        };
-
-        const iconSizeClasses = {
-            sm: 'w-4 h-4',
-            md: 'w-5 h-5',
-            lg: 'w-5 h-5',
-        };
-
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+    ({ className, containerClassName, type, label, error, helperText, leftIcon, rightIcon, fullWidth = true, disabled, ...props }, ref) => {
         return (
-            <div className="flex flex-col gap-2">
+            <div className={cn("flex flex-col gap-1.5", fullWidth ? "w-full" : "w-auto", containerClassName)}>
                 {label && (
-                    <label className="text-label text-text-primary font-medium">
+                    <label className="text-label font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-text-primary">
                         {label}
                     </label>
                 )}
                 <div className="relative">
                     {leftIcon && (
-                        <div className={cn(
-                            'absolute left-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none',
-                            iconSizeClasses[size]
-                        )}>
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary">
                             {leftIcon}
                         </div>
                     )}
                     <input
                         type={type}
                         className={cn(
-                            'w-full bg-ui-surface border rounded-md',
-                            'text-text-primary outline-none transition-colors',
-                            'focus:border-interactive-focus-border focus:ring-2 focus:ring-interactive-focus-ring',
-                            error
-                                ? 'border-state-error focus:border-state-error focus:ring-state-error/20'
-                                : 'border-ui-border',
-                            'disabled:opacity-50 disabled:cursor-not-allowed',
-                            sizeClasses[size],
-                            leftIcon && 'pl-10',
-                            rightIcon && 'pr-10',
+                            "flex h-10 w-full rounded-md border border-ui-border bg-ui-background px-3 py-2 text-body-sm ring-offset-ui-background file:border-0 file:bg-transparent file:text-body-sm file:font-medium placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/20 focus-visible:border-brand-accent disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-normal ease-motion-default",
+                            leftIcon && "pl-10",
+                            rightIcon && "pr-10",
+                            error && "border-state-error focus-visible:ring-state-error/20 focus-visible:border-state-error",
                             className
                         )}
                         ref={ref}
+                        disabled={disabled}
                         {...props}
                     />
                     {rightIcon && (
-                        <div className={cn(
-                            'absolute right-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none',
-                            iconSizeClasses[size]
-                        )}>
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-text-secondary">
                             {rightIcon}
                         </div>
                     )}
                 </div>
-                {error && (
-                    <p className="text-caption text-state-error">{error}</p>
-                )}
-                {helperText && !error && (
-                    <p className="text-caption text-text-muted">{helperText}</p>
-                )}
+                {error ? (
+                    <div className="flex items-center gap-1 text-caption text-state-error animate-in slide-in-from-top-1 fade-in duration-fast">
+                        <AlertCircle className="h-3 w-3" />
+                        <span>{error}</span>
+                    </div>
+                ) : helperText ? (
+                    <p className="text-caption text-text-secondary">{helperText}</p>
+                ) : null}
             </div>
         );
     }
 );
-
-Input.displayName = 'Input';
-
-export { Input };
+Input.displayName = "Input";

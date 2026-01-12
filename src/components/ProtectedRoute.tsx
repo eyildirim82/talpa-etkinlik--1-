@@ -65,7 +65,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     if (loading || (requireAdmin && isAdminLoading)) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-white">
-                <div className="w-8 h-8 border-2 border-gray-200 border-t-primary rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-2 border-ui-border border-t-primary rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -73,10 +73,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     // Show error state if there's an error
     if (error || adminError) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+            <div className="flex items-center justify-center min-h-screen bg-ui-background">
                 <div className="text-center">
                     <p className="text-red-600 mb-2">Bir hata oluştu</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-text-muted">
                         {error?.message || adminError?.message || 'Bilinmeyen hata'}
                     </p>
                 </div>

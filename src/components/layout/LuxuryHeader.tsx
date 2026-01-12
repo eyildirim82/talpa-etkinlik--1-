@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User } from '@/types';
-import { Settings } from 'lucide-react';
+import { Settings, Search, Bell } from 'lucide-react';
 import { Input } from '@/shared/components/ui/Input';
 
 // Luxury Navigation Header with Dropdown - LUXE Design
@@ -108,10 +108,10 @@ export const LuxuryHeader = ({ user, onAuthClick, onAdminClick }: { user: User |
                 {/* Right: Actions */}
                 <div className="flex items-center gap-5">
                     <button className="text-text-secondary hover:text-brand-primary transition-colors">
-                        <span className="material-symbols-outlined text-[20px]">search</span>
+                        <Search className="w-5 h-5" />
                     </button>
                     <button className="text-text-secondary hover:text-brand-primary transition-colors relative">
-                        <span className="material-symbols-outlined text-[20px]">notifications</span>
+                        <Bell className="w-5 h-5" />
                         <span className="absolute top-0 right-0 size-1.5 bg-brand-accent rounded-full"></span>
                     </button>
                     

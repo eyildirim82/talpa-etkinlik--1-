@@ -6,9 +6,9 @@ export const EmptyState: React.FC = () => {
       <div className="max-w-md w-full text-center">
         {/* Minimal Icon */}
         <div className="relative w-24 h-24 mx-auto mb-8 flex items-center justify-center">
-          <div className="w-20 h-20 border-2 border-gray-200 rounded-full flex items-center justify-center">
-            <div className="w-12 h-12 border border-gray-300 rounded-full flex items-center justify-center">
-              <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+          <div className="w-20 h-20 border-2 border-ui-border rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 border border-ui-border rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-ui-border rounded-full"></div>
             </div>
           </div>
         </div>

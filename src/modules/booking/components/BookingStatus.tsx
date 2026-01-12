@@ -15,8 +15,8 @@ export const BookingStatus: React.FC<BookingStatusProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-gray-500">
-        <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 animate-spin rounded-full" />
+      <div className="flex items-center gap-2 text-text-muted">
+        <div className="w-5 h-5 border-2 border-ui-border border-t-text-primary animate-spin rounded-full" />
         <span>Yükleniyor...</span>
       </div>
     )

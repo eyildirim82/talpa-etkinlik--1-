@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, X, Upload, Search, Users, Shield, User } from 'lucide-react';
 import { logger } from '@/shared/utils/logger';
 import { useAdminUsers, useUpdateUserRole } from '@/modules/admin';
 import { MemberImport } from './MemberImport';
@@ -96,7 +96,7 @@ export const UsersPanel: React.FC = () => {
                             : 'bg-brand-primary hover:bg-brand-primary/90 text-white'
                     }`}
                 >
-                    <span className="material-symbols-outlined text-[18px]">{showImport ? 'close' : 'upload_file'}</span>
+                    {showImport ? <X className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
                     <span>{showImport ? 'İptal' : 'Excel ile Üye Ekle'}</span>
                 </button>
             </div>
@@ -112,7 +112,7 @@ export const UsersPanel: React.FC = () => {
             <div className="p-5 bg-ui-surface rounded-2xl border border-ui-border-subtle shadow-subtle flex flex-wrap gap-4">
                 {/* Search */}
                 <div className="flex-1 min-w-[250px] relative group">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-primary transition-colors text-[20px]">search</span>
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-brand-primary transition-colors" />
                     <input
                         type="text"
                         value={searchQuery}
@@ -138,7 +138,7 @@ export const UsersPanel: React.FC = () => {
             <div className="bg-ui-surface rounded-3xl border border-ui-border-subtle shadow-subtle overflow-hidden">
                 {filteredUsers.length === 0 ? (
                     <div className="p-16 text-center">
-                        <span className="material-symbols-outlined text-5xl text-text-muted/30 mb-4 block">group</span>
+                        <Users className="w-12 h-12 text-text-muted/30 mb-4 mx-auto" />
                         <h3 className="text-h3 font-semibold text-text-primary mb-1">Üye bulunamadı</h3>
                         <p className="text-body-sm text-text-muted">Arama kriterlerinize uygun üye yok</p>
                     </div>
@@ -162,11 +162,11 @@ export const UsersPanel: React.FC = () => {
                                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                                                     user.role === 'admin' ? 'bg-brand-primary/10' : 'bg-ui-background'
                                                 }`}>
-                                                    <span className={`material-symbols-outlined text-lg ${
-                                                        user.role === 'admin' ? 'text-brand-primary' : 'text-text-muted/40'
-                                                    }`}>
-                                                        {user.role === 'admin' ? 'admin_panel_settings' : 'person'}
-                                                    </span>
+                                                    {user.role === 'admin' ? (
+                                                        <Shield className={`w-5 h-5 text-brand-primary`} />
+                                                    ) : (
+                                                        <User className={`w-5 h-5 text-text-muted/40`} />
+                                                    )}
                                                 </div>
                                                 <span className="font-medium text-text-primary text-sm">{user.full_name}</span>
                                             </div>
@@ -183,11 +183,11 @@ export const UsersPanel: React.FC = () => {
                                                     ? 'bg-brand-primary/10 text-brand-primary'
                                                     : 'bg-ui-background text-text-secondary'
                                             }`}>
-                                                <span className={`material-symbols-outlined text-xs ${
-                                                    user.role === 'admin' ? 'text-brand-primary' : 'text-text-muted'
-                                                }`}>
-                                                    {user.role === 'admin' ? 'admin_panel_settings' : 'shield'}
-                                                </span>
+                                                {user.role === 'admin' ? (
+                                                    <Shield className="w-3 h-3 text-brand-primary" />
+                                                ) : (
+                                                    <Shield className="w-3 h-3 text-text-muted" />
+                                                )}
                                                 {user.role === 'admin' ? 'Admin' : 'Üye'}
                                             </span>
                                         </td>
@@ -234,7 +234,7 @@ export const UsersPanel: React.FC = () => {
 
             {/* Role Change Confirmation */}
             {roleChangeConfirm && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-overlay p-4">
                     <div className="bg-ui-surface rounded-3xl border border-ui-border-subtle shadow-lg p-8 max-w-md w-full">
                         <div className="flex items-center gap-3 text-brand-primary mb-4">
                             <AlertCircle className="w-6 h-6" />

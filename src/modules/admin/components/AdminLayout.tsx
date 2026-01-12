@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, ChevronRight } from 'lucide-react';
 import { AdminSidebar, AdminTab } from './AdminSidebar';
 
 interface AdminLayoutProps {
@@ -58,7 +58,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-2 text-text-muted text-caption font-medium uppercase tracking-wider mb-1">
                                     <span className="hover:text-text-primary cursor-pointer" onClick={onBack}>Admin</span>
-                                    <span className="material-symbols-outlined text-body-sm">chevron_right</span>
+                                    <ChevronRight className="w-4 h-4" />
                                     <span className="text-text-primary">{tabLabels[activeTab]}</span>
                                 </div>
                                 <h1 className="text-h1 md:text-display-2 font-display font-light text-text-primary tracking-tight">
@@ -68,7 +68,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                             {/* Mobile menu button */}
                             <button
                                 onClick={() => setSidebarOpen(true)}
-                                className="lg:hidden p-2 text-text-muted hover:text-text-primary hover:bg-gray-50 rounded-lg"
+                                className="lg:hidden p-2 text-text-muted hover:text-text-primary hover:bg-ui-background rounded-lg"
                             >
                                 <Menu className="w-5 h-5" />
                             </button>

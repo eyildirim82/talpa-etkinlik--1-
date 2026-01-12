@@ -4,10 +4,15 @@ import {
     Calendar,
     Search,
     Filter,
+    ChevronLeft,
+    ChevronRight,
     MoreHorizontal,
     Edit2,
     Trash2,
     Power,
+    CalendarCheck,
+    Megaphone,
+    Ticket,
     PowerOff,
     Loader2,
     X,
@@ -218,19 +223,19 @@ export const EventsPanel: React.FC = () => {
                 <StatsCard
                     title="Toplam Etkinlik"
                     value={totalEvents}
-                    icon="event_available"
+                    icon={<CalendarCheck className="w-5 h-5" />}
                     trend={{ value: '12%', direction: 'up' }}
                 />
                 <StatsCard
                     title="Aktif Etkinlik"
                     value={activeListings}
-                    icon="campaign"
+                    icon={<Megaphone className="w-5 h-5" />}
                     description={activeListings === 1 ? "Şu anda aktif" : "Aktif etkinlik yok"}
                 />
                 <StatsCard
                     title="Tükendi"
                     value={soldOutEvents}
-                    icon="confirmation_number"
+                    icon={<Ticket className="w-5 h-5" />}
                     description="En iyi performans"
                 />
             </div>
@@ -238,7 +243,7 @@ export const EventsPanel: React.FC = () => {
             {/* Search and Filter */}
             <div className="flex flex-col md:flex-row gap-4 justify-between items-center pt-2">
                 <div className="w-full md:max-w-xs relative group">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-brand-primary transition-colors text-[20px]">search</span>
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-muted group-focus-within:text-brand-primary transition-colors" />
                     <input
                         type="text"
                         placeholder="Etkinlik ara..."
@@ -249,18 +254,18 @@ export const EventsPanel: React.FC = () => {
                 </div>
                 <div className="flex gap-4 w-full md:w-auto">
                     <button className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary transition-colors text-sm font-medium">
-                        <span className="material-symbols-outlined text-[18px]">filter_list</span>
+                        <Filter className="w-4 h-4" />
                         <span>Durum</span>
                     </button>
                     <button className="flex items-center gap-2 px-3 py-2 text-text-muted hover:text-text-primary transition-colors text-sm font-medium">
-                        <span className="material-symbols-outlined text-[18px]">calendar_month</span>
+                        <Calendar className="w-4 h-4" />
                         <span>Tarih</span>
                     </button>
                     <button
                         onClick={handleOpenCreate}
                         className="flex items-center gap-2 cursor-pointer h-10 px-5 bg-brand-primary hover:bg-brand-primary/90 text-white text-sm font-medium rounded-full transition-all duration-300 shadow-subtle hover:shadow-lg ml-auto md:ml-0"
                     >
-                        <span className="material-symbols-outlined text-[18px]">add</span>
+                        <Plus className="w-4 h-4" />
                         <span>Etkinlik Oluştur</span>
                     </button>
                 </div>
@@ -377,11 +382,11 @@ export const EventsPanel: React.FC = () => {
                     <p className="text-text-muted text-sm">Gösteriliyor <span className="text-text-primary font-medium">1-{filteredEvents.length}</span> / {totalEvents}</p>
                     <div className="flex items-center gap-2">
                         <button className="flex items-center justify-center h-8 w-8 rounded-full text-text-muted hover:bg-interactive-hover-surface transition-colors disabled:opacity-30" disabled>
-                            <span className="material-symbols-outlined text-sm">chevron_left</span>
+                            <ChevronLeft className="w-4 h-4" />
                         </button>
                         <span className="text-sm font-medium text-text-primary px-2">Sayfa 1</span>
                         <button className="flex items-center justify-center h-8 w-8 rounded-full text-text-muted hover:bg-interactive-hover-surface transition-colors">
-                            <span className="material-symbols-outlined text-sm">chevron_right</span>
+                            <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -389,7 +394,7 @@ export const EventsPanel: React.FC = () => {
 
             {/* Modal (Simplified for now, reused logic) */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-overlay p-4">
                     {/* ... Keeping existing form logic but wrapping in white clean modal ... */}
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-[500px] max-h-[90vh] overflow-auto">
                         <div className="px-6 py-4 border-b border-ui-border-subtle flex items-center justify-between sticky top-0 bg-ui-surface z-10">
@@ -490,9 +495,9 @@ export const EventsPanel: React.FC = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Durum</label>
+                                <label className="block text-sm font-medium text-text-primary mb-1">Durum</label>
                                 <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg outline-none"
+                                    className="w-full px-3 py-2 border border-ui-border rounded-lg outline-none"
                                 >
                                     <option value="DRAFT">Taslak</option>
                                     <option value="ACTIVE">Aktif</option>
@@ -519,10 +524,10 @@ export const EventsPanel: React.FC = () => {
 
             {/* Confirm Modals (Simplified reused) */}
             {activeConfirm && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-overlay">
                     <div className="bg-white p-6 rounded-xl max-w-sm w-full">
                         <h3 className="text-lg font-bold mb-2">Durum Değiştir</h3>
-                        <p className="text-gray-600 mb-4">Bu etkinliğin durumunu değiştirmek istediğinize emin misiniz?</p>
+                        <p className="text-text-muted mb-4">Bu etkinliğin durumunu değiştirmek istediğinize emin misiniz?</p>
                         <div className="flex gap-3">
                             <Button fullWidth variant="outline" onClick={() => setActiveConfirm(null)}>İptal</Button>
                             <Button fullWidth className="bg-black text-white" onClick={() => handleSetActive(activeConfirm)}>Onayla</Button>
@@ -532,10 +537,10 @@ export const EventsPanel: React.FC = () => {
             )}
 
             {deleteConfirm && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100]">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-overlay">
                     <div className="bg-white p-6 rounded-xl max-w-sm w-full">
                         <h3 className="text-lg font-bold mb-2 text-red-600">Etkinliği Sil</h3>
-                        <p className="text-gray-600 mb-4">Bu işlem geri alınamaz.</p>
+                        <p className="text-text-muted mb-4">Bu işlem geri alınamaz.</p>
                         <div className="flex gap-3">
                             <Button fullWidth variant="outline" onClick={() => setDeleteConfirm(null)}>İptal</Button>
                             <Button fullWidth variant="danger" onClick={() => handleDelete(deleteConfirm)}>Sil</Button>

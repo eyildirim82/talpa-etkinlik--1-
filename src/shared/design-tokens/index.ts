@@ -103,6 +103,7 @@ export const tokens = {
       'body-sm': '0.875rem', // 14px
       label: '0.875rem', // 14px
       caption: '0.75rem', // 12px
+      '2xs': '0.625rem', // 10px - For very small text (badges, labels)
     },
     lineHeight: {
       tight: '1.1',
@@ -148,6 +149,17 @@ export const tokens = {
   textShadow: {
     hero: '0 2px 10px rgba(0,0,0,0.3)',
   },
+  motion: {
+    duration: {
+      fast: '150ms',
+      normal: '200ms',
+      slow: '300ms',
+    },
+    easing: {
+      default: 'ease-in-out',
+      bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
+  },
 } as const;
 
 // Type-safe token access helpers
@@ -160,6 +172,8 @@ export type SpacingToken = keyof typeof tokens.spacing;
 export type TypographyToken = keyof typeof tokens.typography.fontSize;
 export type ShadowToken = keyof typeof tokens.shadows;
 export type BorderRadiusToken = keyof typeof tokens.borderRadius;
+export type MotionDurationToken = keyof typeof tokens.motion.duration;
+export type MotionEasingToken = keyof typeof tokens.motion.easing;
 
 /**
  * Get a color value by path
@@ -191,4 +205,20 @@ export function getSpacing(token: SpacingToken): string {
  */
 export function getFontSize(token: TypographyToken): string {
   return tokens.typography.fontSize[token];
+}
+
+/**
+ * Get a motion duration value
+ * Example: getMotionDuration('normal') => '200ms'
+ */
+export function getMotionDuration(token: MotionDurationToken): string {
+  return tokens.motion.duration[token];
+}
+
+/**
+ * Get a motion easing value
+ * Example: getMotionEasing('default') => 'ease-in-out'
+ */
+export function getMotionEasing(token: MotionEasingToken): string {
+  return tokens.motion.easing[token];
 }

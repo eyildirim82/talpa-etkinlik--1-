@@ -1,19 +1,19 @@
 import React from 'react';
-import { X } from 'lucide-react';
+import { X, LayoutDashboard, Calendar, Ticket, Users, Gem, LogOut, ChevronRight } from 'lucide-react';
 
 export type AdminTab = 'overview' | 'events' | 'tickets' | 'users';
 
 interface MenuItem {
     id: AdminTab;
     label: string;
-    icon: string; // Material Symbols icon name
+    icon: React.ReactNode;
 }
 
 const MENU_ITEMS: MenuItem[] = [
-    { id: 'overview', label: 'Genel Bakış', icon: 'dashboard' },
-    { id: 'events', label: 'Etkinlikler', icon: 'event' },
-    { id: 'tickets', label: 'Biletler', icon: 'confirmation_number' },
-    { id: 'users', label: 'Üyeler', icon: 'group' },
+    { id: 'overview', label: 'Genel Bakış', icon: <LayoutDashboard className="w-5 h-5" /> },
+    { id: 'events', label: 'Etkinlikler', icon: <Calendar className="w-5 h-5" /> },
+    { id: 'tickets', label: 'Biletler', icon: <Ticket className="w-5 h-5" /> },
+    { id: 'users', label: 'Üyeler', icon: <Users className="w-5 h-5" /> },
 ];
 
 interface AdminSidebarProps {
@@ -41,7 +41,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
     return (
         <aside
             className={`
-                fixed top-0 left-0 bottom-0 w-60 bg-ui-surface border-r border-ui-border-subtle shrink-0 z-20 flex flex-col transition-transform duration-300 ease-in-out
+                fixed top-0 left-0 bottom-0 w-60 bg-ui-surface border-r border-ui-border-subtle shrink-0 z-20 flex flex-col transition-transform duration-slow ease-motion-default
                 ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}
         >
@@ -49,7 +49,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 {/* Logo */}
                 <div className="px-6 flex items-center gap-3">
                     <div className="size-10 rounded-xl bg-brand-primary text-white flex items-center justify-center shadow-lg shadow-brand-primary/20 cursor-pointer shrink-0">
-                        <span className="material-symbols-outlined text-2xl">diamond</span>
+                        <Gem className="w-6 h-6" />
                     </div>
                     <span className="text-text-primary font-display font-semibold text-h4">TALPA</span>
                 </div>
@@ -57,7 +57,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                 {/* Close button for mobile */}
                 <button
                     onClick={onClose}
-                    className="lg:hidden absolute top-4 right-4 p-2 text-text-muted hover:text-text-primary rounded-md hover:bg-gray-50"
+                    className="lg:hidden absolute top-4 right-4 p-2 text-text-muted hover:text-text-primary rounded-md hover:bg-ui-background"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -71,14 +71,14 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                                 key={item.id}
                                 onClick={() => handleTabClick(item.id)}
                                 className={`
-                                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group
+                                    flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-slow ease-motion-default group
                                     ${isActive
                                         ? 'text-brand-primary bg-brand-primary/5 font-medium'
                                         : 'text-text-muted hover:text-text-primary hover:bg-ui-background'
                                     }
                                 `}
                             >
-                                <span className={`material-symbols-outlined text-[22px] shrink-0 ${isActive ? 'fill-1' : ''}`}>
+                                <span className={`shrink-0 ${isActive ? 'text-brand-primary' : 'text-text-muted'}`}>
                                     {item.icon}
                                 </span>
                                 <span className="text-body-sm font-medium">{item.label}</span>
@@ -98,7 +98,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
                         onClick={onLogout}
                         className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-text-muted hover:text-brand-primary hover:bg-brand-primary/5 transition-all"
                     >
-                        <span className="material-symbols-outlined text-[22px] shrink-0">logout</span>
+                        <LogOut className="w-5 h-5 shrink-0" />
                         <span className="text-body-sm font-medium">Çıkış Yap</span>
                     </button>
                 </div>

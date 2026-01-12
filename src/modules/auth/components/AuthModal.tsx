@@ -3,6 +3,7 @@ import { X, AlertTriangle, User, Lock } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { loginWithFormData, signupWithFormData } from '../api/auth.api';
 import { Button } from '@/src/components/common/Button';
+import { Input } from '@/shared/components/ui';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -45,18 +46,18 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-all duration-300 animate-in fade-in">
+    <div className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 animate-in fade-in">
       <div className="relative z-20 w-full max-w-md">
 
         {/* Main Card */}
-        <div className="bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-200 backdrop-blur-md bg-opacity-95 transform transition-all animate-in zoom-in-95 duration-200">
+        <div className="bg-ui-surface shadow-2xl rounded-lg overflow-hidden border border-ui-border backdrop-blur-md bg-opacity-95 transform transition-all animate-in zoom-in-95 duration-200">
 
           {/* Header */}
           <div className="px-8 pt-8 pb-6 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 className="text-h2 text-text-primary mb-2">
               {activeTab === 'login' ? 'Hoşgeldiniz' : 'Aramıza Katılın'}
             </h2>
-            <p className="text-gray-500 text-sm">
+            <p className="text-text-secondary text-sm">
               {activeTab === 'login'
                 ? 'Hesabınıza giriş yaparak etkinlikleri takip edin.'
                 : 'Kayıt olarak TALPA etkinliklerine erişim sağlayabilirsiniz.'}
@@ -66,7 +67,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
           {/* Form Section */}
           <div className="px-8 pb-8">
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-md flex items-center gap-2 text-red-600 text-xs font-medium">
+              <div className="mb-4 p-3 bg-state-error-bg border border-state-error-border rounded-md flex items-center gap-2 text-state-error-text text-xs font-medium">
                 <AlertTriangle className="w-4 h-4 shrink-0" />
                 {error}
               </div>
@@ -75,19 +76,19 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
             <form onSubmit={handleSubmit} className="space-y-5">
 
               {/* Tab Switcher (Optional, simplified for this layout) */}
-              <div className="flex justify-center mb-4 text-xs font-bold tracking-widest uppercase border-b border-gray-100 pb-2 gap-4">
+              <div className="flex justify-center mb-4 text-xs font-bold tracking-widest uppercase border-b border-ui-border-subtle pb-2 gap-4">
                 <button
                   type="button"
                   onClick={() => setActiveTab('login')}
-                  className={`transition-colors ${activeTab === 'login' ? 'text-brand-accent' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`transition-colors ${activeTab === 'login' ? 'text-brand-accent' : 'text-text-disabled hover:text-text-secondary'}`}
                 >
                   GİRİŞ YAP
                 </button>
-                <div className="w-px bg-gray-200 h-3 self-center" />
+                <div className="w-px bg-ui-border h-3 self-center" />
                 <button
                   type="button"
                   onClick={() => setActiveTab('signup')}
-                  className={`transition-colors ${activeTab === 'signup' ? 'text-brand-accent' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`transition-colors ${activeTab === 'signup' ? 'text-brand-accent' : 'text-text-disabled hover:text-text-secondary'}`}
                 >
                   KAYIT OL
                 </button>
@@ -95,62 +96,37 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
 
               {activeTab === 'signup' && (
                 <div className="space-y-4 animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 uppercase tracking-wider mb-1">Ad Soyad</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="text-gray-400 w-5 h-5" />
-                      </div>
-                      <input
-                        name="fullName"
-                        type="text"
-                        required
-                        className="block w-full pl-10 pr-3 py-2.5 border border-ui-border rounded-md leading-5 bg-ui-background text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors"
-                        placeholder="Ad Soyad"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 uppercase tracking-wider mb-1">Sicil No</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <User className="text-gray-400 w-5 h-5" />
-                      </div>
-                      <input
-                        name="sicilNo"
-                        type="text"
-                        required
-                        className="block w-full pl-10 pr-3 py-2.5 border border-ui-border rounded-md leading-5 bg-ui-background text-text-primary placeholder-text-muted focus:outline-none focus:ring-1 focus:ring-brand-accent focus:border-brand-accent sm:text-sm transition-colors"
-                        placeholder="12345"
-                      />
-                    </div>
-                  </div>
+                  <Input
+                    name="fullName"
+                    label="AD SOYAD"
+                    placeholder="Ad Soyad"
+                    required
+                    leftIcon={<User className="w-5 h-5" />}
+                  />
+                  <Input
+                    name="sicilNo"
+                    label="SİCİL NO"
+                    placeholder="12345"
+                    required
+                    leftIcon={<User className="w-5 h-5" />}
+                  />
                 </div>
               )}
 
-              <div>
-                <label className="block text-xs font-medium text-gray-700 uppercase tracking-wider mb-1" htmlFor="email">
-                  E-Posta veya Kullanıcı Adı
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="text-gray-400 w-5 h-5" />
-                  </div>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-talpa-primary focus:border-talpa-primary sm:text-sm transition-colors"
-                    placeholder="user@example.com"
-                  />
-                </div>
-              </div>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                label="E-POSTA VEYA KULLANICI ADI"
+                placeholder="user@example.com"
+                required
+                leftIcon={<User className="w-5 h-5" />}
+              />
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-xs font-medium text-gray-700 uppercase tracking-wider" htmlFor="password">
-                    Şifre
+                  <label className="block text-xs font-medium text-text-secondary uppercase tracking-wider" htmlFor="password">
+                    ŞİFRE
                   </label>
                   {activeTab === 'login' && (
                     <a className="text-xs font-medium text-brand-accent hover:text-brand-accent/80 transition-colors cursor-pointer">
@@ -158,20 +134,15 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
                     </a>
                   )}
                 </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="text-gray-400 w-5 h-5" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    minLength={6}
-                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-md leading-5 bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-talpa-primary focus:border-talpa-primary sm:text-sm transition-colors"
-                    placeholder="••••••••"
-                  />
-                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={6}
+                  placeholder="••••••••"
+                  leftIcon={<Lock className="w-5 h-5" />}
+                />
               </div>
 
               <div>
@@ -195,7 +166,7 @@ export const AuthModal = ({ onClose }: AuthModalProps) => {
         <div className="mt-4 text-center">
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-sm transition-colors flex items-center justify-center w-full group gap-1"
+            className="text-white/60 hover:text-white text-sm transition-colors flex items-center justify-center w-full group gap-1"
           >
             <X className="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" />
             Pencereyi Kapat

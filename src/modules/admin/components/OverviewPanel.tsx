@@ -6,7 +6,7 @@
  * - reporting: useDashboardStats
  */
 import React, { useRef } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, TrendingUp, CalendarCheck, Users, Ticket, CreditCard, BarChart } from 'lucide-react';
 // Domain module import - using public API
 import { useDashboardStats } from '@/modules/reporting';
 import { StatsCard } from './StatsCard';
@@ -60,30 +60,30 @@ export const OverviewPanel: React.FC = () => {
                 <StatsCard
                     title="Toplam Etkinlik"
                     value={stats?.totalEvents || 0}
-                    icon="event_available"
+                    icon={<CalendarCheck className="w-5 h-5" />}
                     trend={{ value: '12%', direction: 'up' }}
                 />
                 <StatsCard
                     title="Asil Başvurular"
                     value={stats?.asilCount || 0}
-                    icon="group"
+                    icon={<Users className="w-5 h-5" />}
                     description={`Yedek: ${stats?.yedekCount || 0}`}
                 />
                 <StatsCard
                     title="Bilet Gönderilen"
                     value={stats?.paidCount || 0}
-                    icon="confirmation_number"
+                    icon={<Ticket className="w-5 h-5" />}
                     description="Ödeme onayı alınan"
                 />
                 <StatsCard
                     title="Toplam Gelir"
                     value={`${(stats?.totalRevenue || 0).toLocaleString('tr-TR')} ₺`}
-                    icon="payments"
+                    icon={<CreditCard className="w-5 h-5" />}
                 />
                 <StatsCard
                     title="Doluluk Oranı"
                     value={`%${stats?.occupancyRate || 0}`}
-                    icon="analytics"
+                    icon={<BarChart className="w-5 h-5" />}
                     description={stats?.activeEvent?.title || 'Aktif etkinlik yok'}
                 />
             </div>
@@ -92,7 +92,7 @@ export const OverviewPanel: React.FC = () => {
             {stats?.activeEvent && (
                 <div className="p-6 bg-ui-surface rounded-2xl border border-ui-border-subtle shadow-subtle flex items-center gap-5">
                     <div className="p-3.5 rounded-xl bg-brand-primary/10">
-                        <span className="material-symbols-outlined text-brand-primary text-[28px]">trending_up</span>
+                        <TrendingUp className="w-7 h-7 text-brand-primary" />
                     </div>
                     <div>
                         <p className="text-xs text-text-muted uppercase tracking-wider mb-1">Aktif Etkinlik</p>

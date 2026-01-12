@@ -17,7 +17,7 @@ export const StickyFooter = ({ event, onJoin }: { event: EventData; onJoin?: () 
                         style={{ '--footer-event-image': `url('${event.image_url}')` } as React.CSSProperties & { '--footer-event-image': string }}
                     />
                     <div className="text-left">
-                        <p className="text-[10px] text-brand-accent uppercase tracking-widest font-semibold mb-0.5">
+                        <p className="text-2xs text-brand-accent uppercase tracking-widest font-semibold mb-0.5">
                             Şu Anda Devam Ediyor
                         </p>
                         <p className="text-text-primary font-sans text-body-sm md:text-body font-medium">

@@ -228,6 +228,77 @@ Tailwind'in default spacing scale'i kullanılmaktadır (0.25rem = 4px base unit)
 <button className="bg-gradient-gold">Altın buton</button>
 ```
 
+## Layering (Z-Index) System
+
+Arbitrary `z-[9999]` değerleri yerine bu semantik tokenlar kullanılmalıdır.
+
+- `z-dropdown`: 1000
+- `z-sticky`: 1020 (Headerlar vb.)
+- `z-overlay`: 1040 (Backdrops)
+- `z-modal`: 1050
+- `z-toast`: 1100
+- `z-tooltip`: 1200
+
+## Iconography
+
+Standart ikon seti olarak **Lucide React** kullanılmalıdır.
+Google Material Symbols **deprecated** (kullanımdan kaldırılacak) durumundadır.
+
+**Kurallar:**
+- `lucide-react` paketinden import edin.
+- Stroke width: Varsayılan (2px)
+- Size: Genellikle `w-4 h-4` (sm), `w-5 h-5` (md), `w-6 h-6` (lg)
+- Color: Genellikle `text-text-secondary` veya `text-brand-accent` (aktif durum)
+
+**Kullanım:**
+```tsx
+import { User, Bell } from 'lucide-react';
+
+<User className="w-5 h-5 text-text-secondary" />
+```
+
+## Motion & Animation
+
+"Premium" hissi için `tailwindcss-animate` paketi ve standart giriş animasyonları kullanılır.
+
+### Motion Tokens
+
+Motion token'ları design tokens sisteminde tanımlıdır ve Tailwind config'e map edilmiştir.
+
+#### Duration Tokens
+- `duration-fast`: `150ms` - Hızlı geçişler için
+- `duration-normal`: `200ms` - Standart geçişler için (varsayılan)
+- `duration-slow`: `300ms` - Yavaş geçişler için
+
+#### Easing Tokens
+- `ease-motion-default`: `ease-in-out` - Varsayılan easing
+- `ease-motion-bounce`: `cubic-bezier(0.68, -0.55, 0.265, 1.55)` - Bounce efekti için
+
+**Kullanım:**
+```tsx
+// Duration token kullanımı
+<div className="transition-colors duration-normal">
+  İçerik
+</div>
+
+// Easing token kullanımı
+<div className="transition-all ease-motion-default">
+  İçerik
+</div>
+```
+
+**Standart Animasyonlar:**
+- **Modal Açılış:** `animate-in fade-in zoom-in-95 duration-normal`
+- **Dropdown/Popover:** `animate-in fade-in slide-in-from-top-2 duration-normal`
+- **Sayfa Geçişleri:** `animate-in fade-in duration-slow`
+
+**Kullanım:**
+```tsx
+<div className="animate-in fade-in zoom-in-95 duration-normal">
+  Modal İçeriği
+</div>
+```
+
 ## Best Practices
 
 ### 1. Semantic Renkler Kullan
@@ -363,24 +434,69 @@ import { Input } from '@/shared/components/ui/Input';
 <Input
   type="email"
   label="E-posta"
-  placeholder="ornek@talpa.org"
-  size="md" // sm | md | lg
-  leftIcon={<Mail />}
-  error="Geçersiz e-posta"
+  placeholder="ornek@email.com"
+  error={errors.email}
   helperText="E-posta adresinizi girin"
+  leftIcon={<Mail className="w-4 h-4" />}
 />
 ```
 
-### Card Component
-Kartlar için `Card` component'i kullanılmalıdır:
+### Textarea Component
+Çok satırlı metin girişleri için `Textarea` component'i kullanılmalıdır:
 
 ```tsx
-import { Card } from '@/shared/components/ui/Card';
+import { Textarea } from '@/shared/components/ui/Textarea';
 
-<Card variant="default" padding="md" hover>
-  <h3>Kart Başlığı</h3>
-  <p>Kart içeriği</p>
-</Card>
+<Textarea
+  label="Açıklama"
+  placeholder="Açıklama girin..."
+  error={errors.description}
+  helperText="Maksimum 500 karakter"
+  rows={6}
+/>
+```
+
+### Select Component
+Dropdown seçimleri için `Select` component'i kullanılmalıdır:
+
+```tsx
+import { Select } from '@/shared/components/ui/Select';
+
+<Select
+  label="Durum"
+  placeholder="Durum seçin"
+  options={[
+    { value: 'active', label: 'Aktif' },
+    { value: 'inactive', label: 'Pasif' },
+  ]}
+  error={errors.status}
+/>
+```
+
+### Label Component
+Standalone label'lar için `Label` component'i kullanılmalıdır:
+
+```tsx
+import { Label } from '@/shared/components/ui/Label';
+
+<Label required error={hasError}>
+  E-posta Adresi
+</Label>
+```
+
+### FormGroup Component
+Form field'larını gruplamak için `FormGroup` component'i kullanılmalıdır:
+
+```tsx
+import { FormGroup } from '@/shared/components/ui/FormGroup';
+import { Input } from '@/shared/components/ui/Input';
+import { Textarea } from '@/shared/components/ui/Textarea';
+
+<FormGroup spacing="md">
+  <Input label="Ad" />
+  <Input label="Soyad" />
+  <Textarea label="Açıklama" />
+</FormGroup>
 ```
 
 ### StatusBadge Component
@@ -401,3 +517,5 @@ import { StatusBadge } from '@/modules/admin/components/StatusBadge';
 4. **Magic Numbers**: `p-[18px]`, `gap-[13px]` gibi arbitrary değerler kullanmayın
 5. **Typography Scale Bypass**: `text-[22px]` gibi değerler kullanmayın
 6. **Responsive Breakpoint Inconsistency**: Standart breakpoint'ler kullanın (sm: 640px, md: 768px, lg: 1024px)
+7. **Icon Set Mixing**: Lucide ve Material Symbols'ü karıştırmayın. Material Symbols kullanmayın.
+8. **Arbitrary Z-Index**: `z-[9999]` yerine semantik z-index tokenları kullanın.

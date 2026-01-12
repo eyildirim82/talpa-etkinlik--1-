@@ -39,7 +39,7 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
             {/* Content */}
             <div className="relative z-20 container mx-auto px-6 lg:px-12 text-center flex flex-col items-center justify-center gap-6">
                 {/* Featured Event Badge */}
-                <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-semibold tracking-[0.3em] text-white uppercase mb-2">
+                <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-2xs font-semibold tracking-[0.3em] text-white uppercase mb-2">
                     Öne Çıkan Etkinlik
                 </span>
 
@@ -57,7 +57,7 @@ export const CinematicHero = ({ event }: { event: EventData }) => {
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
                     <button
                         onClick={handleReserveSeat}
-                        className="bg-white text-black h-12 px-8 rounded-sm font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-gray-100 flex items-center justify-center gap-2"
+                        className="bg-white text-black h-12 px-8 rounded-sm font-medium text-sm uppercase tracking-wider transition-all duration-300 hover:bg-ui-background flex items-center justify-center gap-2"
                     >
                         <span>Rezervasyon Yap</span>
                     </button>

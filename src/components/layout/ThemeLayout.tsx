@@ -14,7 +14,7 @@ export const ThemeLayout: React.FC<ThemeLayoutProps> = ({
 }) => {
     return (
         <div className={cn(
-            "min-h-screen transition-colors duration-300",
+            "min-h-screen transition-colors duration-slow ease-motion-default",
             variant === 'dark' ? "bg-ui-background text-text-primary" : "bg-ui-surface text-text-primary",
             className
         )}>

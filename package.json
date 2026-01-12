@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "prepare": "husky install",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
@@ -67,6 +68,8 @@
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.19.0",
     "vite": "^6.2.0",
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11"
   }
 }

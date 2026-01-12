@@ -40,6 +40,7 @@ export default {
         // UI - from design tokens
         'label': ['0.875rem', { lineHeight: '1.4', fontWeight: '500' }],
         'caption': ['0.75rem', { lineHeight: '1.4' }],
+        '2xs': ['0.625rem', { lineHeight: '1.4' }], // 10px - For very small text
       },
       colors: {
         // Semantic brand colors - from design tokens
@@ -116,6 +117,26 @@ export default {
         '2xl': tokens.borderRadius['2xl'],
         '3xl': tokens.borderRadius['3xl'],
         'full': tokens.borderRadius.full,
+      },
+      zIndex: {
+        // Semantic z-index tokens - from design system
+        dropdown: 1000,
+        sticky: 1020,
+        overlay: 1040,
+        modal: 1050,
+        toast: 1100,
+        tooltip: 1200,
+      },
+      transitionDuration: {
+        // Motion duration tokens - from design tokens
+        fast: tokens.motion.duration.fast,
+        normal: tokens.motion.duration.normal,
+        slow: tokens.motion.duration.slow,
+      },
+      transitionTimingFunction: {
+        // Motion easing tokens - from design tokens
+        'motion-default': tokens.motion.easing.default,
+        'motion-bounce': tokens.motion.easing.bounce,
       },
     },
   },

@@ -71,10 +71,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Başvuru Onayı</h2>
+          <h2 className="text-xl font-bold text-text-primary">Başvuru Onayı</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-text-muted hover:text-text-secondary transition-colors"
             disabled={joinMutation.isPending}
           >
             <X className="w-6 h-6" />
@@ -115,7 +115,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
               disabled={joinMutation.isPending}
             />
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-text-primary">
               <strong>KVKK Aydınlatma Metni</strong>'ni okudum ve kabul ediyorum.
             </span>
           </label>
@@ -129,7 +129,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
               disabled={joinMutation.isPending}
             />
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-text-primary">
               <strong>Mesafeli Satış Sözleşmesi</strong>'ni okudum ve{' '}
               <strong>{eventPrice.toLocaleString('tr-TR')} ₺</strong> tutarındaki ödemeyi onaylıyorum.
             </span>
@@ -149,7 +149,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={joinMutation.isPending}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 border border-ui-border rounded-lg text-text-primary hover:bg-ui-background transition-colors disabled:opacity-50"
             >
               Vazgeç
             </button>

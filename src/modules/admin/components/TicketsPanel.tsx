@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CalendarCheck, Users, Ticket } from 'lucide-react';
 import { BookingsTable } from './BookingsTable';
 import { TicketPoolManager } from './TicketPoolManager';
 import { getActiveEvent } from '@/modules/event';
@@ -15,8 +16,8 @@ export const TicketsPanel: React.FC = () => {
     if (!activeEvent) {
         return (
             <div className="flex flex-col items-center justify-center p-12 text-text-muted bg-ui-surface rounded-2xl border border-ui-border-subtle shadow-subtle">
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-text-muted text-2xl">event_available</span>
+                <div className="w-12 h-12 bg-ui-background rounded-full flex items-center justify-center mb-4">
+                    <CalendarCheck className="w-8 h-8 text-text-muted" />
                 </div>
                 <h3 className="text-lg font-medium text-text-primary mb-1">Aktif Etkinlik Yok</h3>
                 <p className="text-sm text-text-muted">İşlem yapmak için lütfen önce bir etkinlik oluşturun veya seçin.</p>
@@ -36,7 +37,7 @@ export const TicketsPanel: React.FC = () => {
                             : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                    <span className="material-symbols-outlined text-[18px]">group</span>
+                    <Users className="w-4 h-4" />
                     <span>Başvurular</span>
                     {view === 'bookings' && (
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-primary rounded-t-full" />
@@ -50,7 +51,7 @@ export const TicketsPanel: React.FC = () => {
                             : 'text-text-muted hover:text-text-primary'
                     }`}
                 >
-                    <span className="material-symbols-outlined text-[18px]">confirmation_number</span>
+                    <Ticket className="w-4 h-4" />
                     <span>Bilet Havuzu</span>
                     {view === 'pool' && (
                         <div className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-primary rounded-t-full" />

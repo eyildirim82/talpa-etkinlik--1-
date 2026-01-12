@@ -126,11 +126,11 @@ export const MemberImport: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-ui-border">
                 <h3 className="text-lg font-semibold mb-4">Üye Excel İçe Aktarma</h3>
 
                 {/* Upload Area */}
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                <div className="border-2 border-dashed border-ui-border rounded-lg p-8 text-center">
                     <FileSpreadsheet className="w-12 h-12 text-green-600 mx-auto mb-4" />
                     <label className="cursor-pointer">
                         <input
@@ -144,7 +144,7 @@ export const MemberImport: React.FC = () => {
                             Excel Dosyası Seç
                         </span>
                     </label>
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-sm text-text-muted mt-2">
                         .xlsx veya .xls dosyaları. Kolonlar: tckn, sicil_no, email, full_name
                     </p>
                 </div>
@@ -161,11 +161,11 @@ export const MemberImport: React.FC = () => {
                 {data.length > 0 && (
                     <div className="mt-8">
                         <div className="flex justify-between items-center mb-4">
-                            <h4 className="font-medium text-gray-700">Bulunan Kayıtlar ({data.length})</h4>
+                            <h4 className="font-medium text-text-primary">Bulunan Kayıtlar ({data.length})</h4>
                             <button
                                 onClick={handleImport}
                                 disabled={importing || data.every(d => d.status !== 'PENDING')}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400"
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-text-disabled"
                             >
                                 {importing ? 'İşleniyor...' : 'İçe Aktarmayı Başlat'}
                             </button>
@@ -173,7 +173,7 @@ export const MemberImport: React.FC = () => {
 
                         <div className="border rounded-lg overflow-hidden max-h-96 overflow-y-auto">
                             <table className="w-full text-sm">
-                                <thead className="bg-gray-50 sticky top-0">
+                                <thead className="bg-ui-background sticky top-0">
                                     <tr>
                                         <th className="px-4 py-2 text-left">Ad Soyad</th>
                                         <th className="px-4 py-2 text-left">E-posta</th>
@@ -190,7 +190,7 @@ export const MemberImport: React.FC = () => {
                                             <td className="px-4 py-2">{row.tckn}</td>
                                             <td className="px-4 py-2">{row.sicil_no}</td>
                                             <td className="px-4 py-2">
-                                                {row.status === 'PENDING' && <span className="text-gray-500">Bekliyor</span>}
+                                                {row.status === 'PENDING' && <span className="text-text-muted">Bekliyor</span>}
                                                 {row.status === 'SUCCESS' && <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> {row.message}</span>}
                                                 {row.status === 'ERROR' && <span className="text-red-600 flex items-center gap-1" title={row.message}><AlertCircle size={14} /> Hata</span>}
                                             </td>

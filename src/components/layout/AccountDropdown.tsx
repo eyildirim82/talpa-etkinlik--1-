@@ -52,7 +52,7 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
             {user ? (
                 /* Logged In - Account Menu */
                 <>
-                    <div className="px-4 py-3 border-b border-gray-100 bg-ui-background">
+                    <div className="px-4 py-3 border-b border-ui-border-subtle bg-ui-background">
                         <div className="text-text-primary text-body-sm font-semibold">
                             {user.full_name}
                         </div>
@@ -81,7 +81,7 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
                                 ⚙️ Admin
                             </button>
                         )}
-                        <div className="h-px bg-gray-100 my-2" />
+                        <div className="h-px bg-ui-border-subtle my-2" />
                         <button
                             onClick={async () => {
                                 onClose();
