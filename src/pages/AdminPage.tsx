@@ -79,7 +79,7 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
             <div className="min-h-screen bg-gradient-admin flex items-center justify-center font-sans">
                 <div className="text-center">
                     <Loader2 className="w-12 h-12 text-brand-primary animate-spin mx-auto" />
-                    <p className="mt-6 text-text-inverse-muted text-sm uppercase tracking-wider">
+                    <p className="mt-6 text-text-inverse-muted text-caption uppercase tracking-wider">
                         Yükleniyor...
                     </p>
                 </div>
@@ -96,15 +96,15 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
                     <div className="w-20 h-20 rounded-2xl bg-state-warning/10 flex items-center justify-center mx-auto mb-6">
                         <Lock className="w-10 h-10 text-state-warning" />
                     </div>
-                    <h1 className="text-2xl font-bold text-text-inverse mb-3">
+                    <h1 className="text-h2 font-bold text-text-inverse mb-3">
                         Giriş Gerekli
                     </h1>
-                    <p className="text-text-inverse-muted mb-8 text-sm leading-relaxed">
+                    <p className="text-text-inverse-muted mb-8 text-body-sm leading-relaxed">
                         Admin paneline erişmek için giriş yapmanız gerekmektedir.
                     </p>
                     <button
                         onClick={onBack}
-                        className="w-full py-4 bg-gradient-gold rounded-xl text-ui-background-dark text-sm font-semibold cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-gold-glow"
+                        className="w-full py-4 bg-gradient-gold rounded-xl text-ui-background-dark text-body-sm font-semibold cursor-pointer transition-all duration-normal ease-motion-default hover:-translate-y-0.5 hover:shadow-gold-glow"
                     >
                         Ana Sayfaya Dön
                     </button>
@@ -121,15 +121,15 @@ const AdminContent: React.FC<AdminPageProps> = ({ onBack }) => {
                     <div className="w-20 h-20 rounded-2xl bg-state-error/10 flex items-center justify-center mx-auto mb-6">
                         <ShieldX className="w-10 h-10 text-state-error" />
                     </div>
-                    <h1 className="text-2xl font-bold text-text-inverse mb-3">
+                    <h1 className="text-h2 font-bold text-text-inverse mb-3">
                         Erişim Engellendi
                     </h1>
-                    <p className="text-text-inverse-muted mb-8 text-sm leading-relaxed">
+                    <p className="text-text-inverse-muted mb-8 text-body-sm leading-relaxed">
                         Bu sayfaya erişmek için admin yetkisine sahip olmanız gerekmektedir.
                     </p>
                     <button
                         onClick={onBack}
-                        className="w-full py-4 bg-transparent border border-brand-gold/30 rounded-xl text-brand-gold text-sm font-semibold cursor-pointer transition-all duration-200 hover:bg-brand-gold/10 hover:border-brand-gold"
+                        className="w-full py-4 bg-transparent border border-brand-gold/30 rounded-xl text-brand-gold text-body-sm font-semibold cursor-pointer transition-all duration-normal ease-motion-default hover:bg-brand-gold/10 hover:border-brand-gold"
                     >
                         Ana Sayfaya Dön
                     </button>

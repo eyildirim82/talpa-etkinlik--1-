@@ -19,8 +19,8 @@ export const TicketsPanel: React.FC = () => {
                 <div className="w-12 h-12 bg-ui-background rounded-full flex items-center justify-center mb-4">
                     <CalendarCheck className="w-8 h-8 text-text-muted" />
                 </div>
-                <h3 className="text-lg font-medium text-text-primary mb-1">Aktif Etkinlik Yok</h3>
-                <p className="text-sm text-text-muted">İşlem yapmak için lütfen önce bir etkinlik oluşturun veya seçin.</p>
+                <h3 className="text-h3 font-medium text-text-primary mb-1">Aktif Etkinlik Yok</h3>
+                <p className="text-body-sm text-text-muted">İşlem yapmak için lütfen önce bir etkinlik oluşturun veya seçin.</p>
             </div>
         );
     }
@@ -31,7 +31,7 @@ export const TicketsPanel: React.FC = () => {
             <div className="flex items-center gap-6 border-b border-ui-border-subtle">
                 <button
                     onClick={() => setView('bookings')}
-                    className={`pb-3 px-1 text-sm font-medium transition-all relative whitespace-nowrap flex items-center gap-2 ${
+                    className={`pb-3 px-1 text-body-sm font-medium transition-all duration-normal ease-motion-default relative whitespace-nowrap flex items-center gap-2 ${
                         view === 'bookings'
                             ? 'text-brand-primary'
                             : 'text-text-muted hover:text-text-primary'
@@ -45,7 +45,7 @@ export const TicketsPanel: React.FC = () => {
                 </button>
                 <button
                     onClick={() => setView('pool')}
-                    className={`pb-3 px-1 text-sm font-medium transition-all relative whitespace-nowrap flex items-center gap-2 ${
+                    className={`pb-3 px-1 text-body-sm font-medium transition-all duration-normal ease-motion-default relative whitespace-nowrap flex items-center gap-2 ${
                         view === 'pool'
                             ? 'text-brand-primary'
                             : 'text-text-muted hover:text-text-primary'
