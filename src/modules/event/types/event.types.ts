@@ -3,6 +3,15 @@
  */
 import type { Database } from '@/shared/infrastructure/supabase/types'
 
+// Event Status Enum (matches database enum)
+export type EventStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED'
+
+export const EventStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
 export type Event = Database['public']['Tables']['events']['Row']
 export type EventInsert = Database['public']['Tables']['events']['Insert']
 export type EventUpdate = Database['public']['Tables']['events']['Update']

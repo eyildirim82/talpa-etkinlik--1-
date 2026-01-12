@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createBrowserClient } from '@/shared/infrastructure/supabase';
 import { Lock, Mail, AlertCircle, ArrowRight } from 'lucide-react';
+import { Input } from '@/shared/components/ui/Input';
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -38,10 +39,10 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-md rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div className="min-h-screen bg-ui-background flex items-center justify-center p-4">
+            <div className="bg-ui-surface w-full max-w-md rounded-xl shadow-lg border border-ui-border overflow-hidden">
                 {/* Header */}
-                <div className="bg-talpa-primary px-8 py-6 text-center">
+                <div className="bg-brand-accent px-8 py-6 text-center">
                     <div className="flex justify-center mb-3">
                         <div className="p-3 bg-white/10 rounded-full text-white">
                             <Lock className="w-8 h-8" />
@@ -54,51 +55,37 @@ const Login: React.FC = () => {
                 {/* Form */}
                 <div className="p-8">
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-lg flex items-start gap-3 text-red-600 text-sm">
+                        <div className="mb-6 p-4 bg-state-error-bg border border-state-error-border rounded-lg flex items-start gap-3 text-state-error-text text-sm">
                             <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                             <span>{error}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleLogin} className="space-y-5">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">E-posta Adresi</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                    <Mail className="w-5 h-5" />
-                                </div>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-talpa-primary/20 focus:border-talpa-primary transition-colors text-sm"
-                                    placeholder="ornek@talpa.org"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            type="email"
+                            label="E-posta Adresi"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="ornek@talpa.org"
+                            leftIcon={<Mail />}
+                        />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1.5">Şifre</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                    <Lock className="w-5 h-5" />
-                                </div>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-talpa-primary/20 focus:border-talpa-primary transition-colors text-sm"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                        </div>
+                        <Input
+                            type="password"
+                            label="Şifre"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            leftIcon={<Lock />}
+                        />
 
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex items-center justify-center gap-2 bg-talpa-primary hover:bg-talpa-accent text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform active:scale-[0.98]"
+                            className="w-full flex items-center justify-center gap-2 bg-brand-accent hover:bg-brand-accent/90 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform active:scale-[0.98]"
                         >
                             {loading ? (
                                 <>
@@ -115,7 +102,7 @@ const Login: React.FC = () => {
                     </form>
 
                     <div className="mt-6 text-center">
-                        <a href="#" className="text-sm text-talpa-secondary hover:text-talpa-primary transition-colors underline decoration-dotted">
+                        <a href="#" className="text-sm text-text-secondary hover:text-brand-accent transition-colors underline decoration-dotted">
                             Şifremi Unuttum
                         </a>
                     </div>

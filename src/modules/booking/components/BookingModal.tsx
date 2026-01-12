@@ -2,27 +2,28 @@ import React, { useState } from 'react'
 import { X, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useJoinEvent } from '../hooks/useBooking'
 import type { QueueStatus } from '../types/booking.types'
-import { useProfile } from '@/modules/profile'
 
 interface BookingModalProps {
   eventId: number
   eventPrice: number
   onClose: () => void
   onSuccess: (queue: QueueStatus) => void
+  user: any // Accepting user as prop to avoid context dependency issues
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
   eventId,
   eventPrice,
   onClose,
-  onSuccess
+  onSuccess,
+  user
 }) => {
   const [consentKvkk, setConsentKvkk] = useState(false)
   const [consentPayment, setConsentPayment] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const { user } = useProfile()
-  
-  const joinEventMutation = useJoinEvent()
+
+  // Use the new server-action-based mutation
+  const joinMutation = useJoinEvent()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,32 +40,42 @@ export const BookingModal: React.FC<BookingModalProps> = ({
       return
     }
 
-    const result = await joinEventMutation.mutateAsync({
-      eventId,
-      consentKvkk,
-      consentPayment
-    })
+    try {
+      // Pass arguments in object format as expected by new mutation
+      const result = await joinMutation.mutateAsync({
+        eventId,
+        consentKvkk,
+        consentPayment
+      })
 
-    if (result.success && result.queue) {
-      onSuccess(result.queue)
-      onClose()
-    } else {
-      setErrorMsg(result.message)
+      // The mutation wrapper returns the server action result directly
+      if (result.success && result.queue) {
+        onSuccess(result.queue as QueueStatus)
+        onClose()
+      } else if (result.success) {
+        // Fallback if queue is not present but success is true
+        onSuccess('ASIL')
+        onClose()
+      } else {
+        setErrorMsg(result.message || 'İşlem başarısız.')
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Bir hata oluştu.')
     }
   }
 
-  const canSubmit = consentKvkk && consentPayment && !joinEventMutation.isPending
+  const canSubmit = consentKvkk && consentPayment && !joinMutation.isPending
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-900">Başvuru Onayı</h2>
+          <h2 className="text-xl font-bold text-text-primary">Başvuru Onayı</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            disabled={joinEventMutation.isPending}
+            className="text-text-muted hover:text-text-secondary transition-colors"
+            disabled={joinMutation.isPending}
           >
             <X className="w-6 h-6" />
           </button>
@@ -101,10 +112,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               type="checkbox"
               checked={consentKvkk}
               onChange={(e) => setConsentKvkk(e.target.checked)}
-              className="mt-1 w-5 h-5 text-talpa-primary border-gray-300 rounded focus:ring-talpa-primary"
-              disabled={joinEventMutation.isPending}
+              className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
+              disabled={joinMutation.isPending}
             />
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-text-primary">
               <strong>KVKK Aydınlatma Metni</strong>'ni okudum ve kabul ediyorum.
             </span>
           </label>
@@ -115,10 +126,10 @@ export const BookingModal: React.FC<BookingModalProps> = ({
               type="checkbox"
               checked={consentPayment}
               onChange={(e) => setConsentPayment(e.target.checked)}
-              className="mt-1 w-5 h-5 text-talpa-primary border-gray-300 rounded focus:ring-talpa-primary"
-              disabled={joinEventMutation.isPending}
+              className="mt-1 w-5 h-5 text-brand-accent border-ui-border rounded focus:ring-brand-accent"
+              disabled={joinMutation.isPending}
             />
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-text-primary">
               <strong>Mesafeli Satış Sözleşmesi</strong>'ni okudum ve{' '}
               <strong>{eventPrice.toLocaleString('tr-TR')} ₺</strong> tutarındaki ödemeyi onaylıyorum.
             </span>
@@ -137,17 +148,17 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              disabled={joinEventMutation.isPending}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              disabled={joinMutation.isPending}
+              className="flex-1 px-4 py-2 border border-ui-border rounded-lg text-text-primary hover:bg-ui-background transition-colors disabled:opacity-50"
             >
               Vazgeç
             </button>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="flex-1 px-4 py-2 bg-talpa-primary text-white rounded-lg font-semibold hover:bg-talpa-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-brand-accent text-white rounded-lg font-semibold hover:bg-brand-accent/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {joinEventMutation.isPending ? (
+              {joinMutation.isPending ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white animate-spin rounded-full" />
                   İşleniyor...
@@ -165,4 +176,3 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     </div>
   )
 }
-

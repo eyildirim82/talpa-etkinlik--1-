@@ -25,8 +25,8 @@ try {
         }
     });
 
-    const url = envVars.VITE_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL;
-    const key = envVars.VITE_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const url = envVars.VITE_SUPABASE_URL;
+    const key = envVars.VITE_SUPABASE_ANON_KEY;
 
     if (!url || !key) {
         console.error('Error: Supabase URL/Key not found in .env.local');

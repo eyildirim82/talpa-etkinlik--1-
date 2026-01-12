@@ -1,0 +1,207 @@
+/**
+ * MemberImport Component
+ * Excel-based member import UI for admin panel
+ * 
+ * Uses domain module services:
+ * - profile: parseExcelMembers, validateMemberData, importMembers
+ */
+import React, { useState } from 'react';
+import { AlertCircle, CheckCircle, FileSpreadsheet } from 'lucide-react';
+import { logger } from '@/shared/utils/logger';
+// Domain module imports - using public APIs only
+import {
+    parseExcelMembers,
+    validateMemberData,
+    importMembers,
+    type MemberImportData,
+    type MemberImportResult
+} from '@/modules/profile';
+
+interface MemberDisplayData extends MemberImportData {
+    status: 'PENDING' | 'SUCCESS' | 'ERROR';
+    message?: string;
+}
+
+export const MemberImport: React.FC = () => {
+    const [file, setFile] = useState<File | null>(null);
+    const [data, setData] = useState<MemberDisplayData[]>([]);
+    const [importing, setImporting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const selectedFile = e.target.files?.[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            handleParse(selectedFile);
+        }
+    };
+
+    const handleParse = async (file: File) => {
+        try {
+            setError(null);
+            
+            // Use profile module's Excel parsing service
+            const parsedData = await parseExcelMembers(file);
+            
+            // Validate data
+            const validation = validateMemberData(parsedData);
+            
+            if (!validation.valid) {
+                setError(validation.errors.join('\n'));
+                setData([]);
+                return;
+            }
+
+            // Convert to display format
+            const displayData: MemberDisplayData[] = parsedData.map(item => ({
+                ...item,
+                status: 'PENDING' as const
+            }));
+
+            setData(displayData);
+
+        } catch (err) {
+            logger.error('MemberImport parse error:', err);
+            setError(err instanceof Error ? err.message : 'Dosya okunurken hata oluştu.');
+            setData([]);
+        }
+    };
+
+    const handleImport = async () => {
+        if (!data.length) return;
+
+        setImporting(true);
+        setError(null);
+
+        try {
+            // Convert display data to import format
+            const importData: MemberImportData[] = data.map(d => ({
+                tckn: d.tckn,
+                sicil_no: d.sicil_no,
+                email: d.email,
+                full_name: d.full_name
+            }));
+
+            // Use profile module's import service
+            const result = await importMembers(importData);
+
+            if (!result.success && result.error) {
+                setError(result.error);
+                return;
+            }
+
+            // Update UI with results
+            const updatedData = [...data];
+
+            result.results.forEach((res: MemberImportResult) => {
+                const index = updatedData.findIndex(d => d.email === res.email);
+                if (index !== -1) {
+                    if (res.status === 'success' || res.status === 'exists') {
+                        updatedData[index] = { 
+                            ...updatedData[index], 
+                            status: 'SUCCESS', 
+                            message: res.status === 'exists' ? 'Kullanıcı zaten mevcut.' : 'Kullanıcı oluşturuldu.' 
+                        };
+                    } else {
+                        updatedData[index] = { 
+                            ...updatedData[index], 
+                            status: 'ERROR', 
+                            message: res.message || 'Hata oluştu.' 
+                        };
+                    }
+                }
+            });
+
+            setData(updatedData);
+
+            alert(`İşlem tamamlandı. ${result.successCount} kullanıcı işlendi, ${result.errorCount} hata.`);
+
+        } catch (err: any) {
+            logger.error('MemberImport import error:', err);
+            setError('İçe aktarma sırasında sunucu hatası: ' + err.message);
+        } finally {
+            setImporting(false);
+        }
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-ui-border">
+                <h3 className="text-lg font-semibold mb-4">Üye Excel İçe Aktarma</h3>
+
+                {/* Upload Area */}
+                <div className="border-2 border-dashed border-ui-border rounded-lg p-8 text-center">
+                    <FileSpreadsheet className="w-12 h-12 text-green-600 mx-auto mb-4" />
+                    <label className="cursor-pointer">
+                        <input
+                            type="file"
+                            accept=".xlsx, .xls"
+                            onChange={handleFileChange}
+                            disabled={importing}
+                            className="hidden"
+                        />
+                        <span className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors inline-block">
+                            Excel Dosyası Seç
+                        </span>
+                    </label>
+                    <p className="text-sm text-text-muted mt-2">
+                        .xlsx veya .xls dosyaları. Kolonlar: tckn, sicil_no, email, full_name
+                    </p>
+                </div>
+
+                {/* Error Message */}
+                {error && (
+                    <div className="mt-4 p-4 bg-red-50 text-red-700 rounded flex items-start gap-2">
+                        <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                        <pre className="whitespace-pre-wrap text-sm">{error}</pre>
+                    </div>
+                )}
+
+                {/* Data Preview / Status */}
+                {data.length > 0 && (
+                    <div className="mt-8">
+                        <div className="flex justify-between items-center mb-4">
+                            <h4 className="font-medium text-text-primary">Bulunan Kayıtlar ({data.length})</h4>
+                            <button
+                                onClick={handleImport}
+                                disabled={importing || data.every(d => d.status !== 'PENDING')}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-text-disabled"
+                            >
+                                {importing ? 'İşleniyor...' : 'İçe Aktarmayı Başlat'}
+                            </button>
+                        </div>
+
+                        <div className="border rounded-lg overflow-hidden max-h-96 overflow-y-auto">
+                            <table className="w-full text-sm">
+                                <thead className="bg-ui-background sticky top-0">
+                                    <tr>
+                                        <th className="px-4 py-2 text-left">Ad Soyad</th>
+                                        <th className="px-4 py-2 text-left">E-posta</th>
+                                        <th className="px-4 py-2 text-left">TCKN</th>
+                                        <th className="px-4 py-2 text-left">Sicil No</th>
+                                        <th className="px-4 py-2 text-left">Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100">
+                                    {data.map((row, idx) => (
+                                        <tr key={idx} className={row.status === 'ERROR' ? 'bg-red-50' : row.status === 'SUCCESS' ? 'bg-green-50' : ''}>
+                                            <td className="px-4 py-2">{row.full_name}</td>
+                                            <td className="px-4 py-2">{row.email}</td>
+                                            <td className="px-4 py-2">{row.tckn}</td>
+                                            <td className="px-4 py-2">{row.sicil_no}</td>
+                                            <td className="px-4 py-2">
+                                                {row.status === 'PENDING' && <span className="text-text-muted">Bekliyor</span>}
+                                                {row.status === 'SUCCESS' && <span className="text-green-600 flex items-center gap-1"><CheckCircle size={14} /> {row.message}</span>}
+                                                {row.status === 'ERROR' && <span className="text-red-600 flex items-center gap-1" title={row.message}><AlertCircle size={14} /> Hata</span>}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};

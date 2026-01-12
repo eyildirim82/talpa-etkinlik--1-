@@ -16,13 +16,8 @@ describe('createClient', () => {
   })
 
   it('should create a browser client with correct configuration', () => {
-    // Mock environment variables
-    const originalEnv = import.meta.env
-    // @ts-ignore
-    import.meta.env = {
-      VITE_SUPABASE_URL: 'https://test.supabase.co',
-      VITE_SUPABASE_ANON_KEY: 'test-anon-key',
-    }
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key')
 
     const client = createClient()
 
@@ -37,27 +32,15 @@ describe('createClient', () => {
       },
     })
 
-    // Restore
-    // @ts-ignore
-    import.meta.env = originalEnv
+    vi.unstubAllEnvs()
   })
 
-  it('should fallback to NEXT_PUBLIC_ prefix if VITE_ not available', () => {
-    const originalEnv = import.meta.env
-    // @ts-ignore
-    import.meta.env = {
-      NEXT_PUBLIC_SUPABASE_URL: 'https://fallback.supabase.co',
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: 'fallback-key',
-    }
+  it('should throw error if VITE_ env vars are missing', () => {
+    vi.unstubAllEnvs()
+    delete import.meta.env.VITE_SUPABASE_URL
+    delete import.meta.env.VITE_SUPABASE_ANON_KEY
 
-    const client = createClient()
-
-    expect(client.url).toBe('https://fallback.supabase.co')
-    expect(client.key).toBe('fallback-key')
-
-    // Restore
-    // @ts-ignore
-    import.meta.env = originalEnv
+    expect(() => createClient()).toThrow('VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables are required')
   })
 })
 

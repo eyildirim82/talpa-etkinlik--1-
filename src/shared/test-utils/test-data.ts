@@ -1,8 +1,8 @@
 import type { User } from '@supabase/supabase-js'
-import type { Profile } from '@/modules/profile/types/profile.types'
-import type { Event, ActiveEvent } from '@/modules/event/types/event.types'
-import type { Booking } from '@/modules/booking/types/booking.types'
-import type { AdminEvent, AdminUser, AdminTicket } from '@/modules/admin/types/admin.types'
+import type { Profile } from '@/modules/profile'
+import type { Event, ActiveEvent } from '@/modules/event'
+import type { Booking } from '@/modules/booking'
+import type { AdminEvent, AdminUser, AdminTicket } from '@/modules/admin'
 
 /**
  * Test Data Factory Functions

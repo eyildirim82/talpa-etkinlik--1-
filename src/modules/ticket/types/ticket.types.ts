@@ -20,3 +20,18 @@ export interface TicketStats {
   unassigned: number
 }
 
+/**
+ * Admin Ticket type for admin dashboard display
+ */
+export interface AdminTicket {
+  id: string
+  event_id: string
+  user_id: string
+  qr_code: string
+  status: 'pending' | 'paid' | 'cancelled'
+  purchase_date: string
+  seat_number: string | null
+  gate: string | null
+  event_title?: string
+  user_name?: string
+}

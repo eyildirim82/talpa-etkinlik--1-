@@ -12,6 +12,17 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/shared/test-utils/setup.ts'],
+    include: ['**/*.{test,spec}.{ts,tsx}'],
+    exclude: [
+      'node_modules',
+      'dist',
+      '.idea',
+      '.vscode',
+      '.cursor',
+      '**/masaüstü/**',
+      '**/OneDrive/**',
+      '**/.antigravity/**',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

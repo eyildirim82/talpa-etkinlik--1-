@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
-import { uploadTicketPool } from '@/src/api/storage';
-import { getTicketStats, getTicketPool } from '@/modules/ticket/api/ticket.api';
-import type { TicketStats, TicketPool } from '@/modules/ticket/types/ticket.types';
+import { logger } from '@/shared/utils/logger';
+import { uploadTicketPool } from '@/modules/file-processing';
+import { getTicketStats, getTicketPool } from '@/modules/ticket';
+import type { TicketStats, TicketPool } from '@/modules/ticket';
 
 interface TicketPoolManagerProps {
     eventId: number;
@@ -26,7 +27,7 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
             setStats(statsData);
             setPool(poolData.data);
         } catch (err) {
-            console.error(err);
+            logger.error('TicketPoolManager error:', err);
             setMessage({ type: 'error', text: 'Veriler yüklenirken hata oluştu.' });
         } finally {
             setLoading(false);
@@ -120,7 +121,7 @@ export const TicketPoolManager: React.FC<TicketPoolManagerProps> = ({ eventId })
                         <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-blue-600 transition-all duration-300"
-                                style={{ width: `${uploadProgress ? (uploadProgress.current / uploadProgress.total) * 100 : 0}%` }}
+                                style={{ width: `${uploadProgress ? (uploadProgress.current / uploadProgress.total) * 100 : 0}%` } as React.CSSProperties}
                             />
                         </div>
                         <p className="text-xs text-slate-400 mt-2">

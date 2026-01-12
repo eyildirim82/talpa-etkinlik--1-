@@ -30,46 +30,37 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isFeatured = false 
 
     return (
         <div
-            className="event-card"
-            style={isFeatured ? {
-                border: '2px solid var(--talpa-pink)'
-            } : {}}
+            className={`bg-white rounded-lg shadow-md overflow-hidden transition-all ${
+                isFeatured ? 'border-2 border-brand-pink p-0' : 'border border-ui-border'
+            }`}
         >
             <img
                 src={event.image_url || ''}
                 alt={event.title}
                 loading="lazy"
+                className="w-full h-48 object-cover"
             />
-            <div className="event-card-content" style={isFeatured ? { padding: '2rem' } : {}}>
-                <h3 className="event-card-title" style={isFeatured ? { fontSize: '1.5rem', marginBottom: '1rem' } : {}}>
+            <div className={isFeatured ? 'p-8' : 'p-4'}>
+                <h3 className={`font-bold text-text-primary ${isFeatured ? 'text-2xl mb-4' : 'text-xl mb-2'}`}>
                     {event.title}
                 </h3>
                 {isFeatured && (
-                    <p style={{
-                        color: 'var(--talpa-text-primary)',
-                        marginBottom: '1rem',
-                        lineHeight: '1.6'
-                    }}>
+                    <p className="text-text-primary mb-4 leading-relaxed">
                         {event.description}
                     </p>
                 )}
-                <p className="event-card-date">Tarih: {formatDate(event.event_date)}</p>
-                <p className="event-card-time">Saat: {formatTime(event.event_date)}</p>
+                <p className="text-sm text-text-muted mb-1">Tarih: {formatDate(event.event_date)}</p>
+                <p className="text-sm text-text-muted mb-2">Saat: {formatTime(event.event_date)}</p>
                 {isFeatured && (
-                    <p style={{ margin: '0.75rem 0', color: 'var(--talpa-text-primary)' }}>
+                    <p className="my-3 text-text-primary">
                         📍 {event.location}
                     </p>
                 )}
-                <p className="event-card-status text-danger" style={isFeatured ? { fontSize: '1.25rem', fontWeight: 'bold' } : {}}>
+                <p className={`font-bold ${isFeatured ? 'text-xl' : 'text-base'} ${isSoldOut ? 'text-state-error' : 'text-text-primary'}`}>
                     {isSoldOut ? 'BİLETLER TÜKENMİŞTİR.' : `${event.remaining_stock} / ${event.total_quota} KALAN`}
                 </p>
                 {isFeatured && !isSoldOut && (
-                    <p style={{
-                        marginTop: '1rem',
-                        fontSize: '1.5rem',
-                        fontWeight: 'bold',
-                        color: 'var(--talpa-purple)'
-                    }}>
+                    <p className="mt-4 text-2xl font-bold text-brand-purple">
                         {event.price.toLocaleString('tr-TR')} {event.currency}
                     </p>
                 )}

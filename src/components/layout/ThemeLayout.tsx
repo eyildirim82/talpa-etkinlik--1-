@@ -14,8 +14,8 @@ export const ThemeLayout: React.FC<ThemeLayoutProps> = ({
 }) => {
     return (
         <div className={cn(
-            "min-h-screen transition-colors duration-300",
-            variant === 'dark' ? "bg-talpa-bg text-talpa-primary" : "bg-white text-talpa-text-primary",
+            "min-h-screen transition-colors duration-slow ease-motion-default",
+            variant === 'dark' ? "bg-ui-background text-text-primary" : "bg-ui-surface text-text-primary",
             className
         )}>
             {children}

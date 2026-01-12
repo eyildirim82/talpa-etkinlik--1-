@@ -1,4 +1,5 @@
 import { createBrowserClient } from '@/shared/infrastructure/supabase'
+import { logger } from '@/shared/utils/logger'
 import type { NotificationType, NotificationPayload, NotificationResponse } from '../types/notification.types'
 
 /**
@@ -21,13 +22,13 @@ export async function sendNotification(
     })
 
     if (error) {
-      console.error('Send Email Error:', error)
+      logger.error('Send Email Error:', error)
       return { success: false, message: 'E-posta gönderilemedi.' }
     }
 
     return { success: true, message: 'E-posta başarıyla gönderildi.' }
   } catch (err) {
-    console.error('Unexpected Error:', err)
+    logger.error('Unexpected Error:', err)
     return { success: false, message: 'Beklenmeyen bir hata oluştu.' }
   }
 }

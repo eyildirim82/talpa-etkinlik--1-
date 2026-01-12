@@ -1,0 +1,10 @@
+# Architecture drift detection artifacts directory
+# 
+# This directory contains:
+# - baseline.json: Current architecture baseline
+# - history/: Historical baseline snapshots
+# - drift-reports/: Generated drift reports
+# - reports/: Metrics reports
+#
+# The baseline.json should be committed to track architecture state over time.
+# History and reports can be gitignored if desired.

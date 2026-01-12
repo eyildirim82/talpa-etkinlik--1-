@@ -12,145 +12,87 @@ describe('Environment Configuration', () => {
 
   describe('getSupabaseUrl', () => {
     it('should return VITE_SUPABASE_URL if available', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        VITE_SUPABASE_URL: 'https://vite.supabase.co',
-        NEXT_PUBLIC_SUPABASE_URL: 'https://next.supabase.co',
-      }
+      vi.stubEnv('VITE_SUPABASE_URL', 'https://vite.supabase.co')
 
       expect(getSupabaseUrl()).toBe('https://vite.supabase.co')
 
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      vi.unstubAllEnvs()
     })
 
-    it('should fallback to NEXT_PUBLIC_SUPABASE_URL', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        NEXT_PUBLIC_SUPABASE_URL: 'https://next.supabase.co',
-      }
+    it('should throw error if VITE_SUPABASE_URL is not set', () => {
+      vi.unstubAllEnvs()
+      delete import.meta.env.VITE_SUPABASE_URL
 
-      expect(getSupabaseUrl()).toBe('https://next.supabase.co')
-
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
-    })
-
-    it('should return empty string if no env var is set', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {}
-
-      expect(getSupabaseUrl()).toBe('')
-
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      expect(() => getSupabaseUrl()).toThrow('VITE_SUPABASE_URL environment variable is required')
     })
   })
 
   describe('getSupabaseAnonKey', () => {
     it('should return VITE_SUPABASE_ANON_KEY if available', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        VITE_SUPABASE_ANON_KEY: 'vite-key',
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: 'next-key',
-      }
+      vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'vite-key')
 
       expect(getSupabaseAnonKey()).toBe('vite-key')
 
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      vi.unstubAllEnvs()
     })
 
-    it('should fallback to NEXT_PUBLIC_SUPABASE_ANON_KEY', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: 'next-key',
-      }
+    it('should throw error if VITE_SUPABASE_ANON_KEY is not set', () => {
+      vi.unstubAllEnvs()
+      delete import.meta.env.VITE_SUPABASE_ANON_KEY
 
-      expect(getSupabaseAnonKey()).toBe('next-key')
-
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      expect(() => getSupabaseAnonKey()).toThrow('VITE_SUPABASE_ANON_KEY environment variable is required')
     })
   })
 
   describe('validateEnv', () => {
     it('should return valid: true when all env vars are set', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        VITE_SUPABASE_URL: 'https://test.supabase.co',
-        VITE_SUPABASE_ANON_KEY: 'test-key',
-      }
+      vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co')
+      vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-key')
 
       const result = validateEnv()
 
       expect(result.valid).toBe(true)
       expect(result.missing).toEqual([])
 
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      vi.unstubAllEnvs()
     })
 
     it('should return valid: false when SUPABASE_URL is missing', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        VITE_SUPABASE_ANON_KEY: 'test-key',
-      }
+      vi.unstubAllEnvs()
+      vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-key')
+      delete import.meta.env.VITE_SUPABASE_URL
 
       const result = validateEnv()
 
       expect(result.valid).toBe(false)
       expect(result.missing).toContain('SUPABASE_URL')
 
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      vi.unstubAllEnvs()
     })
 
     it('should return valid: false when SUPABASE_ANON_KEY is missing', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {
-        VITE_SUPABASE_URL: 'https://test.supabase.co',
-      }
+      vi.unstubAllEnvs()
+      vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co')
+      delete import.meta.env.VITE_SUPABASE_ANON_KEY
 
       const result = validateEnv()
 
       expect(result.valid).toBe(false)
       expect(result.missing).toContain('SUPABASE_ANON_KEY')
 
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
+      vi.unstubAllEnvs()
     })
 
     it('should return all missing vars when none are set', () => {
-      const originalEnv = import.meta.env
-      // @ts-ignore
-      import.meta.env = {}
+      vi.unstubAllEnvs()
+      delete import.meta.env.VITE_SUPABASE_URL
+      delete import.meta.env.VITE_SUPABASE_ANON_KEY
 
       const result = validateEnv()
 
       expect(result.valid).toBe(false)
       expect(result.missing).toContain('SUPABASE_URL')
       expect(result.missing).toContain('SUPABASE_ANON_KEY')
-
-      // Restore
-      // @ts-ignore
-      import.meta.env = originalEnv
     })
   })
 })
